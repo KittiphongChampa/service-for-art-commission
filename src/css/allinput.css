@@ -1,0 +1,64 @@
+input.defInput {
+    background: rgba(255, 255, 255, 0.54);
+    border: 1px solid #9D9EB8;
+    border-radius: 62.5px;
+    padding: 0.5rem 1rem;
+    width: 100%;
+
+}
+
+.onInput {
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+    color: #495C83;
+    font-weight: 700;
+}
+
+.verify-email {
+    height: fit-content;
+    width: 100%;
+    display: flex;
+}
+
+.verify-email .defInput {
+    border-right: none !important;
+    border-radius: 100px 0px 0px 100px !important;
+    flex: 1;
+}
+
+/* input:focus {
+    background-color: #f0f4ff;
+} */
+
+.verify-email button {
+    border: 1px solid #9D9EB8;
+    border-radius: 0px 100px 100px 0px;
+    background-color: transparent;
+    border-left: none;
+    word-wrap: unset;
+    font-weight: 700;
+    padding-inline: 20px;
+}
+
+.input-login-box {
+    width: 80%;
+}
+
+.txtarea {
+    word-break: break-all;
+    border-radius: 5px;
+    color: #000000;
+    display: block;
+    width: 100%;
+    resize: none;
+    line-height: 1.4;
+    overflow: hidden;
+    height: auto;
+    font-size: 18px;
+    border: 1px solid transparent;
+    background-color: transparent;
+}
+
+.validate-input {
+    word-wrap: break-word
+}

@@ -1,0 +1,466 @@
+
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React, { useState, useEffect } from "react";
+import * as Icon from 'react-feather';
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form"
+import Swal from 'sweetalert2/dist/sweetalert2.js'
+import * as alertData from '../../alertdata/alertData';
+import "../../css/indexx.css";
+import "../../css/allbutton.css";
+import "../../css/profileimg.css";
+import '../../css/main.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Helmet } from "react-helmet";
+import ProfileImg from "../../components/ProfileImg";
+import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../../components/Navbar";
+import ArtistBox from '../../components/ArtistBox'
+import CmsItem from "../../components/CmsItem";
+import { Modal, Button, Input, Select, Tabs} from 'antd';
+
+import ChangeProfileImgModal from "../../modal/ChangeProfileImgModal";
+import { ChangeCoverModal, openInputColor } from "../../modal/ChangeCoverModal"
+// import Button from "react-bootstrap/Button";
+
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { host } from "../../utils/api";
+
+const title = 'Profile';
+const bgImg = ""
+const body = { backgroundColor: "#F1F5F9" }
+
+
+export default function Profile() {
+    const navigate = useNavigate();
+    const { isLoggedIn, socket } = useAuth();
+    const token = localStorage.getItem("token");
+    const [userdata, setUserdata] = useState([]);
+
+    const [showCoverModal, setShowCoverModal] = useState(false)
+    const [showProfileModal, setShowProfileModal] = useState(false)
+
+    const [myFollowerData, setMyFollowerData] = useState([]);
+    const [IFollowerData, setIFollowerData] = useState([]);
+
+    const [myCommission, setMyCms] = useState([]);
+    const [myGallery, setMyGallery] = useState([]);
+    
+    // console.log('myFollower : ',myFollower, 'iFollowing : ', iFollowing);
+
+    useEffect(() => {
+        if (token) {
+            getUser();
+            getMyCms();
+            getMyGallery();
+        } else {
+            navigate("/login")
+        }
+    }, []);
+    // }, [myFollower,iFollowing]); //realtime follow
+
+    // useEffect(() => {},[])
+    // const [myFollower, setMyFollower] = useState([])
+    // console.log(myFollower);
+    
+    const getUser = async () => {
+        await axios
+          .get(`${host}/profile`, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          })
+          .then((response) => {
+            const data = response.data;
+            if (data.status === "ok") {
+                setUserdata(data.users[0]);
+                axios .get(`${host}/openFollowing?iFollowing=${data.IFollowingsIds}`).then((response) => {
+                    const data = response.data;
+                    setIFollowerData(data.ifollowing)
+                })
+                axios .get(`${host}/openFollower?myFollower=${data.MyFollowerIds}`).then((response) => {
+                    const data = response.data;
+                    setMyFollowerData(data.myfollower)
+                })
+                
+            } else if (data.status === "no_access") {
+                alert(data.message);
+                navigate('/admin');
+            } else {
+            //   toast.error("ไม่พบผู้ใช้งาน", toastOptions);
+            }
+          }).catch((error) => {
+            if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
+                alert("Token has expired. Please log in again.");
+                localStorage.removeItem("token");
+                navigate("/login");
+              } else {
+                console.error("Error:", error);
+              }
+          });
+    };
+
+    const getMyCms = async () => {
+        await axios.get(`${host}/myCommission`,{
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+            },
+        }).then((response) => {
+            const myCms = response.data;
+            setMyCms(myCms.commissions);
+        })
+    };
+
+    const getMyGallery = async () => {
+        await axios.get(`${host}/myGallery`,{
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+            },
+        }).then((response) => {
+            const data = response.data;
+            setMyGallery(data.myGallery);
+        })
+    }
+
+    function menuProfile(event, menu) {
+        setprofileMenuSelected(menu)
+        let oldSelected = document.querySelector('.sub-menu.selected')
+        oldSelected.classList.remove('selected')
+        event.target.classList.add('selected')
+        setprofileMenuSelected(menu)
+    }
+    
+    const openModal = (modal) => {
+        if (modal === "profile") {
+            const ProfileModal = <ChangeProfileImgModal profile={userdata.urs_profile_img} setShowProfileModal={setShowProfileModal} />
+            setShowProfileModal(ProfileModal)
+        } else {
+            const CoverModal = <ChangeCoverModal profile={userdata.urs_profile_img} setShowCoverModal={setShowCoverModal} />
+            setShowCoverModal(CoverModal)
+            // openInputColor()
+        }
+    }
+    const [profileMenuSelected, setprofileMenuSelected] = useState('cms')
+
+
+    const menus = [
+        {
+            key: '1',
+            label: "คอมมิชชัน",
+            children: <AllCms myCommission={myCommission} userID={userdata.id} />,
+        },
+        {
+            key: '2',
+            label: "แกลเลอรี",
+            children: <AllArtworks myGallery={myGallery}/>,
+        },
+        {
+            key: '3',
+            label: "รีวิว",
+            children: <AllReviews />,
+        },
+        {
+            key: '4',
+            label: "ผู้ติดตาม",
+            children: <Followers myFollowerData={myFollowerData}/>,
+        },
+        {
+            key: '5',
+            label: "กำลังติดตาม",
+            children: <Followings IFollowerData={IFollowerData}/>,
+        }
+    ];
+
+    function changeMenu() {
+    }
+
+    function openCoverModal() {
+        setShowCoverModal(!showCoverModal);
+    }
+    function openProfileModal() {
+        setShowProfileModal(!showProfileModal);
+    }
+
+    // const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         const colorInput = document.getElementById("color-input")
+    //         colorInput.click();
+    //     }, 300);
+
+    // }, [])
+
+    const submitChangeCoverForm = (data) => {
+        // const colorPicker = document.getElementById("color-input");
+        // const colorValue = colorPicker.value;
+        const formData = new FormData();
+        formData.append("cover_color", data.cover);
+        Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
+            if (result.isConfirmed) {
+                axios.patch(`${host}/cover_color/update`, formData, {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    }
+                }).then((response) => {
+                    if (response.data.status === "ok") {
+                        Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
+                            window.location.reload(false);
+                        })
+                    } else {
+                        Swal.fire({ ...alertData.changeCoverIsError })
+                    }
+                })
+            }
+        })
+    }
+
+    const { register, handleSubmit, setValue, formState: { errors, isSubmitting, isDirty, isValid }, reset } = useForm();
+
+    const [file, setFile] = useState("");
+    const [previewUrl, setPreviewUrl] = useState(userdata.urs_profile_img);
+
+    const handleFileChange = (event) => {
+        const image = event.target.files[0];
+        setFile(image);
+        setPreviewUrl(URL.createObjectURL(image));
+    };
+
+    const profileupdate_img = async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append("file", file);
+        await axios
+            .put(`${host}/profile_img/update`, formData, {
+                headers: {
+                    "Content-type": "multipart/form-data",
+                    Authorization: "Bearer " + token,
+                },
+            })
+            .then((response) => {
+                const data = response.data;
+                if (data.status === "ok") {
+                    Swal.fire({ ...alertData.changeProfileImgIsConfirmed }).then(() => {
+                        window.location.reload(false);
+                    });
+                    //   alert("Update Success");
+                    //   window.location = "/userprofile";
+                } else {
+                    //   toast.error(data.message, toastOptions);
+                    Swal.fire({ ...alertData.IsError }).then(() => {
+                        window.location.reload(false);
+                    });
+                }
+            });
+    };
+
+    return (
+        <div className="body-con">
+            <Helmet>
+                <title>{title}</title>
+            </Helmet>
+            {showCoverModal}
+            {showProfileModal}
+            {/* <Navbar /> */}
+            <NavbarUser/>
+            <div class="body-nopadding" style={body}>
+
+                <div className="cover-grid">
+                    <div className="cover" onClick={openCoverModal}>
+                        <div className="cover-color" style={{ backgroundColor: userdata.urs_cover_color }}></div>
+                        <div className="cover-hover"><p className="fs-5">เปลี่ยนสีปก</p></div>
+                    </div>
+                    <div className="container profile-page">
+                        <div className="user-profile-area">
+                            
+                                <div className="user-col-profile">
+                                    <ProfileImg src={userdata.urs_profile_img} type="show"
+                                        onPress={openProfileModal}
+                                    />
+                                    {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
+                                    <p className="username-profile fs-5">{userdata.urs_name}</p>
+                                    <p className="follower-profile">follower</p>
+                                    <div className="group-btn-area">
+                                        {/* <button className="message-btn"><Icon.MessageCircle /></button>
+                                        <button className="follow-btn">ติดตาม</button> */}
+                                        <a href="/setting-profile"><button className="follow-btn" >แก้ไขโปรไฟล์</button></a>
+                                    </div>
+                                    <p className="bio-profile">
+                                        {userdata.urs_bio}
+                                    </p>
+                                </div>
+                                <div className="user-col-about">
+                                   
+                                    <div className="user-about-content">
+                                        <div className="user-about-review mb-4"><p className="fs-3">4.0</p> <p>จาก 5 รีวิว</p></div>
+                                        <div className="user-about-text">
+                                            <div>
+                                                <p>ผู้ติดตาม {myFollowerData.length} </p>
+                                                <p>กำลังติดตาม {IFollowerData.length} </p>
+                                                <p>งานสำเร็จแล้ว 10 งาน</p>
+                                                <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p>
+                                                <p>ตอบกลับภายใน 1 ชั่วโมง</p>
+                                            </div>
+                                            <div>
+                                                <p>คอมมิชชัน เปิด</p>
+                                                <p>คิวว่าง 1 คิว</p>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                        </div>
+                        <div className="user-profile-contentCard">
+                            {/* <button className="sub-menu selected" onClick={(event) => menuProfile(event, 'all')}>ทั้งหมด</button> */}
+                            <div>
+                                <Tabs defaultActiveKey="1" items={menus} onChange={changeMenu} />
+                            </div>
+                            
+                            {/* <div className="user-profile-contentCard sub-menu-group">
+                                <Link className="sub-menu selected" onClick={(event) => menuProfile(event, 'cms')}>คอมมิชชัน</Link>
+                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'gallery')}>งานวาด</Link>
+                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'review')}>รีวิว</Link>
+                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'follower')}>ผู้ติดตาม</Link>
+                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'following')}>กำลังติดตาม</Link>
+                            </div> */}
+                            {/* {profileMenuSelected === "cms" ? <AllCms myCommission={myCommission} userID={userdata.id}/> : null}
+                            {profileMenuSelected === "gallery" ? <AllArtworks myGallery={myGallery} /> : null}
+                            {profileMenuSelected === "review" ? <AllReviews /> : null}
+                            {profileMenuSelected === "follower" ? <Followers myFollowerData={myFollowerData}/> : null}
+                            {profileMenuSelected === "following" ? <Followings IFollowerData={IFollowerData}/> : null} */}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <Modal title="เปลี่ยนสีปก" open={showCoverModal} onCancel={openCoverModal} footer="">
+                {/* <div className="form-area"> */}
+                <form onSubmit={handleSubmit(submitChangeCoverForm)}>
+                    {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนสีปก</h2> */}
+                    <div className="setting-img-box">
+                        <div className="setting-cover">
+                            <input {...register("cover")} type="color" id="color-input" style={{ cursor: "pointer" }} />
+                        </div>
+                        <ProfileImg src={userdata.urs_profile_img} type="only-show" />
+                        <div className="submit-color-btn-area" >
+                            <button className="submit-color-btn" type="submit">บันทึกข้อมูล</button>
+                        </div>
+
+                    </div>
+                    <div className="text-align-center">
+                        <button className="gradiant-btn" type="submit">บันทึก</button>
+                        <button className="cancle-btn" type="button" onClick={openCoverModal}>ยกเลิก</button>
+                    </div>
+                </form>
+
+                {/* </div> */}
+            </Modal>
+
+            <Modal title="เปลี่ยนภาพโปรไฟล์" open={showProfileModal} onCancel={openProfileModal} footer="">
+                {/* <div className="form-modal">
+                    <div className="form-area"> */}
+                <form onSubmit={profileupdate_img}>
+                    {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนภาพโปรไฟล์</h2> */}
+                    <ProfileImg type="only-show" src={previewUrl} basedProfile={userdata.urs_profile_img} />
+                    {/* <ProfileImg src={previewUrl} onPress={addProfileImg}/> */}
+                    <div class="input-group mb-1 mt-5">
+                        <input {...register("profileImg", { required: true })} accept="image/png, image/jpeg" onChange={handleFileChange}
+                            type="file" class="form-control" id="inputGroupFile02" />
+                        {/* <label class="input-group-text" for="inputGroupFile02">Upload</label> */}
+
+                    </div>
+                    <div className="text-align-right">
+                        {errors.profileImg && errors.profileImg.type === "required" && (<p class="validate-input"> กรุณาเลือกไฟล์ภาพ</p>)}
+                        {errors.profileImg && errors.profileImg.type === "accept" && (<p class="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>)}
+                    </div>
+                    <div className="text-align-center">
+                        <button className={`gradiant-btn`} type="submit" >บันทึก</button>
+                        <button className="cancle-btn" type="button" onClick={openProfileModal}>ยกเลิก</button>
+                    </div>
+                </form>
+                {/* </div>
+                </div> */}
+            </Modal>
+        </div>
+    );
+}
+
+function Followers(props) {
+    const {myFollowerData} = props
+
+    return <>
+        <p className="h3 mt-3 mb-2">ผู้ติดตาม</p>
+        {myFollowerData.map(data => (
+            <a key={data.id} href={`/profile/${data.id}`}>
+                <div className="artistbox-items">
+                    <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
+                </div>
+            </a>
+        ))}
+
+
+    </>
+}
+
+function Followings(props) {
+    const { IFollowerData } = props;
+
+    return <>
+        <p className="h3 mt-3 mb-2">กำลังติดตาม</p>   
+        <div className="artistbox-items">
+            {IFollowerData.map(data => (
+                <a key={data.id} href={`/profile/${data.id}`}>
+                    <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
+                </a>
+            ))}
+        </div>
+    </>
+}
+
+function AllCms(props) {
+    const { myCommission, userID } = props;
+    return <>
+        <p className="h3 mt-3 mb-2">คอมมิชชัน</p>
+        <div class="content-items">
+            {myCommission.map(mycms => (
+                <div key={mycms.cms_id} style={{display:"flex"}}>
+                <Link to={`/cmsdetail/${mycms.cms_id}`}>
+                    <CmsItem src={mycms.ex_img_path} headding={mycms.cms_name} price="100" desc={mycms.cms_desc}/>
+                </Link>
+                </div>
+            ))}
+        </div>
+    </>
+}
+
+function AllArtworks(props) {
+    const { myGallery } = props
+    return <>
+        <p className="h3 mt-3 mb-2">งานวาด</p>
+        <div className="profile-gallery-container">
+            {myGallery.map((data)=>(
+                <div className="profile-gallery" key={data.artw_id}>
+                    <img src={data.ex_img_path} />
+                </div>
+            ))}
+            {/* <div className="profile-gallery">
+                <img src="b3.png" />
+                <img src="AB1.png" />
+                <img src="mainmoon.jpg" />
+                <img src="b3.png" />
+                <img src="b3.png" />
+            </div> */}
+        </div>
+    </>
+}
+
+function AllReviews(props) {
+    return <>
+        <p className="h3 mt-3 mb-2">รีวิว</p>
+    </>
+}

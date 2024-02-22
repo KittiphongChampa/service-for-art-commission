@@ -1,0 +1,102 @@
+.homeBG {
+    z-index: -2;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    position: fixed;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    filter: contrast(110%) saturate(30%);
+
+}
+
+
+.frame {
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    padding-inline: 5rem;
+    /* align-items: center; */
+    flex-direction: column;
+    /* padding: 5rem; */
+    border: 1px solid white;
+    border-radius: 20px;
+    width: 100%;
+    /* background-color: aliceblue; */
+    height: 100%;
+    /* background-color: #9582C9; */
+
+
+}
+
+.headding-box {
+    width: 50%;
+    display: flex;
+    height: fit-content;
+    margin-bottom: 2rem;
+    /* background-color: antiquewhite; */
+}
+
+
+
+.headding-box::before {
+    content: " ";
+    border-radius: 30px;
+    background: #CDDCF7;
+    box-shadow: 0px 4px 16px 1px #f9ecff;
+    border-radius: 31px;
+    width: 15px;
+    /* margin-right: 1rem; */
+    margin: 20px 1rem 20px auto;
+}
+
+.box-container {
+    padding: 0rem 5rem 5rem 5rem;
+    height: 100%;
+    /* background-color: #C79CFD; */
+}
+
+.headding-box div {}
+
+.headding-box h1 {
+    font-weight: 400;
+    /* background-color: pink; */
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(270deg, #FFFFFF 10%, #f1f6ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+
+    text-shadow: 0px 4px 8px #f6eeff;
+}
+
+
+.presenter {
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    object-fit: cover;
+    object-position: left top;
+    right: 0;
+    bottom: 0;
+}
+
+.find-artist-btn {
+    width: fit-content;
+    background-color: white;
+    color: rgb(0, 0, 0);
+    border-radius: 30px;
+    border: 1px solid white;
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0px 0px 15px 4px #9582C9;
+}
+
+.frame p {
+    color: white;
+}
