@@ -12,6 +12,8 @@ const token = localStorage.getItem('token');
 
 export const AuthProvider = ({ children }) => {
     const [userdata, setUserData] = useState([]);
+    // const [onlineUsers, setOnlineUsers] = useState(new Map());
+
     const [admindata, setAdmindata] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [socket, setSocket] = useState(null);
@@ -31,10 +33,14 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         if (type === "user") {
             socket?.emit("add-user", userdata.id);
+            // socket?.on("getUsers", (onlineUsers) => {
+            //     setOnlineUsers(new Map(onlineUsers));
+            // });
         } else if (type === "admin") {
             socket?.emit("add-admin", admindata.admin_id);
         }
     }, [ userdata, admindata ]);
+
 
     useEffect(() => {
         if (token) {
@@ -122,8 +128,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // แสดงวันเวลาเป็นไทย
+    // let today = new Date();
+    // console.log(today.toLocaleString("th-TH", { timeZone: "Asia/Bangkok" }));
+
     return (
-        <AuthContext.Provider value={{ login, isLoggedIn, userdata, admindata, socket,  }}>
+        <AuthContext.Provider value={{ login, isLoggedIn, userdata, admindata, socket  }}>
             {children}
         </AuthContext.Provider>
     );

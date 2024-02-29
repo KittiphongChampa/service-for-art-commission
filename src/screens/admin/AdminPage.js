@@ -24,10 +24,15 @@ export default function AdminPage() {
   
   const [admins, setAdmins] = useState([]); //ข้อมูลของแอดมินทั้งหมด
   const [user, setUser] = useState([]); //ข้อมูลของผู้ใช้งานทั้งหมด
+  const [cmsData, setCmsdata] = useState([]); //ข้อมูลของ cms ที่รอตรวจสอบทั้งหมด
+  const [reportAll, setReportAll] = useState([]); //ข้อมูลของ report ทั้งหมด
+
   useEffect(() => {
     if (token && type=="admin") {
       getAllAdminData(); 
       getAllUsersData(); 
+      getAllCmsProblem();
+      getReport();
     } else {
       navigate("/login");
     }
@@ -60,6 +65,34 @@ export default function AdminPage() {
       });
   };
 
+  const getAllCmsProblem = async () => {
+    await axios
+        .get(`${host}/allcommission`,{
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }).then((response) => {
+          const data = response.data;
+          setCmsdata(data.data);
+        })
+  };
+
+  const getReport = async () => {
+    await axios
+      .get(`${host}/allreport`, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.status === "ok") {
+          setReportAll(data.results);
+        }
+      });
+  };
+
+
 
   return (
     <>
@@ -86,7 +119,7 @@ export default function AdminPage() {
                       width: "250px",
                     }}
                   >
-                    <p>41</p>
+                    <p>{cmsData.length}</p>
                     <p>ภาพที่รอตรวจความคล้าย</p>
                   </div>
                 </Link>
@@ -101,7 +134,7 @@ export default function AdminPage() {
                       width: "250px",
                     }}
                   >
-                    <p>20</p>
+                    <p>{reportAll.length}</p>
                     <p>จำนวนรีพอร์ตทั้งหมด</p>
                   </div>
                 </Link>
@@ -136,22 +169,6 @@ export default function AdminPage() {
                   </div>
                 </Link>
               </div>
-
-              {/* <div style={{ marginTop: "20px" }}>
-                <label>ช่วง: </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={handleStartDateChange}
-                />
-                <label>ถึง: </label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={handleEndDateChange}
-                />
-                <button onClick={handleDateChange}>กรอง</button>
-              </div> */}
 
               <div style={{ display: "flex", marginTop: "15px" }}>
                 <div

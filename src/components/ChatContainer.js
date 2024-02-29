@@ -56,10 +56,14 @@ export default function ChatContainer({ currentChat, test }) {
   const currentDate = new Date();
   const date = new Date();
   const date_now = date.toLocaleDateString("th-TH", {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
     hour: "2-digit",
     minute: "2-digit",
   });
   const timestamp_chat = date_now.split(" ")[1];
+  // const timestamp_chat = date_now;
 
   const [allSteps, setAllSteps] = useState()
   const [orderDetail, setOrderDetail] = useState()

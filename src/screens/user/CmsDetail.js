@@ -47,10 +47,11 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const token = localStorage.getItem("token");
-const type = localStorage.getItem("type");
+
 
 export default function CmsDetail() {
+  const token = localStorage.getItem("token");
+  const type = localStorage.getItem("type");
   const navigate = useNavigate();
   const cmsID = useParams();
   const [artistDetail, setArtistDetail] = useState([]);
@@ -61,7 +62,8 @@ export default function CmsDetail() {
   const [topics, setTopics] = useState([]);
 
   const { userdata, isLoggedIn, socket } = useAuth();
-  // console.log(pkgDetail);
+  console.log(isLoggedIn);
+
 
 
   const time = cmsDetail.created_at;
@@ -166,6 +168,8 @@ export default function CmsDetail() {
   const { TextArea } = Input;
 
   const [pkgID, setPkgID] = useState();
+  const [pkgName, setPkgName] = useState();
+  // const [Deadline, setDeadline] = useState();
 
   const [attImgComponents, setAttImgComponents] = useState([]);
   function addNewAttImg(props) {
@@ -221,6 +225,7 @@ export default function CmsDetail() {
     // formData.append("userID", userdata.id);
     formData.append("artistId", artistDetail.artistId);
     formData.append("pkgId", pkgID);
+    // formData.append("Deadline", Deadline);
     formData.append("selectedValue", touValue);
     formData.append("od_use_for", values.purpose);
     formData.append("od_detail", values.detail);
@@ -299,6 +304,13 @@ export default function CmsDetail() {
   function handlePkgId(id) {
     setPkgID(id);
   }
+  function handlePkgName(Pkgname) {
+    setPkgName(Pkgname);
+  }
+
+  // function handleDeadline(deadline) {
+  //   setDeadline(deadline);
+  // }
 
   const [openEditForm, setOpenEditForm] = useState(false)
 
@@ -360,6 +372,7 @@ export default function CmsDetail() {
         },
       });
       if (response.status === 200) {
+
           // เพิ่มการส่งข้อมูลไปยัง socket server
           const reportData = {
               sender_id: userdata.id,
@@ -372,18 +385,22 @@ export default function CmsDetail() {
           socket.emit('reportCommission', reportData);
 
           // บันทึก notification
-          // await axios.post(`${host}/admin-noti-commission/add`, {
-          //     reporter: userdata.id,
-          //     cms_Id: cmsID.id,
-          //     reportId: response.data.reportId,
-          //     msg: "ได้รายคอมมิชชัน"
-          // });
-
-          Swal.fire({
-              title: "รายงานสำเร็จ",
-              icon: "success"
-          }).then(() => {
-              window.location.reload(false);
+          await axios.post(`${host}/admin/noti/add`, {
+              reporter: userdata.id,
+              reported: 0,
+              reportId: response.data.reportId,
+              msg: "ได้รายงานคอมมิชชัน"
+          }).then((response) => {
+            if (response.status === 200){
+              Swal.fire({
+                  title: "รายงานสำเร็จ",
+                  icon: "success"
+              }).then(() => {
+                  window.location.reload(false);
+              });
+            } else {
+                console.log("เกิดข้อผิดพลาดในการบันทึกข้อมูลการแจ้งเตือนของแอดมิน");
+            }
           });
       } else {
           Swal.fire({
@@ -401,6 +418,7 @@ export default function CmsDetail() {
   const onFinishFailed = () => {
     message.error('Submit failed!');
   };
+
   const [editorValue, setEditorValue] = useState('')
 
   const all_option = [
@@ -427,7 +445,17 @@ export default function CmsDetail() {
     formData.append("good", values.cmsGood);
     formData.append("bad", values.cmsBad);
     formData.append("no_talking", values.cmsNo);
-    axios .patch(`${host}/commission/update/${cmsID.id}`, formData, {
+
+    for (const pkg of values.pkgs) {
+      formData.append("package_id", pkg.pkg_id);
+      formData.append("package_name", pkg.pkgName);
+      formData.append("package_detail", pkg.pkgDesc);
+      formData.append("duration", pkg.pkgDuration);
+      formData.append("price", pkg.pkgPrice);
+      formData.append("edits", pkg.pkgEdit);
+    }
+
+    axios .patch(`${host}/commission/update/${cmsID.id}?deletedPkgIds=${deletedPkgIds}`, formData, {
       headers: {
           Authorization: "Bearer " + token,
           "Content-type": "multipart/form-data",
@@ -488,6 +516,7 @@ export default function CmsDetail() {
 
   //เลือก tou
   const [selectedValues, setSelectedValues] = useState([]);
+
   const initialValues = {
     cmsName: cmsDetail.cms_name,
     cmsTou: selectedValues,
@@ -495,14 +524,30 @@ export default function CmsDetail() {
     cmsQ: cmsDetail.cms_amount_q,
     cmsGood: cmsDetail.cms_good_at,
     cmsBad: cmsDetail.cms_bad_at,
-    cmsNo: cmsDetail.cms_no_talking
+    cmsNo: cmsDetail.cms_no_talking,
+    pkgs: pkgDetail.map(pkg => ({
+      pkg_id: pkg.pkg_id,
+      pkgName: pkg.pkg_name,
+      pkgDesc: pkg.pkg_desc,
+      pkgDuration: pkg.pkg_duration,
+      pkgEdit: pkg.pkg_edits,
+      pkgPrice: pkg.pkg_min_price
+    }))
   };
+
+
+  const [deletedPkgIds, setDeletedPkgIds] = useState([]);
+  const handleDelete = (pkg_id) => {
+    setDeletedPkgIds(prevDeletedPkgIds => [...prevDeletedPkgIds, pkg_id]);
+    
+  };
+  // console.log(deletedPkgIds);
 
   return (
     <div className="body-con">
       {/* {formModalOpened ? <FormModal pkgId={packageId}/> : null} */}
       <Modal
-        title="ส่งคำขอจ้าง 'แพ็กเกจ: ' "
+        title={`ส่งคำขอจ้าง 'แพ็กเกจ : ${pkgName}'`}
         open={isModalOpened}
         onCancel={closeModal}
         footer=""
@@ -561,8 +606,10 @@ export default function CmsDetail() {
         <div className="container">
           <div className="content-card">
             {
+              
               !openEditForm ?
                 <>
+                {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
                     <h1 className="h3 me-3">คอมมิชชัน Full Scale<span class="cms-status-detail">เปิด</span></h1>
                     <Flex gap="small" justify="flex-end" flex={1}>
@@ -641,6 +688,7 @@ export default function CmsDetail() {
                     </div>
                   </div>
                   <div className="group-submenu">
+                    
                     <button
                       className="sub-menu selected"
                       onClick={
@@ -651,6 +699,7 @@ export default function CmsDetail() {
                     >
                       แพ็กเกจ
                     </button>
+
                     <button
                       className="sub-menu"
                       onClick={
@@ -678,8 +727,10 @@ export default function CmsDetail() {
                   {activeMenu.package && (
                     <Package
                       pkgDetail={pkgDetail}
-                      onClick={openModal}
                       setPkgID={handlePkgId}
+                      setPkgName={handlePkgName}
+                      // setDeadline={handleDeadline}
+                      onClick={openModal}
                     />
                   )}
                   {activeMenu.review && <Review />}
@@ -687,6 +738,7 @@ export default function CmsDetail() {
                 </>
                 :
                 <>
+                {/* กรณีกดแก้ไข */}
                   <ImgSlide imgDetail={imgDetail} />
                   <Form
                     form={form}
@@ -696,10 +748,7 @@ export default function CmsDetail() {
                     // onFinishFailed={onFinishFailed}
                     autoComplete="off"
                     initialValues={initialValues}
-
                   >
-                    {/*  */}
-
                     <Form.Item
                       label="ชื่อคอมมิชชัน"
                       name="cmsName"
@@ -714,6 +763,7 @@ export default function CmsDetail() {
                     >
                       <Input />
                     </Form.Item>
+
                     <Form.Item name="cmsTou" label={<>
                       ประเภทการใช้งานที่รับ
                       <Tooltip title="1.Personal use : ใช้ส่วนตัว ไม่สามารถใช้เชิงพาณิชย์ได้ 2.License : สามารถนำไปทำบางอย่างได้ เช่น ใช้ในเชิงพาณิชย์ ทั้งนี้ทั้งนั้นขึ้นอยู่กับข้อตกลงว่าสามารถทำอะไรได้บ้าง 3.Exclusive right : สามารถนำผลงานไปทำอะไรก็ได้ ลิขสิทธิ์อยู่ที่ผู้ซื้อ แต่นักวาดยังมีเครดิตในผลงานอยู่" color="#2db7f5">
@@ -747,6 +797,7 @@ export default function CmsDetail() {
                       </Checkbox.Group>
 
                     </Form.Item>
+
                     <Form.Item
                       label="รายละเอียดคอมมิชชัน"
                       name="cmsDesc"
@@ -767,6 +818,7 @@ export default function CmsDetail() {
                       />
 
                     </Form.Item>
+
                     <Space
                       style={{
                         display: 'flex',
@@ -808,6 +860,7 @@ export default function CmsDetail() {
                           maxRows: 5,
                         }} />
                     </Form.Item>
+
                     <Form.Item label="งานที่ไม่ถนัด" name='cmsBad'
                       rules={[
                         {
@@ -824,7 +877,8 @@ export default function CmsDetail() {
                           maxRows: 5,
                         }} />
                     </Form.Item>
-                    <Form.Item label="งานไม่รับ" name='cmsNo'
+
+                    <Form.Item label="งานที่ไม่รับ" name='cmsNo'
                       rules={[
                         {
                           required: true,
@@ -842,74 +896,75 @@ export default function CmsDetail() {
                     </Form.Item>
 
                     {/* <Button onClick={() => console.log(editorValue)}>เทส</Button> */}
+
                     <Form.Item
-                      name=""
+                      name="pkgs"
                       label="แพ็กเกจ"
                     >
-                      <Form.List name="pkgs" >
+                      <Form.List name="pkgs">
                         {(fields, { add, remove }, { errors }) => (
-
-                          <div
-                            style={{
-                              display: 'flex',
-                              rowGap: 16,
-                              flexDirection: 'column',
-                            }}
-                          >
-                            {console.log(fields)}
-                            {fields.map((field) => (
+                          <>
+                            {fields.map((field, index) => (
                               <Card
                                 size="small"
-                                title={`แพ็กเกจ ${field.name + 1}`}
+                                title={`แพ็กเกจ ${index + 1}`}
                                 key={field.key}
                                 extra={
-                                  field.name !== 0 && <CloseOutlined
-                                    onClick={() => {
-                                      remove(field.name);
-                                    }}
-                                  />
+                                  fields.length > 0 && (
+                                    <Button
+                                      type="danger"
+                                      onClick={() => {
+                                        const pkg_id = pkgDetail[index].pkg_id;
+                                        handleDelete(pkg_id);
+                                        remove(field.name);
+                                      }}
+                                    >
+                                      <CloseOutlined />
+                                    </Button>
+                                  )
                                 }
                               >
-                                {console.log(field)}
-                                <Form.Item label="ชื่อแพ็กเกจ" name={[field.name, 'pkgName']}
+                                <Form.Item
+                                  label="ไอดีแพ็กเกจ"
+                                  name={[field.name, 'pkg_id']}
+                                >
+                                  <Input disabled/>
+                                </Form.Item>
+                              
+                                <Form.Item
+                                  label="ชื่อแพ็กเกจ"
+                                  name={[field.name, 'pkgName']}
                                   rules={[
                                     {
                                       required: true,
                                       whitespace: true,
                                       message: "กรุณาใส่ชื่อแพ็กเกจ",
                                     },
-                                  ]}>
+                                  ]}
+                                >
                                   <Input />
                                 </Form.Item>
-                                <Form.Item label="คำอธิบาย" name={[field.name, 'pkgDesc']}
+                                <Form.Item
+                                  label="คำอธิบาย"
+                                  name={[field.name, 'pkgDesc']}
                                   rules={[
                                     {
                                       required: true,
                                       whitespace: true,
                                       message: "กรุณาใส่คำอธิบาย",
                                     },
-                                  ]}>
-                                  <TextArea showCount maxLength={200}
-                                    autoSize={{
-                                      minRows: 3,
-                                      maxRows: 5,
-                                    }} />
+                                  ]}
+                                >
+                                  <Input.TextArea showCount maxLength={200} autoSize={{ minRows: 3, maxRows: 5 }} />
                                 </Form.Item>
-
-                                <Space
-                                  style={{
-                                    display: 'flex',
-                                    flexDirection: "row",
-                                    flexWrap: "wrap"
-                                    // backgroundColor: 'pink'
-                                  }}>
+                                <Space>
                                   <Form.Item
                                     label="จำนวนวัน"
                                     name={[field.name, 'pkgDuration']}
                                     rules={[
                                       {
                                         required: true,
-                                        message: "กรุณาใส่คำอธิบาย",
+                                        message: "กรุณาใส่จำนวนวัน",
                                       },
                                       { type: "number" }
                                     ]}
@@ -922,12 +977,11 @@ export default function CmsDetail() {
                                     rules={[
                                       {
                                         required: true,
-                                        message: "กรุณาใส่คำอธิบาย",
+                                        message: "กรุณาใส่จำนวนแก้ไข",
                                       },
                                       { type: "number" }
                                     ]}
                                   >
-
                                     <InputNumber suffix="ครั้ง" className="inputnumber-css" />
                                   </Form.Item>
                                   <Form.Item
@@ -936,146 +990,21 @@ export default function CmsDetail() {
                                     rules={[
                                       {
                                         required: true,
-                                        message: "กรุณาใส่คำอธิบาย",
+                                        message: "กรุณาใส่ราคาเริ่มต้น",
                                       },
                                       { type: "number" }
                                     ]}
-
                                   >
                                     <InputNumber suffix="บาท" className="inputnumber-css" />
                                   </Form.Item>
                                 </Space>
-
-                                <Form.Item label={<>
-                                  ขั้นตอนการทำงาน
-                                  <Tooltip title="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งให้ลูกค้าดู การจ่ายเงินครั้งแรกคือหลังจากที่นักวาดส่งภาพไปแล้ว จ่ายเงินครึ่งหลังจะได้จ่ายเมื่องานดำเนินไปถึง 50% แล้ว" color="#2db7f5">
-                                    <Icon.Info />
-                                  </Tooltip>
-                                </>}
-                                  name=""
-                                >
-                                  <Form.List
-                                    name={[field.name, 'step']}
-                                    rules={[
-                                      {
-                                        validator: async (_, step) => {
-                                          if (!step || step.length === 0) {
-                                            console.log("ยังไม่เพิ่มการทำงาน")
-                                            return Promise.reject(new Error('เพิ่มการทำงานอย่างน้อย 1 ขั้นตอน'));
-
-                                          }
-                                        },
-                                      },
-                                    ]}
-                                  >
-                                    {(subFields, subOpt, { errors }) => (
-                                      <div style={{ display: 'flex', flexDirection: 'column' }} >
-                                        <Space
-                                          style={{
-                                            display: 'flex'
-                                          }}
-                                          align="baseline"
-                                        >
-                                          <div style={{ width: "1rem", textAlign: "right" }}>1: </div>
-                                          <Form.Item
-                                            name="draft"
-                                            validateTrigger={['onChange', 'onBlur']}>
-                                            <Input placeholder="ตัวอย่าง ภาพลงสี" defaultValue="ภาพร่าง" readOnly />
-                                          </Form.Item>
-                                        </Space>
-
-
-                                        {subFields.map((subField) => (
-                                          <>
-                                            <Space
-                                              key={subField.key}
-                                              style={{
-                                                display: 'flex'
-
-                                              }}
-                                              align="baseline"
-                                            >
-                                              <div style={{ width: "1rem", textAlign: "right" }}>{subField.name + 2}: </div>
-                                              <Form.Item
-                                                name={subField.name}
-                                                validateTrigger={['onChange', 'onBlur']}
-                                                rules={[
-                                                  {
-                                                    required: true,
-                                                    whitespace: true,
-                                                    message: "กรุณาใส่ขั้นตอนการทำงาน",
-                                                  },
-                                                ]}>
-                                                <Input prefix="ภาพ" placeholder="ตัวอย่าง ภาพลงสี" />
-                                              </Form.Item>
-
-
-                                              <MinusCircleOutlined onClick={() => subOpt.remove(subField.name)} />
-
-
-                                            </Space>
-
-                                          </>
-                                        ))}
-
-                                        <Form.Item
-                                          style={{
-
-                                            marginLeft: '1.5rem',
-                                          }}>
-
-
-                                          <Button
-                                            type="dashed"
-                                            style={{
-                                              width: 'fit-content',
-                                              // marginLeft: '1.5rem',
-                                            }}
-
-                                            onClick={() => subOpt.add()} block>
-                                            + เพิ่มขั้นตอนการทำงาน
-                                          </Button>
-
-
-                                        </Form.Item>
-
-                                        <Space
-                                          style={{
-                                            display: 'flex'
-                                          }}
-                                          align="baseline"
-                                        >
-                                          <div style={{ width: "1rem", textAlign: "right" }}>{subFields.length + 2}: </div>
-                                          <Form.Item
-                                            name="final"
-                                          >
-                                            <Input placeholder="ตัวอย่าง ภาพลงสี" defaultValue="ภาพไฟนัล" readOnly />
-                                          </Form.Item>
-                                        </Space>
-                                        <Form.ErrorList errors={errors} style={{
-                                          // width: 'fit-content',
-                                          marginLeft: '1.5rem',
-                                        }} />
-                                        {/* {subFields.length === 0 && subOpt.add()} */}
-                                      </div>
-
-                                    )}
-
-
-
-                                  </Form.List>
-                                </Form.Item>
-                                {/* </Form.Item> */}
                               </Card>
                             ))}
-                            <Button type="dashed" onClick={() => add()} block>
-                              + เพิ่มแพ็กเกจ
-                            </Button>
-                            {/* {fields.length == 0 && add()} */}
-                          </div>
+                          </>
                         )}
                       </Form.List>
                     </Form.Item>
+
                     <Form.Item
                       label="หัวข้อ"
                       name="cmsTopic"
@@ -1101,6 +1030,7 @@ export default function CmsDetail() {
                       >
                       </Select>
                     </Form.Item>
+                    
                     <Button onClick={() => setOpenEditForm(false)}>ยกเลิก</Button>
                     <Button htmlType="submit">บันทึก</Button>
                   </Form>
@@ -1221,9 +1151,12 @@ export default function CmsDetail() {
 function Package(props) {
   const { pkgDetail } = props;
 
-  const handlePackageClick = (pkgId, pkg_name) => {
+  const handlePackageClick = (pkgId, pkgName, pkg_duration) => {
+    console.log(pkgName);
     console.log(`Clicked on package with id: ${pkgId}`);
     props.setPkgID(pkgId);
+    props.setPkgName(pkgName);
+    // props.setDeadline(pkg_duration);
     props.onClick(); //เปิดโมดอล
   };
 
@@ -1237,7 +1170,7 @@ function Package(props) {
         pkgDetail.map((pkg) => (
           <div
             className="select-package-item"
-            onClick={() => handlePackageClick(pkg.pkg_id)}
+            onClick={() => handlePackageClick(pkg.pkg_id, pkg.pkg_name, pkg.pkg_duration)}
             key={pkg.pkg_id}
           >
             <div>
@@ -1255,7 +1188,7 @@ function Package(props) {
       ) : (
         <div
           className="select-package-item"
-          onClick={() => handlePackageClick(pkgDetail.pkg_id, pkgDetail.pkg_name)}
+          onClick={() => handlePackageClick(pkgDetail.pkg_id, pkgDetail.pkg_name, pkgDetail.pkg_duration)}
         >
           <div>
             <h3>{pkgDetail.pkg_name}</h3>
@@ -1344,56 +1277,58 @@ function Review() {
 function Queue(props) {
   const cmsID = props.cmsID;
   const [queue, setQueue] = useState("");
-  const [orderAll, setOrderAll] = useState("");
-  const [allqueue, setAllQueue] = useState([]);
-  // console.log("queue", queue);
-  // console.log("orderAll", orderAll);
-  // console.log(allqueue);
+  const [queueTotal, setQueueTotal] = useState([]);
+  const [queueData, setQueueData] = useState([]);
+
+
   useEffect(() => {
-    fetchData()
+    getQueueData()
+    fetchData();
   }, [])
+
   const fetchData = async () => {
-    await axios.get(`${host}/getQueueData/${cmsID}`).then((response) => {
+    await axios.get(`${host}/queue/${cmsID}`).then((response) => {
       const data = response.data;
-      setAllQueue(data.uniqueResults)
+      setQueue(data.Queue);
     })
   }
 
-  axios
-    .get(`${host}/queue/${cmsID}`, {
-      headers: {
-        "Content-Type": "application/json",
-        // Authorization: "Bearer " + token,
-      },
-    })
-    .then((response) => {
+  const getQueueData = async () => {
+    await axios.get(`${host}/get/queue/${cmsID}`).then((response) => {
       const data = response.data;
-      setQueue(data.Queue);
-      setOrderAll(data.latestOdQNumber);
-    });
+      setQueueTotal(data.QueueInfo[0])
+      setQueueData(data.QueueData)
+    })
+  }
+
 
   return (
     <>
       <h2>
-        คิว ({orderAll}/{queue})
+      <h2>คิว ({queueTotal?.used_slots || 0}/{queueTotal?.cms_amount_q || queue})</h2>
       </h2>
       {/* <Alert message="ในตารางคิวนี้รวมคิวของคอมมิชชันอื่นของคุณBoobi ด้วย" closable type="info" showIcon className="mt-3 mb-5 " /> */}
       <table className="queue-table">
         <tr>
           <th className="q">คิว</th>
           <th>คอมมิชชัน:แพคเกจ</th>
-          <th>ระยะเวลา(วัน)</th>
+          <th>ชื่อผู้จ้าง</th>
+          <th>วันที่จ้าง</th>
           <th>ความคืบหน้า</th>
         </tr>
-
-        {allqueue.map(data => (
+        {queueData.length == 0 ? (<div>
+          <h4>ยังไม่มีออเดอร์</h4>
+        </div>) 
+        : 
+        (queueData.map((data, index)=> (
           <tr key={data.od_id}>
-            <td>{data.od_id}</td>
+            <td>{index + 1}</td>
             <td>{data.cms_name} : {data.pkg_name}</td>
-            <td>3</td>
-            <td>ยังไม่เริ่ม</td>
+            <td>{data.urs_name}</td>
+            <td>{data.ordered_at}</td>
+            <td>{data.step_name}</td>
           </tr>
-        ))}
+        )))}
       </table>
     </>
   );

@@ -44,9 +44,11 @@ export default function Report(props) {
   const { reportid } = useParams();
 
   const [reportAll, setReportAll] = useState([]);
-  const [reportDetail, setReportDetail] = useState([]);
-  const [reporterData, setReporterData] = useState([]);
+  const [filteredUser, setFilteredUser] = useState([]);
 
+
+  const [reportDetail, setReportDetail] = useState([]);
+  const [relatedTo, setRelatedTo] = useState([]);
 
   const [artistDetail, setArtistDetail] = useState([]);
   const [workDetail, setWorkDetail] = useState([]);
@@ -71,6 +73,10 @@ export default function Report(props) {
     }
   }, [reportid]);
 
+  useEffect(() => {
+    setFilteredUser(reportAll);
+  }, [reportAll])
+
   const getReport = async () => {
     await axios
       .get(`${host}/allreport`, {
@@ -89,7 +95,8 @@ export default function Report(props) {
   const getReportDetail = () => {
     axios.get(`${host}/report/detail/${reportid}`).then((response) => {
       const data = response.data;
-      setReporterData(data.reporterData[0]);
+      // console.log(data);
+      setRelatedTo(data.relatedTo)
       setReportDetail(data.reportDetail[0]);
       setArtistDetail(data.data.artist);
       setWorkDetail(data.data.work);
@@ -138,7 +145,6 @@ export default function Report(props) {
     })
   }
   
-
   const [form] = Form.useForm();
 
   function deleteReport(values) {
@@ -180,6 +186,19 @@ export default function Report(props) {
     })
   }
 
+  const handleSearch = (event) => {
+    const query = event.target.value.toLowerCase();
+    const filtered = reportAll.filter(
+      (item) =>
+        item.reporter_name.toLowerCase().includes(query) ||
+        item.reported_name.toLowerCase().includes(query) ||
+        item.sendrp_header.toLowerCase().includes(query) ||
+        item.sendrp_detail.toLowerCase().includes(query) ||
+        item.text.toLowerCase().includes(query)
+    );
+    setFilteredUser(filtered);
+  };
+
   return (
     <>
       <Helmet>
@@ -200,11 +219,11 @@ export default function Report(props) {
               ลบแล้ว
             </Link>
           </div>
-          <div className="report-item-area">
+          {/* <div className="report-item-area"> */}
             {/* <Link to="/admin/adminmanage/report/11"><ReportItem /></Link> */}
 
             {/* ต้อง map */}
-            {reportAll.map((data) => (
+            {/* {reportAll.map((data) => (
               <div key={data.sendrp_id}>
                 <Link to={`/admin/adminmanage/report/${data.sendrp_id}`}>
                   <ReportItem
@@ -217,8 +236,42 @@ export default function Report(props) {
                   />
                 </Link>
               </div>
-            ))}
+            ))} */}
+          {/* </div> */}
+
+          <div className="all-user-head">
+            <h2>จำนวนทั้งหมด ({reportAll.length})</h2>
+            <div>
+              <Input type="search" onChange={handleSearch} placeholder=" ค้นหา..." />
+            </div>
           </div>
+
+          <table className="table is-striped is-fullwidth">
+            <thead>
+                <tr>
+                  <th>ลำดับ</th>
+                  <th>ผู้รายงาน</th>
+                  <th>ผู้ถูกรายงาน</th>
+                  <th>หัวข้อ</th>
+                  <th>ประเภท</th>
+                  <th>เวลา</th>
+                  <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+              {filteredUser.map((data, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{data.reporter_name}</td>
+                  <td>{data.reported_name}</td>
+                  <td>{data.sendrp_header}</td>
+                  <td>{data.text}</td>
+                  <td>{data.created_at}</td>
+                  <td><Link to={`/admin/adminmanage/report/${data.sendrp_id}`}>จัดการ</Link></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </>
       ) : (
         <>
@@ -263,10 +316,10 @@ export default function Report(props) {
             <Card>
               <div className="report-content">
                 <Flex gap="1rem" vertical wrap="wrap">
-                  <Link to={`/profile/${reporterData.id}`}>
+                  <Link to={`/profile/${reportDetail.id}`}>
                     <div id="cms-artist-profile">
-                      <img src={reporterData.urs_profile_img} alt="" />
-                      <p>แจ้งโดย {reporterData.urs_name}</p>
+                      <img src={reportDetail.urs_profile_img} alt="" />
+                      <p>แจ้งโดย {reportDetail.urs_name}</p>
                     </div>
                   </Link>
                   <div>
@@ -281,7 +334,7 @@ export default function Report(props) {
                   {reportDetail.sendrp_link != null && (
                     <div>
                       <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                      <p>-</p>
+                      <p>{reportDetail.sendrp_link}</p>
                     </div>
                   )}
 
@@ -292,12 +345,55 @@ export default function Report(props) {
                 </Flex>
               </div>
             </Card>
-            <div>
-              <h3>ที่เกี่ยวข้อง</h3>
+            <h5>รายงานที่เกี่ยวข้อง</h5>
+            <div className="report-grid">
+              {relatedTo.map((data) => (
+                <Card key={data.id}>
+                  <div className="report-content">
+                      <Flex gap="1rem" vertical wrap="wrap">
+                          <Link to={`/profile/${data.id}`}>
+                              <div id="cms-artist-profile">
+                                  <img src={data.urs_profile_img} alt="" />
+                                  <p>แจ้งโดย {data.urs_name}</p>
+                              </div>
+                          </Link>
+                          <div>
+                              <p className="h6">หัวข้อที่มีการละเมิด: {data.sendrp_header}</p>
+                          </div>
+                          <div>
+                              <p className="h6">รายละเอียดที่มีการแจ้ง</p>
+                              <p>{data.sendrp_detail}</p>
+                          </div>
+                          {data.sendrp_link != null && (
+                            <div>
+                                <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
+                                <p>{data.sendrp_link}</p>
+                            </div>
+                          )}
+                          <div>
+                              <p className="h6">อีเมลติดต่อกลับ</p>
+                              <p>{data.sendrp_email}</p>
+                          </div>
+
+                          {data.status !== null ? (
+                            <div>
+                                <p className="h6">สถานะ : {data.status === "approve" ? "อนุมัติแล้ว" : (data.status === "delete" ? "ไม่อนุมัติ" : "ยังไม่ได้ตรวจสอบ")}</p>
+                            </div>
+                          ) : (
+                            <div>
+                                <p className="h6">สถานะ : ยังไม่ได้ตรวจสอบ</p>
+                            </div>
+                          )}
+
+                      </Flex>
+                  </div>
+              </Card>
+              ))}
+              
             </div>
           </div>
+
           <Modal title="ระบุเหตุผลการลบ" open={deleteModal} onCancel={openDelModal} footer="">
-            
             <Form
               form={form}
               name="delReport"
@@ -427,52 +523,3 @@ export default function Report(props) {
   );
 }
 
-// // import * as Icon from 'react-feather';
-// // import UserBox from "../components/UserBox";
-// import ReportItem from "../../components/ReportItem";
-// import { Link } from 'react-router-dom';
-// import React, { useState, useEffect } from "react";
-
-// export default function Report(props) {
-//     const jwt_token = localStorage.getItem("token");
-//     useEffect(() => {
-//         // if (localStorage.getItem("token")) {
-//         //   if (window.location.pathname === "/login") {
-//         //     navigate("/admin/alluser");
-//         //   }
-//         // } else {
-//         //   navigate("/login");
-//         // }
-//         // getData();
-//     }, []);
-
-//     return (
-//         <>
-
-//             <h1 className="">การรายงาน</h1>
-//             {/* <div style={{ border: "1px solid gray", borderRadius: "200px", padding: "0.5rem", marginTop: "1.5rem", marginBottom: "1.5rem" }}>
-//                 <button className="sub-menu " >ทั้งหมด</button>
-//                 <button className="sub-menu" >การรายงาน</button>
-//                 <button className="sub-menu">โพสต์ที่ถูกสั่งลบ</button>
-//                 <button className="sub-menu selected">รายชื่อผู้ใช้</button>
-//             </div> */}
-
-//             <div className="all-user-head">
-//                 {/* <h3>รายชื่อผู้ใช้ (4)</h3> */}
-//                 {/* <div>
-//                     <button><Icon.Plus /> เพิ่มแอดมิน</button>
-//                     <input type="text" style={{ borderRadius: "200px", border: "1px solid gray" }} placeholder=" ค้นหา..."></input>
-//                 </div> */}
-//             </div>
-//             <div className="sub-menu-group mt-4">
-//                 <Link to="/homepage" id="foryou" className="sub-menu selected"  >กำลังดำเนินการ</Link>
-//                 <Link to="/homepage/commissions" id="commissions" className="sub-menu" >อนุมัติแล้ว</Link>
-//                 <Link to="/homepage/gallery" id="gallery" className="sub-menu" >ลบแล้ว</Link>
-//             </div>
-//             <div className="report-item-area">
-//                 <ReportItem src="/monlan.png"  />
-//             </div>
-
-//         </>
-//     )
-// }

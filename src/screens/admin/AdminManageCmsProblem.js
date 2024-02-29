@@ -6,10 +6,11 @@ import "sweetalert2/src/sweetalert2.scss";
 import { useAuth } from '../../context/AuthContext';
 import { host } from "../../utils/api";
 
-const type = localStorage.getItem("type");
-const token = localStorage.getItem("token");
+
 
 export default function AdminManageCmsProblem() {
+    const type = localStorage.getItem("type");
+    const token = localStorage.getItem("token");
     const navigate = useNavigate();
     const cmsID = useParams();
     const { admindata, isLoggedIn } = useAuth();
@@ -29,6 +30,7 @@ export default function AdminManageCmsProblem() {
 
     // ข้อมูลผู้ใช้ คอมมิชชัน ภาพ ที่เป็นต้นแบบ
     const [prototype, setPrototype] = useState([]);
+    
     // const [usersPrototype, setUserPrototype] = useState([]);
     // const [cmsPrototype, setCmsPrototype] = useState([]);
     // const [imgPrototype, setImgPrototype] = useState([]);

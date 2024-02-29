@@ -61,9 +61,9 @@ const App = () => {
             <Route path="/setting-profile" element={<SettingProfile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/artistmanagement/:menu" element={<ArtistManagement />} />
-          <Route path="/chatbox" element={<ChatBox />} />
-          <Route path="/myreq" element={<MyReq />} />
-      <Route path="/allfaq" element={<AllFaq />} />
+            <Route path="/chatbox" element={<ChatBox />} />
+            <Route path="/myreq" element={<MyReq />} />
+            <Route path="/allfaq" element={<AllFaq />} />
           
 
             {/* admins */}

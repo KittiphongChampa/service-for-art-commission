@@ -36,10 +36,12 @@ const toastOptions = {
   theme: "dark",
 };
 
-const jwt_token = localStorage.getItem("token");
-const type = localStorage.getItem("type");
+
+
 
 export default function ViewProfile() {
+  const jwt_token = localStorage.getItem("token");
+  const type = localStorage.getItem("type");
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
@@ -389,7 +391,7 @@ export default function ViewProfile() {
 }
 
 function AllCms(props) {
-
+  const type = localStorage.getItem("type");
   const { myCommission, userID } = props;
   const handleRedirect = (cms_id) => {
       window.location = (`/cmsdetail/${cms_id}`);

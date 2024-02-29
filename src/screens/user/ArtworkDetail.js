@@ -15,11 +15,15 @@ import { useAuth } from '../../context/AuthContext';
 
 import { host } from "../../utils/api";
 
+
+
 export default function ArtworkDetail() { 
+    const token = localStorage.getItem("token");
+    const type = localStorage.getItem("type");
     const { userdata, isLoggedIn, socket } = useAuth();
     const {TextArea} = Input;
     const artworkId = useParams();
-    const token = localStorage.getItem("token");
+    
 
     const [reportModalIsOpened, setReportModalIsOpened] = useState(false)
     const [gettopics, setGetTopics] = useState([]);
@@ -127,24 +131,30 @@ export default function ArtworkDetail() {
                     sender_img: userdata.urs_profile_img,
                     artworkId: artworkId.id,
                     reportId: response.data.reportId,
-                    msg: "ได้รายงานผลงานวาน"
+                    msg: "ได้รายงานผลงานภาพ"
                 };
-                socket.emit('adminReportNotification', reportData);
+                socket.emit('reportArtwork', reportData);
 
                 // บันทึก notification
-                // await axios.post(`${host}/admin-noti-artwork/add`, {
-                //     reporter: userdata.id,
-                //     artworkId: artworkId.id,
-                //     reportId: response.data.reportId,
-                //     msg: "ได้รายงานผลงานวาน"
-                // });
-
-                Swal.fire({
-                    title: "รายงานสำเร็จ",
-                    icon: "success"
-                }).then(() => {
-                    window.location.reload(false);
+                await axios.post(`${host}/admin/noti/add`, {
+                    reporter: userdata.id,
+                    reported: 0,
+                    reportId: response.data.reportId,
+                    msg: "ได้รายงานผลงานภาพ"
+                }).then((response) => {
+                    if (response.status === 200){
+                        Swal.fire({
+                            title: "รายงานสำเร็จ",
+                            icon: "success"
+                        }).then(() => {
+                            window.location.reload(false);
+                        });
+                    } else {
+                        console.log("เกิดข้อผิดพลาดในการบันทึกข้อมูลการแจ้งเตือนของแอดมิน");
+                    }
                 });
+
+                
             } else {
                 Swal.fire({
                     title: "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่",
@@ -264,7 +274,11 @@ export default function ArtworkDetail() {
         <>
             {src!=null  && <ImgFullscreen src={src} handleFullImg={handleFullImg} />}
             <div className="body-con">
-                <NavbarUser />
+                {isLoggedIn ? (
+                    type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+                ) : (
+                    <NavbarHomepage />
+                )}
                 <div className="body-lesspadding" style={{ backgroundColor: "#F1F5F9" }}>
                     <div className="container">
                         <div className="unnamedcard">

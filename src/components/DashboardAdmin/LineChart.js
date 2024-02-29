@@ -65,7 +65,7 @@ const LineChart = () => {
         break;
       case 'today':
         newStartDate.setDate(currentDate.getDate());
-        newEndDate.setDate(currentDate.getDate());
+        newEndDate.setDate(currentDate.getDate() + 1);
         break;
       case 'last7days':
         newStartDate.setDate(currentDate.getDate() - 6);

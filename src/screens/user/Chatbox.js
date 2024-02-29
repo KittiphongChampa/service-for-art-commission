@@ -60,6 +60,8 @@ export default function ChatBox() {
   // console.log("partnerChat : ",partnerChat);
 
   const [contacts, setContacts] = useState([]);
+  const userRef = useRef([]);
+
   const [currentChat, setCurrentChat] = useState(undefined); //คนที่เราเลือกสนทนา
   // console.log("currentChat : ",currentChat);
 
@@ -84,25 +86,74 @@ export default function ChatBox() {
     }
   }, []);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const response = await axios.get(`${host}/allchat`, {
+        // headers: {
+        //   Authorization: "Bearer " + token,
+        // },
+  //     });
+  //     const sortedContacts = response.data.sort((a, b) => {
+  //       return new Date(b.last_message_timestamp) - new Date(a.last_message_timestamp);
+  //     });
+  //     setContacts(sortedContacts);
+  //     userRef.current = response.data;
+  //   };
+  
+  //   fetchData();
+  // }, [userRef.current]);
+
+
+  // useEffect(() => {
+  //   try {
+  //     axios
+  //       .get(`${host}/allchat`,{
+  //         headers: {
+  //           Authorization: "Bearer " + token,
+  //         },
+  //       })
+  //       .then((response) => {
+  //         // console.log(response.data);
+  //         setContacts(response.data); //แสดงผลคนที่เราสามารถแชทด้วยได้ทั้งหมด
+  //       });
+  //   } catch (error) {
+  //     // Handle error
+  //     console.log("catch");
+  //   }
+  // }, [contacts])
+  // }, [])
+
+  // useEffect(() => {
+    
+  //   const fetchData = async () => {
+  //     const response = await axios.get(`${host}/allchat`, {
+  //       headers: {
+  //         Authorization: "Bearer " + token,
+  //       },
+  //     })
+  //     setContacts(response.data);
+  //     userRef.current = response.data;
+  //   }
+  //   fetchData();
+  
+  // }, [userRef.current])
 
   useEffect(() => {
-    try {
-      axios
-        .get(`${host}/allchat`,{
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${host}/allchat`, {
           headers: {
             Authorization: "Bearer " + token,
           },
-        })
-        .then((response) => {
-          // console.log(response.data);
-          setContacts(response.data); //แสดงผลคนที่เราสามารถแชทด้วยได้ทั้งหมด
         });
-    } catch (error) {
-      // Handle error
-      console.log("catch");
-    }
-  // }, [contacts])
-  }, [])
+        setContacts(response.data);
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
 
   const handleChatChange = (chat) => {

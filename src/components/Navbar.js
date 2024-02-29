@@ -38,7 +38,6 @@ const NavbarUser = (props) => {
         const token = localStorage.getItem("token");
         if (socket) {
             socket.on('getNotification', (data) => {
-                console.log(data);
                 setNotifications((prev) => {
                     // เพิ่มการแจ้งเตือนที่มาใหม่ไปที่ตำแหน่งแรกของอาร์เรย์
                     prev.unshift(data.data);
@@ -56,7 +55,7 @@ const NavbarUser = (props) => {
 
     // ทำงานหลังจากกดอ่านแจ้งเตือน
     const handleNotificationClick = async (keyData, action) => {
-        await axios.put(`${host}/noti/readed/?keyData=${keyData}&action=${action}`)
+        await axios.put(`${host}/noti/readed/?order_keyData=${keyData}&action=${action}`)
     };
 
     const displayNotification = ( data ) => {
@@ -242,8 +241,6 @@ const NavbarUser = (props) => {
 }
 
 const NavbarHomepage = (props) => {
-
-
     const [open, setOpen] = useState(false);
     const showDrawer = () => {
         setOpen(true);
@@ -259,7 +256,7 @@ const NavbarHomepage = (props) => {
                 <div class="inline-nav inhomepage" >
                     <a href="#" className="ham-menu" onClick={showDrawer}><Icon.Menu className='nav-icon' /></a>
                     <a href="/search"><Icon.Search className='nav-icon' /></a>
-                    <a href="#"><Icon.Home className='nav-icon' /></a>
+                    <a href="/"><Icon.Home className='nav-icon' /></a>
                 </div>
                 <div class="inline-nav inhomepage">
                     <a href="/login">เข้าสู่ระบบ</a>
@@ -342,6 +339,7 @@ const NavbarAdmin = (props) => {
         }
     }, [])
 
+    // ส่วนของการแสดงผล noti
     const [notifications, setNotifications] = useState([]);
     const [openNoti, setOpenNoti] = useState(false);
 
@@ -349,7 +347,6 @@ const NavbarAdmin = (props) => {
         const token = localStorage.getItem("token");
         if (socket) {
             socket.on('getNotificationAdmin', (data) => {
-                console.log(data);
                 setNotifications((prev) => {
                     // เพิ่มการแจ้งเตือนที่มาใหม่ไปที่ตำแหน่งแรกของอาร์เรย์
                     prev.unshift(data.data);
@@ -358,18 +355,18 @@ const NavbarAdmin = (props) => {
             });
         }
         // การทำงานที่ดึงการแจ้งเตือนของแอดมินออกมา
-        // axios.get(`${host}/noti/getmsg`, {
-        //     headers: { Authorization: "Bearer " + token }
-        // }).then((response) => {
-        //     const data = response.data;
-        //     setNotifications(data.dataNoti);
-        // });
+        axios.get(`${host}/admin/noti/getmsg`, {
+            headers: { Authorization: "Bearer " + token }
+        }).then((response) => {
+            const data = response.data;
+            setNotifications(data.dataNoti);
+        });
 
     }, [socket]);
 
     // ทำงานหลังจากกดอ่านแจ้งเตือน
-    const handleNotificationClick = async (keyData) => {
-        await axios.put(`${host}/noti/readed/${keyData}`)
+    const handleNotificationClick = async (keyData, action) => {
+        await axios.put(`${host}/noti/readed/?report_keyData=${keyData}&action=${action}`)
     };
 
     const displayNotification = (data) => {
@@ -399,7 +396,7 @@ const NavbarAdmin = (props) => {
         return (
             <div key={keyData}>
                 {/* < href={linked} onClick={() => handleNotificationClick(keyData, action)}> */}
-                <a href={linked} >
+                <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
                     <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {action} {data.created_at} {read}</span>
                 </a>
             </div>

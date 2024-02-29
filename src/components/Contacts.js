@@ -11,7 +11,13 @@ import { host } from "../utils/api";
 
 export default function Contacts({ contacts, changeChat, Toggled, partnerID, orderID, selectedChatType }) {
   const { userdata } = useAuth();
+  // const [usersOnline, setUsersOnline] = useState([]);
 
+  // useEffect(() => {
+  //   const usersArray = Array.from(onlineUsers);
+  //   setUsersOnline(usersArray);
+  // }, [onlineUsers]);
+  
   const [currentSelected, setCurrentSelected] = useState();
 
   const uniqueContactIds = new Set();
@@ -25,6 +31,7 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
     }
   });
   // console.log("filteredContacts", filteredContacts);
+
  
 
   const token = localStorage.getItem("token");
@@ -47,6 +54,7 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
         <>
 
           {/* แสดงผลคนที่เราสามารถแชทด้วยได้ */}
+
           {filteredContacts.map((contact, index) => {
             return (
               <>
@@ -63,6 +71,7 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
                           <>
                             <p className="order h6">{contact.urs_name}</p>
                             <p>
+
                               {contact.message_text?.split("images")[0] === `${host}/` ? (
                                 <p className="message">ได้ส่งรูปภาพ</p>
                               ) : (
@@ -70,8 +79,8 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
                                     style={{
                                       display: "flex",
                                     }}>
-                                    <span className="oneline-textoverflow" style={{ flex: 1}}>{contact.message_text}</span>
-                                    <span style={{ width: "fit-content" }}> xx:xx น.</span>
+                                    <span className="oneline-textoverflow" style={{ flex: 1}}>{contact.latest_message_text}</span>
+                                    <span style={{ width: "fit-content" }}> {new Date(contact.last_message_time).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit", })} น.</span>
                                   </p>
                               )}
                             </p>

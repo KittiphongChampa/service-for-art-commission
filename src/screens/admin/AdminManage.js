@@ -6,7 +6,6 @@ import * as Icon from "react-feather";
 // import "../css/profileimg.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Helmet } from "react-helmet";
-// import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest } from "../components/Navbar";
 // import UserBox from "../components/UserBox";
 // import inputSetting from "../function/function";
 // import ProfileImg from "../components/ProfileImg";
@@ -41,7 +40,6 @@ export default function AdminManagement() {
   //     setMainMenu(menu)
   // }
 
-  // const id = useParams()
 
   return (
     <div className="body-con">
@@ -54,9 +52,9 @@ export default function AdminManagement() {
           <AdminMenuAside onActive={menu} />
         </div>
         <div className="aside-main-card" style={{ padding: "1.3rem 3rem" }}>
-          {menu == "alladmin" ? (
+          {menu == "alladmin" ? ( 
             <AdminManageAdmin />
-          ) : menu == "report" ? (
+          ) : menu == "report" ? ( 
             <Report />
           ) : menu == "alluser" ? (
             <AdminManageUser />
