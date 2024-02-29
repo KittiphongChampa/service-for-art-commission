@@ -6,7 +6,9 @@ import { useState, useEffect, useRef } from 'react';
 import * as ggIcon from '@mui/icons-material';
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
-import { Button, Drawer, Radio, Space } from 'antd';
+import { Button, Drawer, Radio, Flex, Avatar, Badge, Space } from 'antd';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 
 import { host } from '../utils/api'
 
@@ -59,7 +61,7 @@ const NavbarUser = (props) => {
         await axios.put(`${host}/noti/readed/?keyData=${keyData}&action=${action}`)
     };
 
-    const displayNotification = ( data ) => {
+    const displayNotification = (data) => {
         let action;
         let read;
         let linked;
@@ -68,17 +70,17 @@ const NavbarUser = (props) => {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
-            
+
         } else if (data.msg === 'ไม่รับคำขอจ้าง') {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
-            
+
         } else if (data.msg === 'ได้ส่งภาพร่าง') {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
-            
+
         } else if (data.msg === 'แจ้งเตือนการชำระเงินครั้งที่ 1') {
             action = data.msg
             keyData = data.order_id
@@ -123,7 +125,7 @@ const NavbarUser = (props) => {
         return (
             <div key={keyData}>
                 <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
-                    <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {action} {data.created_at} {read}</span>
+                    <span><img src={data.sender_img} style={{ width: 30 }} />{data.sender_name} {action} {data.created_at} {read}</span>
                 </a>
             </div>
         );
@@ -157,14 +159,40 @@ const NavbarUser = (props) => {
                     <a href="#" className="ham-menu" onClick={showDrawer}><Icon.Menu className='nav-icon' /></a>
                     <a href="/"><Icon.Home className='nav-icon' /></a>
                     <a href="/search"><Icon.Search className='nav-icon' /></a>
+
                 </div>
                 <div class="inline-nav">
                     {/* <a href="#"><Icon.Bell className='nav-icon' /><i data-feather="bell" class="nav-icon"></i></a> */}
+                    {/* 
+                    <a href="/search" style={{ position: "relative" }}>
+                        <div className="ba">
+                            58
+                        </div>
+                        
+                        <Icon.Bell className='nav-icon' />
+                       
+                    </a> */}
+                    <div  ref={dropdownRef} style={{position:"relative"}}>
+                        <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
+                            <Badge dot={notifications.length > 0 ? true : false}>
+                                <Icon.Bell className='nav-icon' />
+                            </Badge>
+                            {/* --โนติแบบมีเลข ห้ามลบบบ */}
+                            {/* {notifications.length > 0 &&
+                                <div className="ba">
+                                    {notifications.length <= 99 ?
+                                        <>
+                                            {notifications.length}
+                                        </>
 
-                    <div className="dropdown-nav" ref={dropdownRef}>
-                        <button onClick={() => setOpenNoti(!openNoti)}>
-                            <Icon.Bell className='nav-icon' />
-                            <div className="counter">{notifications.length > 0 ? notifications.length : 0}</div>
+                                        :
+                                        <>
+                                            99+
+                                        </>}
+                                </div>} */}
+                            
+
+                            {/* <div className="counter">{notifications.length > 0 ? notifications.length : 0}</div> */}
                             {/* {notifications.length > 0 ? (
                                 <div className="counter">{notifications.length}</div>
                             ) : (
@@ -196,7 +224,7 @@ const NavbarUser = (props) => {
                     ) : (
                         <></>
                     )}
-                
+
                     <div className="dropdown-nav" ref={dropdownRef}>
                         <button onClick={() => { setOpen(!open) }}
                         // style={{ backgroundImage: "url(mainmoon.jpg)" }}
@@ -206,17 +234,14 @@ const NavbarUser = (props) => {
                         <div className={`dropdown-area ${open ? 'open' : 'close'}`} >
                             <a href="/profile" className="in-dropdown"><Icon.User className='nav-icon mx-2' />โปรไฟล์ของฉัน</a>
                             <a href="/setting-profile" className="in-dropdown"><Icon.Settings className='nav-icon mx-2' />ตั้งค่าโปรไฟล์</a>
-                            {userdata.urs_type === 1 ? (
+                            <a href="/myreq" className="in-dropdown"><DescriptionOutlinedIcon className='nav-icon mx-2' />รายการจ้าง</a>
+                            {/* <a href="/chatbox" className="in-dropdown"><Icon.MessageCircle className='nav-icon mx-2' />แชท</a> */}
+                            {userdata.urs_type === 1 && (
                                 <>
-                                    <a href="/artistmanagement/dashboard" className="in-dropdown"><ggIcon.GridView className='nav-icon mx-2' />Dashborad</a>
-                                    <a href="/chatbox" className="in-dropdown"><Icon.MessageCircle className='nav-icon mx-2' />แชทและออเดอร์</a>
-                                </>
-                            ) : (
-                                <>
-                                    <a href="/chatbox" className="in-dropdown"><Icon.MessageCircle className='nav-icon mx-2' />แชท</a>
+                                    <a href="/artistmanagement/dashboard" className="in-dropdown"><PaletteOutlinedIcon className='nav-icon mx-2' />artist panel</a>
                                 </>
                             )}
-                            <a href="/allfaq" className="in-dropdown"><Icon.HelpCircle className='nav-icon mx-2' />ช่วยเหลือ</a>
+                            <a href="/allfaq" className="in-dropdown"><Icon.HelpCircle className='nav-icon mx-2' />คำถามที่พบบ่อย</a>
                             <a href="#" onClick={handleLogout} className="in-dropdown"><Icon.LogOut className='nav-icon mx-2' />ออกจากระบบ</a>
                         </div>
                     </div>
@@ -230,12 +255,28 @@ const NavbarUser = (props) => {
                     open={openDrawer}
                 // className="ham-nav"
                 >
-                <div className="ham-nav">
-                    <a href="/admin/adminmanage/alluser"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
-                    <a href="/search"><Icon.Search className='nav-icon mx-2' />ค้นหาคอมมิชชัน</a>
-                    <a href="#"><Icon.LogOut className='nav-icon mx-2' />ออกจากระบบ</a>
-                </div>
-            </Drawer>
+                    <div className="ham-nav">
+                        <a href="/profile">
+                            <Flex gap="small" align="center">
+                                <img src={userdata.urs_profile_img} style={{ width: "45px", height: "45px", borderRadius: "45px" }} />
+                                <p>โปรไฟล์ของฉัน</p>
+                            </Flex>
+                        </a>
+                        <a href="/admin/adminmanage/alluser"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
+                        <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
+                        <a href="/setting-profile"><Icon.Bell className='nav-icon mx-2' />การแจ้งเตือน</a>
+                        <a href="/chatbox"><Icon.MessageCircle className='nav-icon mx-2' />แชท</a>
+                        <a href="/setting-profile"><Icon.Settings className='nav-icon mx-2' />ตั้งค่าโปรไฟล์</a>
+                        <a href="/myreq"><DescriptionOutlinedIcon className='nav-icon mx-2' />รายการจ้างของฉัน</a>
+                        {userdata.urs_type === 1 &&
+                            <>
+                                <a href="/manage-commission"><Icon.PlusSquare className='nav-icon mx-2' />เพิ่มคอมมิชชันและงานวาด</a>
+                                <a href="/artistmanagement/dashboard"><PaletteOutlinedIcon className='nav-icon mx-2' />artist panel</a>
+                            </>}
+                        <a href="/allfaq"><Icon.HelpCircle className='nav-icon mx-2' />คำถามที่พบบ่อย</a>
+                        <a href="#"><Icon.LogOut className='nav-icon mx-2' />ออกจากระบบ</a>
+                    </div>
+                </Drawer>
             </nav>
         </div>
     )
@@ -279,7 +320,7 @@ const NavbarHomepage = (props) => {
                     <a href="/login"><Icon.LogIn className='nav-icon mx-2' />เข้าสู่ระบบ</a>
                     <a href="/verify"><Icon.LogIn className='nav-icon mx-2' />สมัครสมาชิก</a>
                     <a href="/"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
-                    <a href="/search"><Icon.Search className='nav-icon mx-2' />ค้นหาคอมมิชชัน</a>
+                    <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
                 </div>
             </Drawer>
         </div>
@@ -400,7 +441,7 @@ const NavbarAdmin = (props) => {
             <div key={keyData}>
                 {/* < href={linked} onClick={() => handleNotificationClick(keyData, action)}> */}
                 <a href={linked} >
-                    <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {action} {data.created_at} {read}</span>
+                    <span><img src={data.sender_img} style={{ width: 30 }} />{data.sender_name} {action} {data.created_at} {read}</span>
                 </a>
             </div>
         );
@@ -413,7 +454,7 @@ const NavbarAdmin = (props) => {
         localStorage.removeItem("type");
         navigate("/welcome");
     };
-    
+
     return (
         <div class="nav-box" >
             <nav class="nav-container">
@@ -422,9 +463,9 @@ const NavbarAdmin = (props) => {
                     <a href="/admin"><Icon.Home className='nav-icon' /></a>
                 </div>
                 <div class="inline-nav">
-        
+
                     <div className="dropdown-nav" ref={dropdownRef}>
-                        <button onClick={() => setOpenNoti(!openNoti)}>
+                        <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
                             <Icon.Bell className='nav-icon' />
                             <div className="counter">{notifications.length > 0 ? notifications.length : 0}</div>
 
@@ -438,11 +479,11 @@ const NavbarAdmin = (props) => {
 
                     {admindata.admin_type === 0 ? (
                         <>
-                        <a href="/admin/adminmanage/alladmin"><ggIcon.AdminPanelSettings className='nav-icon' /></a>
+                            <a href="/admin/adminmanage/alladmin"><ggIcon.AdminPanelSettings className='nav-icon' /></a>
                         </>
                     ) : (
                         <></>
-                    ) }
+                    )}
 
                     <div className="dropdown-nav" ref={dropdownRef}>
                         <button onClick={() => { setOpen(!open) }}>

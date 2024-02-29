@@ -212,7 +212,7 @@ export default function Dashboard() {
     <>
       {/* <div className="artist-mn-container"> */}
         <div className="headding">
-          <h1>แดชบอร์ด</h1>
+        <h1 className="h3">แดชบอร์ด</h1>
         </div>
         {/* <div className="artist-mn-card"> */}
           <Scrollbars>

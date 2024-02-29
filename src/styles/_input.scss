@@ -1,0 +1,39 @@
+.txtarea-input {
+    border-radius: 1.5rem;
+    border: 1px solid #9D9EB8;
+    background: rgba(255, 255, 255, 0.54);
+    padding: 0.7rem;
+
+    &:focus {
+        border: 1px solid rgb(26, 54, 100);
+        outline: none;
+    }
+}
+
+.form-item {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+
+    .tou-radio-btn-group {
+        display: flex;
+        // justify-content:space-between;
+        column-gap: 2rem;
+        div{
+            span{
+                font-weight: 300;
+                margin-left: 0.1rem;
+            }
+        }
+    }
+
+    p {
+        color: $dusk;
+    }
+
+    label {
+        color: $dusk;
+        font-weight: 500;
+    }
+
+}

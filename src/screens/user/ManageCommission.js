@@ -39,8 +39,9 @@ import {
   Tooltip,
   Alert,
   Select,
-  message,
+  Flex,
   InputNumber,
+  Tabs
 } from "antd";
 import * as Icon from "react-feather";
 import ReactQuill from "react-quill";
@@ -268,6 +269,34 @@ export default function ManageCommission() {
     });
   };
 
+  const menus = [
+    {
+      key: "1",
+      label: "คอมมิชชัน"
+    },
+    {
+      key: "2",
+      label: <Link to="/manage-artwork">งานวาด</Link>
+    }
+  ]
+
+
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'align': [] }], [{ 'indent': '-1' }, { 'indent': '+1' }],
+      ['clean'],
+    ],
+  };
+
+  // Define what happens when the custom option is clicked
+  const formats = [
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet',
+    'align', 'indent'
+  ];
+
   return (
     <div className="body-con">
       {contextHolder}
@@ -280,10 +309,11 @@ export default function ManageCommission() {
         <div className="container mt-4">
           <div className="content-container">
             <div className="content-body preview-cms">
-              <div className="sub-menu-group">
+              {/* <div className="sub-menu-group">
                 <Link className="sub-menu selected">คอมมิชชัน</Link>
                 <Link to="/manage-artwork" className="sub-menu">งานวาด</Link>
-              </div>
+              </div> */}
+              <Tabs defaultActiveKey="1" items={menus} />
               <h3 className="content-header d-flex justify-content-center mt-4">
                 เพิ่มคอมมิชชัน
               </h3>
@@ -408,6 +438,8 @@ export default function ManageCommission() {
                 >
                   <ReactQuill
                     theme="snow"
+                    modules={modules}
+                    formats={formats}
                     value={editorValue}
                     onChange={setEditorValue}
                     placeholder="เขียนรายละเอียดคอมมิชชัน.."
@@ -814,7 +846,9 @@ export default function ManageCommission() {
                     allowClear
                   ></Select>
                 </Form.Item>
-                <Button htmlType="submit">บันทึก</Button>
+                <Flex justify="flex-end">
+                  <Button size="large" type="primary" htmlType="submit" shape="round">บันทึก</Button>
+                </Flex>
               </Form>
               <br />
             </div>

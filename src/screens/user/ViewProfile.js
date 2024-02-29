@@ -261,20 +261,20 @@ export default function ViewProfile() {
                 {type != "admin" ? (
                   <div className="group-btn-area">
                     {follow === "no_follow" ? (
-                      <button className="follow-btn" onClick={eventfollow}>
+                      <Button shape="round"  onClick={eventfollow}>
                         ติดตาม
-                      </button>
+                      </Button>
                     ) : (
-                      <button className="follow-btn" onClick={eventUnfollow}>
+                      <Button shape="round" onClick={eventUnfollow}>
                         เลิกติดตาม
-                      </button>
+                      </Button>
                     )}
 
                     <a href={`/chatbox?id=${userdata.id}&od_id=0`}>
                       {/* <Link to={{ pathname: "/chatbox", state: { data: id } }}> */}
-                      <button className="follow-btn">
+                      <Button shape="round" >
                         แชท
-                      </button>
+                      </Button>
                       {/* </Link> */}
                     </a>
                   </div>
@@ -401,7 +401,7 @@ function AllCms(props) {
         {type != "admin" ? (
           <>
             {myCommission.map((mycms) => (
-              <div key={mycms.cms_id} style={{ display: "flex" }}>
+              <div key={mycms.cms_id}>
                 <Link to={`/cmsdetail/${mycms.cms_id}`}>
                   <CmsItem
                     src={mycms.ex_img_path}

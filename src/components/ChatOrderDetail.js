@@ -5,7 +5,7 @@ import * as Icon from 'react-feather';
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form"
 import "../css/indexx.css";
-import '../css/main.css';
+import '../styles/main.css';
 import "../css/allbutton.css";
 import "../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -13,14 +13,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { format, isToday, isYesterday } from 'date-fns';
 
 import Switch from 'react-switch';
-import 'rsuite/styles/index.less';
+// import 'rsuite/styles/index.less';
 import TextareaAutosize from "react-textarea-autosize";
 // import ImgFullscreen from '../function/openFullPic'
 import 'animate.css'
 import { waitFor } from "@testing-library/react";
 import { Container } from 'react-bootstrap/Container';
 
-export default function ChatOrderDetail({ myId,isBriefOpen,handleBrief,currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
+export default function ChatOrderDetail({ myId, isBriefOpen, handleBrief, currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
 
     const odModalRef = useRef();
     const briefModalRef = useRef();
@@ -283,14 +283,14 @@ export default function ChatOrderDetail({ myId,isBriefOpen,handleBrief,currentSt
                                 currentDate = format(message.current_time, 'เมื่อวานนี้ HH:mm น.')
                             }
                         } else {
-                            currentDate =message.current_time;
+                            currentDate = message.current_time;
                         }
 
 
-                        return currentDate != null && currentDate != undefined && message.step_id !== 0 && message.step_id !== undefined && message.message != null && !message.message.includes("แนบ")? (
+                        return currentDate != null && currentDate != undefined && message.step_id !== 0 && message.step_id !== undefined && message.message != null && !message.message.includes("แนบ") ? (
                             <tr key={index}>
                                 <td>{currentDate}</td>
-                                <td>{message.sender == myId &&'คุณ'}{message.message}</td>
+                                <td>{message.sender == myId && 'คุณ'}{message.message}</td>
                             </tr>
                         ) : null;
                     })}

@@ -20,6 +20,7 @@ export default function ArtworkDetail() {
     const {TextArea} = Input;
     const artworkId = useParams();
     const token = localStorage.getItem("token");
+    const type = localStorage.getItem("type");
 
     const [reportModalIsOpened, setReportModalIsOpened] = useState(false)
     const [gettopics, setGetTopics] = useState([]);
@@ -264,7 +265,13 @@ export default function ArtworkDetail() {
         <>
             {src!=null  && <ImgFullscreen src={src} handleFullImg={handleFullImg} />}
             <div className="body-con">
-                <NavbarUser />
+                {
+                    isLoggedIn ? (
+                        type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+                    ) : (
+                        <NavbarGuest />
+                    )
+                }
                 <div className="body-lesspadding" style={{ backgroundColor: "#F1F5F9" }}>
                     <div className="container">
                         <div className="unnamedcard">

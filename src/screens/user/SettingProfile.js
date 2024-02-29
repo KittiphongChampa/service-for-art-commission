@@ -282,12 +282,12 @@ export default function SettingProfile() {
       <div className="body-lesspadding" style={{ backgroundColor: "rgb(241, 241, 249)" }}>
         <div className="container">
           <div className="content-card">
-            <h1>การตั้งค่า</h1>
+            <h1 className="h3">การตั้งค่า</h1>
             {/* <SettingAside onActive="profile" /> */}
             <div className="setting-content-box">
               <div className="settingCard profile-card">
                 <div>
-                  <h2>โปรไฟล์</h2>
+                  <h2 className="h3">โปรไฟล์</h2>
                 </div>
                 <div className="in-setting-page">
                   <form onSubmit={profileupdate}>
@@ -368,7 +368,7 @@ export default function SettingProfile() {
 
               <div className="settingCard">
                 <div>
-                  <h2>อีเมลและรหัสผ่าน</h2>
+                  <h2 className="h3">อีเมลและรหัสผ่าน</h2>
                 </div>
                 <div className="in-setting-page">
                   <div>
@@ -393,7 +393,7 @@ export default function SettingProfile() {
 
               <div className="settingCard">
                 <div>
-                  <h2>บัญชีพร้อมเพย์</h2>
+                  <h2 className="h3">บัญชีพร้อมเพย์</h2>
                 </div>
                 <div className="in-setting-page">
                   <form onSubmit={bankupdate}>

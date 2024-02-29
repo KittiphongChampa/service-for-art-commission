@@ -2,7 +2,7 @@ import { log } from "util";
 import "../css/profileimg.css";
 
 export default function ProfileImg(props) {
-    console.log(props);
+    // console.log(props);
     let imgbrowse = "imgbrowse"
     let display = "flex" 
     if (props.type === "only-show") {

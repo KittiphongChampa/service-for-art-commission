@@ -1,0 +1,56 @@
+.fill-icon {
+    font-size: 20px !important;
+    color: rgb(255, 205, 40);
+    padding: 0 !important;
+    vertical-align: text-top !important;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL'0 , 
+        'wght'400,
+        'GRAD'0,
+        'opsz'24
+}
+
+
+.middle-icon{
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.plus-icon {
+    width: 48px;
+    height: 48px;
+    background-color: #061228;
+    border-radius: 200px;
+    padding: 0.7rem;
+    color: white;
+}
+
+.send-icon {
+    width: 48px;
+    height: 48px;
+    padding: 0.7rem;
+    border-radius: 200px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.go-back-icon {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+
+}
+
+.close-icon {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+
+}
