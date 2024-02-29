@@ -13,7 +13,7 @@ import { Helmet } from "react-helmet";
 import {
     UploadOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined, RadiusBottomleftOutlined,
 } from '@ant-design/icons';
-import { Modal, Progress, notification, Button, Upload, Checkbox, Form, Input, Space, Flex, Tooltip, Alert, Select, message, InputNumber } from 'antd';
+import { Modal, Progress, notification, Button, Upload, Checkbox, Form, Input, Space, Flex, Tooltip, Alert, Select, message, Tabs } from 'antd';
 import 'react-quill/dist/quill.snow.css';
 // import 'animate.css';
 
@@ -192,6 +192,16 @@ export default function ManageArtwork() {
         });
     }
 
+    const menus = [
+        {
+            key: "1",
+            label: <Link to="/manage-commission">คอมมิชชัน</Link>
+        },
+        {
+            key: "2",
+            label:"งานวาด"
+        }
+    ]
 
     return (
         <div className="body-con">
@@ -206,10 +216,7 @@ export default function ManageArtwork() {
                     <div className="content-container">
 
                         <div className="content-body preview-cms">
-                            <div className="sub-menu-group">
-                                <Link to="/manage-commission" className="sub-menu ">คอมมิชชัน</Link>
-                                <Link className="sub-menu selected">งานวาด</Link>
-                            </div>
+                            <Tabs defaultActiveKey="2" items={menus} />
                             <h3 className="content-header d-flex justify-content-center mt-4">เพิ่มงานวาด</h3>
                             <Form
                                 form={form}
@@ -326,7 +333,7 @@ export default function ManageArtwork() {
                                 </Form.Item>
                                 <Flex justify="right" gap="small" >
                                     <>
-                                        <Button shape="round" size="large">ยกเลิก</Button>
+                                        {/* <Button shape="round" size="large">ยกเลิก</Button> */}
                                         <Button type="primary" shape="round" size="large" htmlType="submit">บันทึก</Button>
                                     </>
                                 </Flex>

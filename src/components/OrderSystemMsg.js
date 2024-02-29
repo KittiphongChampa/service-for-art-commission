@@ -4,6 +4,9 @@ import { InfoCircleOutlined, LoadingOutlined, PlusOutlined, UploadOutlined, Dele
 import * as Icon from 'react-feather';
 import ImgFullscreen from './openFullPic'
 import QRCode from "qrcode.react";
+import Swal from 'sweetalert2/dist/sweetalert2.js'
+import axios from "axios";
+import { host } from "../utils/api";
 
 const getBase64 = (img, callback) => {
     const reader = new FileReader();
@@ -22,7 +25,7 @@ const beforeUpload = (file) => {
     return isJpgOrPng;
 };
 
-export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName,qrCode,handleBrief,message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
+export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
     // console.log(orderDetail);
     const flexSysDialog = { width: "50%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
     const flexSysDialogWip = { width: "80%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
@@ -30,7 +33,7 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
     const [IsModalOpen, setIsModalOpen] = useState(false)
     const stepIdRef = useRef()
 
-    
+
 
     function ModalToggle(stepId) {
         //ถ้ามันปิดอยู่
@@ -76,20 +79,18 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
     async function uploadSlip(stepId) {
         const res = await submitSlip(stepId)
         res == true && ModalToggle()
-        console.log("res=",res)
+        console.log("res=", res)
     }
-
-    const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
     const [reviewValue, setReviewValue] = useState(5);
-
+    const [commentValue, setCommentValue] = useState();
     const ref = useRef()
-    
+
     const scrollToWip = () => {
         ref.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const [fullImgOpened, setFullImgOpened] = useState(false)
-  const [src, setSrc] = useState("")
+    const [src, setSrc] = useState("")
 
     const handleFullImg = (imgsrc) => {
         console.log("คลิกฟังชันโชว์", imgsrc)
@@ -97,11 +98,44 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
         setSrc(imgsrc)
     }
 
+    
+
+    const submitReview = (values) => {
+        Swal.fire({
+            title: values.comment + reviewValue,
+            showCancelButton: true,
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await axios.post(
+                    `${host}/sendreview`,
+                    {
+                        od_id: orderDetail.od_id,
+                        rw_comment: values.comment,
+                        rw_score: reviewValue,
+                        cms_id: orderDetail.cms_id,
+                        artist_id: orderDetail.artist_id,
+                        all: orderDetail
+                    }
+                );
+                sendReview()
+            }
+        });
+    };
+
+
     return (
         <>
             <ImgFullscreen src={src} opened={fullImgOpened} handleFullImg={handleFullImg} acceptRequest={acceptRequest} />
-            {/* {alert(message)} */}
-            {/* <p>message}{message.step_name}</p> */}
+
+            {message.step_id == 0 && message.status == "e" &&
+                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                    {message.message}
+                    {/* {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดได้เปลี่ยนแปลงรายละเอียดออเดอร์แล้ว จากราคา XXX เป็น xxx และ XXX เป็น xxxx</p>} */}
+                </Flex>}
+            
+
             {
                 message.step_name == "ส่งคำขอจ้าง" &&
                 <>
@@ -112,8 +146,8 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
                         {orderDetail.artist_id == myId ?
                             message.checked == 0 ?
                                 <Flex gap="small">
-                                    <Button size="large"  shape="round" onClick={() => acceptRequest(message.step_id, message.step_name)} > ยอมรับคำขอจ้าง</Button>
-                                    <Button size="large" danger shape="round" onClick={() => acceptRequest(message.step_id, message.step_name)} > ยกเลิกคำขอจ้าง</Button>
+                                    <Button size="large" shape="round" onClick={() => acceptRequest(message.step_id, message.step_name)} > ยอมรับคำขอจ้าง</Button>
+                                    <Button size="large" danger shape="round" onClick={() => cancelRequest(message.step_id, message.step_name)} > ยกเลิกคำขอจ้าง</Button>
                                 </Flex>
                                 : null
                             : null
@@ -121,9 +155,17 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
                     </Flex>
                 </>
             }
-            {message.step_name == "รับคำขอจ้าง" &&
+
+
+            {message.step_name == "รับคำขอจ้าง" && message.status !== "c" &&
                 <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
-                    {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดยอมรับคำขอแล้ว</p>}
+                    {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดยอมรับคำขอจ้างแล้ว</p>}
+                </Flex>}
+
+            {/*! -----but ปฏิเสธ-------*/}
+            {message.step_name == "รับคำขอจ้าง" && message.status == "c" &&
+                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                    {orderDetail.artist_id == myId ? <p>ยกเลิกคำขอจ้างแล้ว</p> : <p>นักวาดยกเลิกคำขอจ้างแล้ว</p>}
                 </Flex>}
 
             {message.step_name == "ระบุราคา" && message.status == null && message.status == undefined && orderDetail.artist_id == myId &&
@@ -147,8 +189,8 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
 
             {message?.step_name?.includes('แนบสลิป') && message.status == null && message.status == undefined &&
                 <Flex className="system-message qrcode" gap="small" justify="center" align="center" vertical style={flexSysDialog}>
-                    <p className="h4">{!message?.step_name?.includes('2')? 'ชำระเงินครึ่งแรก' : "ชำระเงินครึ่งหลัง"}
-                         <Tooltip title="มีการจ่ายเงินสองรอบ จ่ายครั้งแรกหลังนักวาดส่งภาพร่าง จ่ายเงินครั้งที่สองหลังจากที่งานดำเนินไปได้ 50% แล้ว" color="#2db7f5">
+                    <p className="h4">{!message?.step_name?.includes('2') ? 'ชำระเงินครึ่งแรก' : "ชำระเงินครึ่งหลัง"}
+                        <Tooltip title="มีการจ่ายเงินสองรอบ จ่ายครั้งแรกหลังนักวาดส่งภาพร่าง จ่ายเงินครั้งที่สองหลังจากที่งานดำเนินไปได้ 50% แล้ว" color="#2db7f5">
                             <Icon.Info />
                         </Tooltip>
                     </p>
@@ -202,11 +244,11 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
                 <Flex className="system-message progress" gap="small" justify="center" align="center" vertical style={flexSysDialogWip}>
                     <p className="h4">{message.step_name}</p>
                     <div className="progress-img-container">
-                        {Array.isArray(message.img) && message.img.map((img)=>{
+                        {Array.isArray(message.img) && message.img.map((img) => {
                             return <div onClick={() => handleFullImg(img)}><img src={img} /></div>
-                        })} 
+                        })}
                         {!Array.isArray(message.img) && <div onClick={() => handleFullImg(message.img)}><img src={message.img} /></div>
-                        } 
+                        }
                     </div>
                     <Flex gap="small">
                         {
@@ -214,7 +256,7 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
                                 message.checked == 0 ? <>
                                     <Button size="large" shape="round" onClick={() => editProgress(message.step_id, message.step_name)} >แก้ไขภาพ {orderDetail.od_number_of_edit}/{orderDetail.pkg_edits}</Button>
                                     <Button size="large" shape="round" onClick={() => approveProgress(message.step_id, message.step_name)} >อนุมัติภาพ</Button>
-                                    <Button size="large"  shape="round" onClick={() => delProgress(message.step_id, message.step_name,message.msgId)} danger icon={<DeleteOutlined />}></Button>
+                                    <Button size="large" shape="round" onClick={() => delProgress(message.step_id, message.step_name, message.msgId)} danger icon={<DeleteOutlined />}></Button>
                                 </>
                                     : <p>ดำเนินการแล้ว</p>
                                 : message.checked == 0 ? <>
@@ -257,6 +299,7 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
                     <Flex key={message.index} gap="small" justify="center" align="center" vertical style={flexSysDialog}>
                         {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
                         <p><u>อันนี้แอดมินต้องเป็นคนอนุมัติแต่ให้userมากดเองก่อนยังไม่มีหน้า</u></p>
+                        <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
                         {orderDetail.artist_id !== myId ?
                             message.checked !== 0 ?
                                 <>
@@ -301,12 +344,12 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
             <Modal title="รีวิว" open={IsReviewModalOpen} footer="" onCancel={ReviewModalHandle} style={{ maxWidth: "1000px" }}>
                 {/* <Flex gap="small" justify="center" align="center" vertical className="big-uploader"> */}
                 <Form
-                    layout="vertical">
+                    layout="vertical"
+                    onFinish={submitReview}>
                     <Flex justify='center'>
-                        <Rate tooltips={desc} onChange={setReviewValue} value={reviewValue} allowClear={false}/>
-                        {reviewValue ? <span>{desc[reviewValue - 1]}</span> : ''}
+                        <Rate  onChange={setReviewValue} value={reviewValue} allowClear={false} />
                     </Flex>
-                    <Form.Item label="ความคิดเห็น" style={{textAlign:"center"}}>
+                    <Form.Item name='comment' label="ความคิดเห็น" style={{ textAlign: "center" }}>
                         <Input.TextArea placeholder="เขียนความคิดเห็น..."
                             showCount maxLength={200}
                             autoSize={{
@@ -314,10 +357,10 @@ export default function OrderSystemMsg({ orderDetail, phoneNumber,amount,accName
                                 maxRows: 6,
                             }} />
                     </Form.Item>
-                    <Form.Item>
+                    <Form.Item >
                         <Flex gap="small" justify='flex-end'>
                             <Button htmlType="submit" size="large" shape="round">ยกเลิก</Button>
-                            <Button size="large" type="primary" shape="round">ส่งรีวิว</Button>
+                            <Button size="large" type="primary" shape="round" htmlType='submit'>ส่งรีวิว</Button>
                         </Flex>
                     </Form.Item>
                 </Form>

@@ -1,0 +1,176 @@
+// @include media-breakpoint-up(sm) {}
+
+//แนฟบา
+
+@media (min-width: 0px) and (max-width: 767px) {
+    .ham-menu {
+        display: block !important;
+    }
+
+    .inline-nav a:not(.ham-menu),
+    .dropdown-area {
+        display: none;
+    }
+
+    //หน้าตั้งค่า
+
+    .setting-content-box {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+@media (min-width: 768px) and (max-width: 1200px) {}
+
+@media (min-width: 1901px) {}
+
+
+//
+
+@media (min-width: 0px) and (max-width: 767px) {
+    .sys-section {
+        grid-template-columns: 1fr;
+    }
+
+    .aa {
+        flex-direction: column-reverse;
+
+        .img-col {
+            padding-top: 3rem;
+        }
+
+        .text-col {
+            // background-color: rgba(255, 255, 255, 0.372);
+            justify-content: flex-start;
+        }
+    }
+
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .sys-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 1901px) {
+    .box-container {
+        height: 50rem;
+    }
+}
+
+// @media (min-height: 100vw){
+//     .box-container {
+//         height: 50vh;
+//     }
+// }
+
+
+// @include media-breakpoint-up(lg) {}
+
+//login
+
+
+@media (min-width: 0px) and (max-width: 767px) {
+    .body {
+        // display: flex;
+        // justify-content: center;
+        // align-items: center;
+    }
+
+    .login-soloCard {
+        margin-inline: 0 !important;
+        flex-direction: column !important;
+
+        .login-col-img {
+            display: none;
+        }
+
+        .login-col-text {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    }
+
+
+
+}
+
+
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .login-soloCard {
+        margin-inline: 0 !important;
+    }
+}
+
+@media (min-width: 1901px) {}
+
+
+//profile
+
+@media (min-width: 0px) and (max-width: 767px) {
+    .user-profile-area {
+        flex-direction: column;
+
+        .user-col-profile {
+            flex: 1 1 1;
+        }
+
+        .user-col-about {
+            flex: 1 1 1;
+            padding-top: 0;
+        }
+    }
+
+
+}
+
+
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .login-soloCard {
+        margin-inline: 0 !important;
+    }
+}
+
+@media (min-width: 1901px) {}
+
+//artist admin panel
+
+@media (min-width: 0px) and (max-width: 767px) {
+    .aside-chatbox {
+        // flex: 15rem 1 auto;
+        flex-basis: 4rem !important;
+        .setting-menu{
+            padding: 0;
+        }
+        p,h1{
+            display: none;
+        }
+        div{
+            width:fit-content;
+        }
+    }
+    .aside-main-card{
+        flex: 1 1 auto;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .aside-chatbox {
+        // flex: 15rem 1 auto;
+        flex-basis: 14rem !important;
+        // h1{
+        //     font-size: 16px;
+        //     font-weight:400;
+        // }
+        .setting-menu {
+            // padding: 0;
+        }
+    }
+    
+}
+
+@media (min-width: 1901px) {}

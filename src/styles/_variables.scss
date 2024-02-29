@@ -1,0 +1,49 @@
+$lightPurple: #7A86B6;
+$lightBlue: #7E9AFA;
+$darkMineral: #525764;
+$green: #b7eb8f;
+$milkWhite : #FCFBFF;
+$dusk:#495C83;
+$headdingColor:#495C83;
+$lightLetter : #8898b5;
+
+
+.small-ellipse-btn {
+    padding: 0.3rem 0.7rem;
+    border-radius: 30rem;
+}
+
+.thin-ellipse-btn{
+    padding: 0.3rem 0.7rem;
+    border-radius: 30rem;
+}
+
+.normal-ellipse-btn{
+    padding: 0.8rem 1.4rem;
+    border-radius: 30rem;
+}
+
+.fat-ellipse-btn{
+    padding: 0.3rem 0.7rem;
+    border-radius: 50rem;
+}
+
+
+
+@mixin normal-ellipse-btn($color, $bgColor,$borderColor) {
+    padding: 0.8rem 1.4rem;
+    border-radius: 30rem;
+    color: $color;
+    background-color:$bgColor;
+    border: 1px solid $borderColor;
+}
+
+@mixin default-ellipse-btn($color, $bgColor, $borderColor) {
+    padding: 0.6rem 0.8rem;
+    border-radius: 30rem;
+    color: $color;
+    background-color: $bgColor;
+    border: 1px solid $borderColor;
+}
+
+

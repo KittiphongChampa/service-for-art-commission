@@ -10,14 +10,14 @@ import * as alertData from '../../alertdata/alertData';
 import "../../css/indexx.css";
 import "../../css/allbutton.css";
 import "../../css/profileimg.css";
-import '../../css/main.css';
+import '../../styles/main.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Helmet } from "react-helmet";
 import ProfileImg from "../../components/ProfileImg";
 import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../../components/Navbar";
 import ArtistBox from '../../components/ArtistBox'
 import CmsItem from "../../components/CmsItem";
-import { Modal, Button, Input, Select, Tabs} from 'antd';
+import { Modal, Button, Input, Select, Tabs, Flex } from 'antd';
 
 import ChangeProfileImgModal from "../../modal/ChangeProfileImgModal";
 import { ChangeCoverModal, openInputColor } from "../../modal/ChangeCoverModal"
@@ -46,7 +46,7 @@ export default function Profile() {
 
     const [myCommission, setMyCms] = useState([]);
     const [myGallery, setMyGallery] = useState([]);
-    
+
     // console.log('myFollower : ',myFollower, 'iFollowing : ', iFollowing);
 
     useEffect(() => {
@@ -63,46 +63,46 @@ export default function Profile() {
     // useEffect(() => {},[])
     // const [myFollower, setMyFollower] = useState([])
     // console.log(myFollower);
-    
+
     const getUser = async () => {
         await axios
-          .get(`${host}/profile`, {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          })
-          .then((response) => {
-            const data = response.data;
-            if (data.status === "ok") {
-                setUserdata(data.users[0]);
-                axios .get(`${host}/openFollowing?iFollowing=${data.IFollowingsIds}`).then((response) => {
-                    const data = response.data;
-                    setIFollowerData(data.ifollowing)
-                })
-                axios .get(`${host}/openFollower?myFollower=${data.MyFollowerIds}`).then((response) => {
-                    const data = response.data;
-                    setMyFollowerData(data.myfollower)
-                })
-                
-            } else if (data.status === "no_access") {
-                alert(data.message);
-                navigate('/admin');
-            } else {
-            //   toast.error("ไม่พบผู้ใช้งาน", toastOptions);
-            }
-          }).catch((error) => {
-            if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
-                alert("Token has expired. Please log in again.");
-                localStorage.removeItem("token");
-                navigate("/login");
-              } else {
-                console.error("Error:", error);
-              }
-          });
+            .get(`${host}/profile`, {
+                headers: {
+                    Authorization: "Bearer " + token,
+                },
+            })
+            .then((response) => {
+                const data = response.data;
+                if (data.status === "ok") {
+                    setUserdata(data.users[0]);
+                    axios.get(`${host}/openFollowing?iFollowing=${data.IFollowingsIds}`).then((response) => {
+                        const data = response.data;
+                        setIFollowerData(data.ifollowing)
+                    })
+                    axios.get(`${host}/openFollower?myFollower=${data.MyFollowerIds}`).then((response) => {
+                        const data = response.data;
+                        setMyFollowerData(data.myfollower)
+                    })
+
+                } else if (data.status === "no_access") {
+                    alert(data.message);
+                    navigate('/admin');
+                } else {
+                    //   toast.error("ไม่พบผู้ใช้งาน", toastOptions);
+                }
+            }).catch((error) => {
+                if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
+                    alert("Token has expired. Please log in again.");
+                    localStorage.removeItem("token");
+                    navigate("/login");
+                } else {
+                    console.error("Error:", error);
+                }
+            });
     };
 
     const getMyCms = async () => {
-        await axios.get(`${host}/myCommission`,{
+        await axios.get(`${host}/myCommission`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token,
@@ -114,7 +114,7 @@ export default function Profile() {
     };
 
     const getMyGallery = async () => {
-        await axios.get(`${host}/myGallery`,{
+        await axios.get(`${host}/myGallery`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token,
@@ -132,7 +132,7 @@ export default function Profile() {
         event.target.classList.add('selected')
         setprofileMenuSelected(menu)
     }
-    
+
     const openModal = (modal) => {
         if (modal === "profile") {
             const ProfileModal = <ChangeProfileImgModal profile={userdata.urs_profile_img} setShowProfileModal={setShowProfileModal} />
@@ -155,7 +155,7 @@ export default function Profile() {
         {
             key: '2',
             label: "แกลเลอรี",
-            children: <AllArtworks myGallery={myGallery}/>,
+            children: <AllArtworks myGallery={myGallery} />,
         },
         {
             key: '3',
@@ -165,12 +165,12 @@ export default function Profile() {
         {
             key: '4',
             label: "ผู้ติดตาม",
-            children: <Followers myFollowerData={myFollowerData}/>,
+            children: <Followers myFollowerData={myFollowerData} />,
         },
         {
             key: '5',
             label: "กำลังติดตาม",
-            children: <Followings IFollowerData={IFollowerData}/>,
+            children: <Followings IFollowerData={IFollowerData} />,
         }
     ];
 
@@ -194,11 +194,12 @@ export default function Profile() {
 
     // }, [])
 
-    const submitChangeCoverForm = (data) => {
+    const submitChangeCoverForm = (event,data) => {
         // const colorPicker = document.getElementById("color-input");
         // const colorValue = colorPicker.value;
+        event.preventDefault()
         const formData = new FormData();
-        formData.append("cover_color", data.cover);
+        formData.append("cover_color", selectedColor);
         Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
             if (result.isConfirmed) {
                 axios.patch(`${host}/cover_color/update`, formData, {
@@ -257,6 +258,8 @@ export default function Profile() {
             });
     };
 
+    const [selectedColor, setSelectedColor] = useState(userdata.urs_cover_color);
+
     return (
         <div className="body-con">
             <Helmet>
@@ -265,7 +268,7 @@ export default function Profile() {
             {showCoverModal}
             {showProfileModal}
             {/* <Navbar /> */}
-            <NavbarUser/>
+            <NavbarUser />
             <div class="body-nopadding" style={body}>
 
                 <div className="cover-grid">
@@ -275,63 +278,50 @@ export default function Profile() {
                     </div>
                     <div className="container profile-page">
                         <div className="user-profile-area">
-                            
-                                <div className="user-col-profile">
-                                    <ProfileImg src={userdata.urs_profile_img} type="show"
-                                        onPress={openProfileModal}
-                                    />
-                                    {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
-                                    <p className="username-profile fs-5">{userdata.urs_name}</p>
-                                    <p className="follower-profile">follower</p>
-                                    <div className="group-btn-area">
-                                        {/* <button className="message-btn"><Icon.MessageCircle /></button>
-                                        <button className="follow-btn">ติดตาม</button> */}
-                                        <a href="/setting-profile"><button className="follow-btn" >แก้ไขโปรไฟล์</button></a>
-                                    </div>
-                                    <p className="bio-profile">
-                                        {userdata.urs_bio}
-                                    </p>
-                                </div>
-                                <div className="user-col-about">
-                                   
-                                    <div className="user-about-content">
-                                        <div className="user-about-review mb-4"><p className="fs-3">4.0</p> <p>จาก 5 รีวิว</p></div>
-                                        <div className="user-about-text">
-                                            <div>
-                                                <p>ผู้ติดตาม {myFollowerData.length} </p>
-                                                <p>กำลังติดตาม {IFollowerData.length} </p>
-                                                <p>งานสำเร็จแล้ว 10 งาน</p>
-                                                <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p>
-                                                <p>ตอบกลับภายใน 1 ชั่วโมง</p>
-                                            </div>
-                                            <div>
-                                                <p>คอมมิชชัน เปิด</p>
-                                                <p>คิวว่าง 1 คิว</p>
 
-                                            </div>
-                                        </div>
+                            <div className="user-col-profile">
+                                <ProfileImg src={userdata.urs_profile_img} type="show"
+                                    onPress={openProfileModal}
+                                />
+                                {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
+                                <p className="username-profile fs-5">{userdata.urs_name}</p>
+                                <p className="follower-profile">follower</p>
+                                <div className="group-btn-area">
+                                    {/* <button className="message-btn"><Icon.MessageCircle /></button>
+                                        <button className="follow-btn">ติดตาม</button> */}
+                                    <a href="/setting-profile"><Button shape="round" >แก้ไขโปรไฟล์</Button></a>
+                                </div>
+                                <p className="bio-profile">
+                                    {userdata.urs_bio}
+                                </p>
+                            </div>
+                            <div className="user-col-about">
+
+                                <div className="user-about-content">
+                                    <div className="user-about-review mb-4"><p className="fs-3">4.0</p> <p>จาก 5 รีวิว</p></div>
+                                    <div className="user-about-text">
+                                        <Flex gap="small" vertical>
+                                            <p>ผู้ติดตาม {myFollowerData.length} </p>
+                                            <p>กำลังติดตาม {IFollowerData.length} </p>
+                                            <p>งานสำเร็จแล้ว 10 งาน</p>
+                                            <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p>
+                                            <p>ตอบกลับภายใน 1 ชั่วโมง</p>
+                                        </Flex>
+                                        <Flex gap="small" vertical>
+                                            <p>คอมมิชชัน เปิด</p>
+                                            <p>คิวว่าง 1 คิว</p>
+
+                                        </Flex>
                                     </div>
                                 </div>
-                            
+                            </div>
+
                         </div>
                         <div className="user-profile-contentCard">
                             {/* <button className="sub-menu selected" onClick={(event) => menuProfile(event, 'all')}>ทั้งหมด</button> */}
                             <div>
-                                <Tabs defaultActiveKey="1" items={menus} onChange={changeMenu} />
+                                <Tabs defaultActiveKey="1" items={menus} />
                             </div>
-                            
-                            {/* <div className="user-profile-contentCard sub-menu-group">
-                                <Link className="sub-menu selected" onClick={(event) => menuProfile(event, 'cms')}>คอมมิชชัน</Link>
-                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'gallery')}>งานวาด</Link>
-                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'review')}>รีวิว</Link>
-                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'follower')}>ผู้ติดตาม</Link>
-                                <Link className="sub-menu" onClick={(event) => menuProfile(event, 'following')}>กำลังติดตาม</Link>
-                            </div> */}
-                            {/* {profileMenuSelected === "cms" ? <AllCms myCommission={myCommission} userID={userdata.id}/> : null}
-                            {profileMenuSelected === "gallery" ? <AllArtworks myGallery={myGallery} /> : null}
-                            {profileMenuSelected === "review" ? <AllReviews /> : null}
-                            {profileMenuSelected === "follower" ? <Followers myFollowerData={myFollowerData}/> : null}
-                            {profileMenuSelected === "following" ? <Followings IFollowerData={IFollowerData}/> : null} */}
                         </div>
                     </div>
 
@@ -340,22 +330,19 @@ export default function Profile() {
             </div>
             <Modal title="เปลี่ยนสีปก" open={showCoverModal} onCancel={openCoverModal} footer="">
                 {/* <div className="form-area"> */}
-                <form onSubmit={handleSubmit(submitChangeCoverForm)}>
+                <form onSubmit={submitChangeCoverForm}>
                     {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนสีปก</h2> */}
                     <div className="setting-img-box">
                         <div className="setting-cover">
-                            <input {...register("cover")} type="color" id="color-input" style={{ cursor: "pointer" }} />
+                            <input onChange={(e) => {setSelectedColor(e.target.value)}} defaultValue={userdata.urs_cover_color}  type="color" id="color-input" style={{ cursor: "pointer" }} />
                         </div>
                         <ProfileImg src={userdata.urs_profile_img} type="only-show" />
-                        <div className="submit-color-btn-area" >
-                            <button className="submit-color-btn" type="submit">บันทึกข้อมูล</button>
-                        </div>
 
                     </div>
-                    <div className="text-align-center">
-                        <button className="gradiant-btn" type="submit">บันทึก</button>
-                        <button className="cancle-btn" type="button" onClick={openCoverModal}>ยกเลิก</button>
-                    </div>
+                    <Flex justify="center" gap="small">
+                        <Button type="primary" shape="round" size="large" htmlType="submit">บันทึก</Button>
+                        <Button shape="round" size="large" onClick={openCoverModal}>ยกเลิก</Button>
+                    </Flex>
                 </form>
 
                 {/* </div> */}
@@ -378,10 +365,10 @@ export default function Profile() {
                         {errors.profileImg && errors.profileImg.type === "required" && (<p class="validate-input"> กรุณาเลือกไฟล์ภาพ</p>)}
                         {errors.profileImg && errors.profileImg.type === "accept" && (<p class="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>)}
                     </div>
-                    <div className="text-align-center">
-                        <button className={`gradiant-btn`} type="submit" >บันทึก</button>
-                        <button className="cancle-btn" type="button" onClick={openProfileModal}>ยกเลิก</button>
-                    </div>
+                    <Flex gap="small" justify="center">
+                        <Button type="primary" shape="round" size="large" htmlType="submit">บันทึก</Button>
+                        <Button shape="round" size="large" onClick={openProfileModal}>ยกเลิก</Button>
+                    </Flex>
                 </form>
                 {/* </div>
                 </div> */}
@@ -391,14 +378,14 @@ export default function Profile() {
 }
 
 function Followers(props) {
-    const {myFollowerData} = props
+    const { myFollowerData } = props
 
     return <>
         <p className="h3 mt-3 mb-2">ผู้ติดตาม</p>
         {myFollowerData.map(data => (
             <a key={data.id} href={`/profile/${data.id}`}>
                 <div className="artistbox-items">
-                    <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
+                    <ArtistBox img={data.urs_profile_img} name={data.urs_name} />
                 </div>
             </a>
         ))}
@@ -411,11 +398,11 @@ function Followings(props) {
     const { IFollowerData } = props;
 
     return <>
-        <p className="h3 mt-3 mb-2">กำลังติดตาม</p>   
+        <p className="h3 mt-3 mb-2">กำลังติดตาม</p>
         <div className="artistbox-items">
             {IFollowerData.map(data => (
                 <a key={data.id} href={`/profile/${data.id}`}>
-                    <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
+                    <ArtistBox img={data.urs_profile_img} name={data.urs_name} />
                 </a>
             ))}
         </div>
@@ -428,10 +415,10 @@ function AllCms(props) {
         <p className="h3 mt-3 mb-2">คอมมิชชัน</p>
         <div class="content-items">
             {myCommission.map(mycms => (
-                <div key={mycms.cms_id} style={{display:"flex"}}>
-                <Link to={`/cmsdetail/${mycms.cms_id}`}>
-                    <CmsItem src={mycms.ex_img_path} headding={mycms.cms_name} price="100" desc={mycms.cms_desc}/>
-                </Link>
+                <div key={mycms.cms_id}>
+                    <Link to={`/cmsdetail/${mycms.cms_id}`}>
+                        <CmsItem src={mycms.ex_img_path} headding={mycms.cms_name} price="100" desc={mycms.cms_desc} />
+                    </Link>
                 </div>
             ))}
         </div>
@@ -443,7 +430,7 @@ function AllArtworks(props) {
     return <>
         <p className="h3 mt-3 mb-2">งานวาด</p>
         <div className="profile-gallery-container">
-            {myGallery.map((data)=>(
+            {myGallery.map((data) => (
                 <div className="profile-gallery" key={data.artw_id}>
                     <img src={data.ex_img_path} />
                 </div>

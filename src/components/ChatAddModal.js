@@ -3,7 +3,7 @@ import * as Icon from 'react-feather';
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form"
 import "../css/indexx.css";
-import '../css/main.css';
+import '../styles/main.css';
 import "../css/allbutton.css";
 import "../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,7 +18,7 @@ import 'sweetalert2/src/sweetalert2.scss'
 import * as alertData from '../alertdata/alertData';
 import { width } from '@mui/system';
 import ImgFullscreen from '../components/openFullPic'
-import { Modal, Input, Select, Space, Switch } from 'antd';
+import { Modal, Input, Select, Space, Switch, Checkbox } from 'antd';
 import { host } from "../utils/api";
 
 
@@ -28,7 +28,7 @@ export default function ChatAddModal(props) {
         setPage(pagenumber)
     }
 
-    
+
 
     const [isChecked, setIsChecked] = useState({ tou: false, price: false })
 
@@ -42,12 +42,14 @@ export default function ChatAddModal(props) {
         return (<>
             <p className="h4">เปลี่ยนแปลงประเภทการใช้และราคา</p>
             <div><p>ประเภทการใช้งานปัจจุบัน : Personal use</p>
-                <p>ราคาปัจจุบัน : 200 บาท</p></div>
+                <p>ราคาปัจจุบัน : 200 บาท</p>
+            <p>ราคาขั้นต่ำ: xxxx</p></div>
             <form action="/action_page.php">
                 <div className="form-item">
                     <div>
                         <input type="checkbox" id="tou" name="tou" value="tou" checked={isChecked.tou} onChange={handleIsChecked} />
                         <label className="ms-2" for="tou">เปลี่ยนประเภทการใช้งาน</label>
+                        {/* <Checkbox >เปลี่ยนประเภทการใช้งาน</Checkbox> */}
 
                         {/* <fieldset>
                             <legend>Personalia:</legend>
@@ -80,12 +82,12 @@ export default function ChatAddModal(props) {
         </>
         )
     }
-    
-
-    
 
 
-    
+
+
+
+
 
     const [src, setSrc] = useState(null)
 

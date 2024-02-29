@@ -832,7 +832,7 @@ input[type="color"]::-webkit-color-swatch {
     grid-row-start: 1;
     grid-column-start: 1;
     height: 100%;
-    background-color: pink;
+    background-color: transparent;
 }
 
 
@@ -973,6 +973,7 @@ input[type="color"]::-webkit-color-swatch {
     flex-wrap: wrap;
     row-gap: auto;
     column-gap: 2.5rem;
+    /* row-gap: 1rem; */
     /* grid-template-columns: repeat(auto-fit, minmax(18.7rem, 1fr)); */
 }
 
@@ -991,8 +992,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .username-profile {
-    font-weight: 700;
-
+    font-weight: 500;
     color: #525764;
     padding-inline: 2.5rem;
 }

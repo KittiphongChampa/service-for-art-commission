@@ -274,11 +274,13 @@ export default function ArtworkDetail() {
         <>
             {src!=null  && <ImgFullscreen src={src} handleFullImg={handleFullImg} />}
             <div className="body-con">
-                {isLoggedIn ? (
-                    type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
-                ) : (
-                    <NavbarHomepage />
-                )}
+                {
+                    isLoggedIn ? (
+                        type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+                    ) : (
+                        <NavbarGuest />
+                    )
+                }
                 <div className="body-lesspadding" style={{ backgroundColor: "#F1F5F9" }}>
                     <div className="container">
                         <div className="unnamedcard">

@@ -5,10 +5,11 @@ import { useForm } from "react-hook-form";
 // import "../css/indeAttImgInput.css";
 // import "../css/recent_index.css";
 // import '../styles/index.css';
-import "../../css/main.css";
+import "../../styles/main.css";
 import "../../css/allbutton.css";
 import "../../css/profileimg.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-quill/dist/quill.snow.css';
 import { Helmet } from "react-helmet";
 import {
   NavbarUser,
@@ -27,7 +28,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useNavigate, Link, useParams, useLocation } from "react-router-dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
-import { Radio, Dropdown, Breadcrumb, Flex, Modal, Progress, notification, Button, Upload, Checkbox, Form, Input, Space, Card, Tooltip, Alert, Select, message, InputNumber } from "antd";
+import { Radio, Dropdown, Breadcrumb, Flex, Modal, Progress, notification, Button, Upload, Checkbox, Form, Input, Space, Card, Tooltip, Alert, Select, message, InputNumber, Tabs } from "antd";
 import { CloseOutlined, MoreOutlined, HomeOutlined, UserOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
 import ReactQuill from 'react-quill';
@@ -60,6 +61,7 @@ export default function CmsDetail() {
   const [pkgDetail, setPkgDetail] = useState([]);
   const [touDetail, setTouDetail] = useState([]);
   const [topics, setTopics] = useState([]);
+  const [isOwner, setIsOwner] = useState(false);
 
   const { userdata, isLoggedIn, socket } = useAuth();
   console.log(isLoggedIn);
@@ -82,28 +84,7 @@ export default function CmsDetail() {
     });
   }
 
-  const [activeMenu, setActiveMenu] = useState({
-    package: true,
-    review: false,
-    queue: false,
-  });
 
-  const onChangeTouReq = (e) => {
-    console.log("radio checked", e.target.value);
-    setTouValue(e.target.value);
-  };
-
-  function handleMenu(event, menu) {
-    const oldMenu = document.querySelector(".sub-menu.selected");
-    oldMenu.classList.remove("selected");
-    event.target.classList.add("selected");
-    // setActiveMenu((prevState) => ({
-    //     ...prevState, package: !prevState.package, review: !prevState.review, queue: !prevState.queue
-    // }));
-    setActiveMenu({ package: false, review: false, queue: false });
-    setActiveMenu({ [menu]: true });
-    // setActiveMenu(...prevState, package: !prevState.package )
-  }
 
   const getDetailCommission = async () => {
     await axios
@@ -122,6 +103,12 @@ export default function CmsDetail() {
 
         const aaa = data.typeofuse.map(tou => tou.tou_id.toString())
         setSelectedValues(aaa)
+        if (userdata.id == artistDetail.artistId) {
+          setIsOwner(true)
+          console.log(userdata.id == artistDetail.artistId)
+          console.log(userdata.id)
+          console.log(artistDetail.artistId)
+        }
       });
   };
 
@@ -142,7 +129,7 @@ export default function CmsDetail() {
   const queryParams = new URLSearchParams(location.search);
   const adminParam = queryParams.get("admin");
 
-  
+
   const [touValue, setTouValue] = useState(1);
   const onChangeTou = (e) => {
     console.log("radio checked", e.target.value);
@@ -195,23 +182,23 @@ export default function CmsDetail() {
   // เช็คว่าเป็น post ของตัวเองหรือไม่
   let items = [];
   if (userdata.id === artistDetail.artistId) {
-      items = [
-        {
-          label: <div onClick={() => setOpenEditForm(true)}>แก้ไข</div>,
-          key: '1',
-        },
-        {
-          label: <div onClick={delCms}>ลบ</div>,
-          key: '2',
-        }
-      ];
+    items = [
+      {
+        label: <div onClick={() => setOpenEditForm(true)}>แก้ไข</div>,
+        key: '1',
+      },
+      {
+        label: <div onClick={delCms}>ลบ</div>,
+        key: '2',
+      }
+    ];
   } else {
-      items = [
-        {
-          label: <div onClick={handleReportModal}>รายงาน</div>,
-          key: '0',
-        },
-      ];
+    items = [
+      {
+        label: <div onClick={handleReportModal}>รายงาน</div>,
+        key: '0',
+      },
+    ];
   }
 
   const SendRequest = (values) => {
@@ -341,23 +328,23 @@ export default function CmsDetail() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         // Swal.fire("ลบคอมมิชชันนี้แล้ว", "", "success");
-        axios .patch(`${host}/commission/delete/${cmsID.id}`).then((response) => {
+        axios.patch(`${host}/commission/delete/${cmsID.id}`).then((response) => {
           const data = response.data;
           if (data.status === 'ok') {
-              Swal.fire("ลบคอมมิชชันนี้แล้ว", "", "success").then(() => {
-                  window.location.href = "/";
-              });
+            Swal.fire("ลบคอมมิชชันนี้แล้ว", "", "success").then(() => {
+              window.location.href = "/";
+            });
           } else {
-              Swal.fire("เกิดข้อผิดพลาดกรุณาลองใหม่", "", "error").then(() => {
-                  window.location.reload(false);
-              });
+            Swal.fire("เกิดข้อผิดพลาดกรุณาลองใหม่", "", "error").then(() => {
+              window.location.reload(false);
+            });
           }
-      })
+        })
       }
     });
   }
 
-  const onFinish = async(values, selectRadio) => {
+  const onFinish = async (values, selectRadio) => {
     try {
       const postData = {
         rpheader: selectRadio,
@@ -367,8 +354,8 @@ export default function CmsDetail() {
       };
       const response = await axios.post(`${host}/report/commission/${cmsID.id}`, postData, {
         headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
         },
       });
       if (response.status === 200) {
@@ -403,16 +390,16 @@ export default function CmsDetail() {
             }
           });
       } else {
-          Swal.fire({
-              title: "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่",
-              icon: "error"
-          }).then(() => {
-              window.location.reload(false);
-          });
+        Swal.fire({
+          title: "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่",
+          icon: "error"
+        }).then(() => {
+          window.location.reload(false);
+        });
       }
-  } catch (error) {
+    } catch (error) {
       console.error('เกิดข้อผิดพลาด', error);
-  }
+    }
   };
 
   const onFinishFailed = () => {
@@ -457,26 +444,26 @@ export default function CmsDetail() {
 
     axios .patch(`${host}/commission/update/${cmsID.id}?deletedPkgIds=${deletedPkgIds}`, formData, {
       headers: {
-          Authorization: "Bearer " + token,
-          "Content-type": "multipart/form-data",
+        Authorization: "Bearer " + token,
+        "Content-type": "multipart/form-data",
       },
     }).then((response) => {
-        const data = response.data;
-        if (data.status === "ok") {
-            Swal.fire({
-                title: "บันทึกสำเร็จ",
-                icon: "success"
-            }).then(() => {
-                window.location.reload(false);
-            });
-        } else {
-            Swal.fire({
-                title: "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่",
-                icon: "error"
-            }).then(() => {
-                window.location.reload(false);
-            });
-        }
+      const data = response.data;
+      if (data.status === "ok") {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success"
+        }).then(() => {
+          window.location.reload(false);
+        });
+      } else {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่",
+          icon: "error"
+        }).then(() => {
+          window.location.reload(false);
+        });
+      }
     })
     // values.pkgs.map((item) => {
     //   // console.log(item);
@@ -542,63 +529,118 @@ export default function CmsDetail() {
     
   };
   // console.log(deletedPkgIds);
+  const menus = [
+    {
+      key: '1',
+      label: "แพ็กเกจ",
+      children: <Package
+        pkgDetail={pkgDetail}
+        onClick={openModal}
+        setPkgName={handlePkgName}
+        setPkgID={handlePkgId}
+        isOwner={isOwner}
+        id={userdata.id}
+        artistId={artistDetail.artistId}
+      />,
+    },
+    {
+      key: '2',
+      label: "รีวิว",
+      children: <Review />,
+    },
+    {
+      key: '3',
+      label: "คิว",
+      children: <Queue cmsID={cmsID.id} />,
+    },
+  ];
+
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'align': [] }], [{ 'indent': '-1' }, { 'indent': '+1' }],
+      ['clean'],
+    ],
+  };
+
+  // Define what happens when the custom option is clicked
+  const formats = [
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet',
+    'align', 'indent'
+  ];
 
   return (
     <div className="body-con">
       {/* {formModalOpened ? <FormModal pkgId={packageId}/> : null} */}
       <Modal
-        title={`ส่งคำขอจ้าง 'แพ็กเกจ : ${pkgName}'`}
+        // title={`ส่งคำขอจ้าง 'แพ็กเกจ : ${pkgName}'`}
+        title={isLoggedIn ? `ส่งคำขอจ้างแพ็กเกจ : ${pkgName}` : "คุณยังไม่ได้เข้าสู่ระบบ"}
         open={isModalOpened}
         onCancel={closeModal}
         footer=""
       >
-        <Form layout="vertical" onFinish={SendRequest}>
-          <Form.Item label="ประเภทการใช้งาน">
-            <Radio.Group onChange={onChangeTou} value={touValue}>
-              {touDetail.map((item) => (
-                <Radio key={item.tou_id} value={item.tou_name}>
-                  {item.tou_name}
-                </Radio>
-              ))}
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item
-            label="จุดประสงค์การใช้ภาพ"
-            name="purpose"
-            rules={[{ required: true, message: "กรุณาใส่จุดประสงค์การใช้งาน" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="รายละเอียด"
-            name="detail"
-            rules={[{ required: true, message: "กรุณาใส่รายละเอียด" }]}
-          >
-            <TextArea
-              placeholder="อธิบายรายละเอียดที่ต้องการ เช่น ผู้หญิงใส่เสื้อสีดาวผมยาวยืนอยู่ข้างกำแพงสีฟ้าเอียงมุมกล้องเล็กน้อย"
-              showCount
-              maxLength={200}
-              autoSize={{
-                minRows: 3,
-                maxRows: 5,
-              }}
-            />
-          </Form.Item>
-          <Button htmlType="submit" type="primary" shape="round" size="large">
-            ส่งคำขอจ้าง
-          </Button>
-          {/* </Flex> */}
-        </Form>
-      </Modal>
+        {!isLoggedIn ?
+          <>
+            <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+            <Flex justify="flex-end">
+              <Link to="/login"><Button shape="round" size="large">ตกลง</Button></Link>
+            </Flex>
+          </>
+          :
+          <Form layout="vertical" onFinish={SendRequest}>
+            <Form.Item label="ประเภทการใช้งาน">
+              <Radio.Group onChange={onChangeTou} value={touValue}>
+                {touDetail.map((item) => (
+                  <Radio key={item.tou_id} value={item.tou_name}>
+                    {item.tou_name}
+                  </Radio>
+                ))}
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item
+              label="จุดประสงค์การใช้ภาพ"
+              name="purpose"
+              rules={[{ required: true, message: "กรุณาใส่จุดประสงค์การใช้งาน" }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="รายละเอียด"
+              name="detail"
+              rules={[{ required: true, message: "กรุณาใส่รายละเอียด" }]}
+            >
+              <TextArea
+                placeholder="อธิบายรายละเอียดที่ต้องการ เช่น ผู้หญิงใส่เสื้อสีดาวผมยาวยืนอยู่ข้างกำแพงสีฟ้าเอียงมุมกล้องเล็กน้อย"
+                showCount
+                maxLength={200}
+                autoSize={{
+                  minRows: 3,
+                  maxRows: 5,
+                }}
+              />
+            </Form.Item>
+            <Button htmlType="submit" type="primary" shape="round" size="large">
+              ส่งคำขอจ้าง
+            </Button>
+            {/* </Flex> */}
+          </Form>
+
+        }
+
+      </Modal >
 
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      {isLoggedIn ? (
-        type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
-      ) : (
-        <NavbarHomepage />
-      )}
+      {
+        isLoggedIn ? (
+          type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+        ) : (
+          <NavbarGuest />
+        )
+      }
 
       <div className="background-blur" style={body}></div>
 
@@ -612,17 +654,21 @@ export default function CmsDetail() {
                 {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
                     <h1 className="h3 me-3">คอมมิชชัน Full Scale<span class="cms-status-detail">เปิด</span></h1>
-                    <Flex gap="small" justify="flex-end" flex={1}>
-                      <Dropdown
-                        menu={{
-                          items,
-                        }}
-                        trigger={['click']}
-                      >
-                        <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
-                        </Button>
-                      </Dropdown>
-                    </Flex>
+                    {isLoggedIn &&
+                      <Flex gap="small" justify="flex-end" flex={1}>
+                        <Dropdown
+                          menu={{
+                            items,
+                          }}
+                          trigger={['click']}
+                        >
+                          <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
+                          </Button>
+                        </Dropdown>
+                      </Flex>
+                    }
+
+
                   </div>
                   <div className="cms-artist-box">
                     <Link to={`/profile/${artistDetail.artistId}`}>
@@ -646,9 +692,13 @@ export default function CmsDetail() {
               </p> */}
                   <ImgSlide imgDetail={imgDetail} />
 
-                  <p className="text-align-center mt-3 mb-3">
+                  {/* <p className="text-align-center mt-3 mb-3">
                     {cmsDetail.cms_desc}
-                  </p>
+                  </p> */}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: cmsDetail.cms_desc }}
+                    className="view ql-editor displaydesc mt-4 mb-4"
+                  />
                   <div className="skill">
                     <div className="good-at">
                       <ul>
@@ -687,8 +737,7 @@ export default function CmsDetail() {
                       </ul>
                     </div>
                   </div>
-                  <div className="group-submenu">
-                    
+                  {/* <div className="group-submenu">
                     <button
                       className="sub-menu selected"
                       onClick={
@@ -720,11 +769,14 @@ export default function CmsDetail() {
                     >
                       คิว
                     </button>
+                  </div> */}
+                  <div className="mt-3 mb-3">
+                    <Tabs defaultActiveKey="1" items={menus} />
                   </div>
 
                   {/* <Queue /> */}
 
-                  {activeMenu.package && (
+                  {/* {activeMenu.package && (
                     <Package
                       pkgDetail={pkgDetail}
                       setPkgID={handlePkgId}
@@ -734,7 +786,7 @@ export default function CmsDetail() {
                     />
                   )}
                   {activeMenu.review && <Review />}
-                  {activeMenu.queue && <Queue cmsID={cmsID.id} />}
+                  {activeMenu.queue && <Queue cmsID={cmsID.id} />} */}
                 </>
                 :
                 <>
@@ -776,9 +828,9 @@ export default function CmsDetail() {
                           message: "กรุณาเลือกประเภทงานที่รับ",
                         }
                       ]}
-                      
-                      >
-                        
+
+                    >
+
                       <Checkbox.Group
                         value={selectedValues}
                         onChange={(values) => setSelectedValues(values)}
@@ -812,6 +864,8 @@ export default function CmsDetail() {
                     >
                       <ReactQuill
                         theme="snow"
+                        modules={modules}
+                        formats={formats}
                         value={editorValue}
                         onChange={setEditorValue}
                         placeholder="เขียนรายละเอียดคอมมิชชัน.."
@@ -1009,12 +1063,12 @@ export default function CmsDetail() {
                       label="หัวข้อ"
                       name="cmsTopic"
 
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "กรุณาเลือกหัวข้อ",
-                      //   }
-                      // ]}
+                    // rules={[
+                    //   {
+                    //     required: true,
+                    //     message: "กรุณาเลือกหัวข้อ",
+                    //   }
+                    // ]}
                     >
                       <Select
                         mode="multiple"
@@ -1030,9 +1084,10 @@ export default function CmsDetail() {
                       >
                       </Select>
                     </Form.Item>
-                    
-                    <Button onClick={() => setOpenEditForm(false)}>ยกเลิก</Button>
-                    <Button htmlType="submit">บันทึก</Button>
+                    <Flex justify="flex-end" gap="small">
+                      <Button size="large" type="primary" shape="round" htmlType="submit">บันทึก</Button>
+                      <Button size="large" shape="round" onClick={() => setOpenEditForm(false)}>ยกเลิก</Button>
+                    </Flex>
                   </Form>
                 </>
             }
@@ -1085,9 +1140,9 @@ export default function CmsDetail() {
             autoComplete="off"
             className="ant-form"
           >
-          {value == "ละเมิดทรัพย์สินทางปัญญา" && isNext &&
-            <>
-              <p>รายงาน : การละเมิดทรัพย์สินทางปัญญา</p>
+            {value == "ละเมิดทรัพย์สินทางปัญญา" && isNext &&
+              <>
+                <p>รายงาน : การละเมิดทรัพย์สินทางปัญญา</p>
                 <Form.Item
                   name="rp-detail"
                   label="รายละเอียดการแจ้งรายงาน"
@@ -1114,12 +1169,12 @@ export default function CmsDetail() {
                   <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
                   <Button shape="round" size="large" type="primary" onClick={handleNext} >รายงาน</Button>
                 </Flex>
-            </>
-          }
+              </>
+            }
 
-          {value !== "ละเมิดทรัพย์สินทางปัญญา" && isNext &&
-            <>
-              <p>รายงาน : {value}</p>
+            {value !== "ละเมิดทรัพย์สินทางปัญญา" && isNext &&
+              <>
+                <p>รายงาน : {value}</p>
                 <Form.Item
                   name="rp-detail"
                   label="รายละเอียดการแจ้งรายงาน"
@@ -1135,16 +1190,16 @@ export default function CmsDetail() {
                   <Input />
                 </Form.Item>
 
-              <Flex gap="small" justify="flex-end">
-                <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
-                <Button shape="round" size="large" type="primary" htmlType="submit">รายงาน</Button>
-              </Flex>
-            </>
-          }
+                <Flex gap="small" justify="flex-end">
+                  <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
+                  <Button shape="round" size="large" type="primary" htmlType="submit">รายงาน</Button>
+                </Flex>
+              </>
+            }
           </Form>
         </Space>
       </Modal>
-    </div>
+    </div >
   );
 }
 
@@ -1162,15 +1217,15 @@ function Package(props) {
 
   return (
     <>
-      <h2>เลือกแพ็กเกจ</h2>
+      <h2 className="h3">เลือกแพ็กเกจ</h2>
       <p className="text-align-right">
         ราคาสำหรับ personal use หากใช้ในเชิงอื่นอาจกำหนดราคาขึ้นมากกว่านี้
       </p>
       {Array.isArray(pkgDetail) ? (
         pkgDetail.map((pkg) => (
           <div
-            className="select-package-item"
-            onClick={() => handlePackageClick(pkg.pkg_id, pkg.pkg_name, pkg.pkg_duration)}
+            className={`select-package-item ${props.id === props.artistId && "owner"}`}
+            onClick={props.id === props.artistId ? undefined : () => handlePackageClick(pkg.pkg_id, pkg.pkg_name, pkg.pkg_duration)}
             key={pkg.pkg_id}
           >
             <div>
@@ -1209,7 +1264,7 @@ function Package(props) {
 function Review() {
   return (
     <>
-      <h2>รีวิว (4.0 จาก 3 รีวิว)</h2>
+      <h2 className="h3">รีวิว (4.0 จาก 3 รีวิว)</h2>
       <div className="review-box">
         <div className="reviewer-box">
           <div>
@@ -1302,11 +1357,11 @@ function Queue(props) {
   }
 
 
+
+
   return (
     <>
-      <h2>
       <h2>คิว ({queueTotal?.used_slots || 0}/{queueTotal?.cms_amount_q || queue})</h2>
-      </h2>
       {/* <Alert message="ในตารางคิวนี้รวมคิวของคอมมิชชันอื่นของคุณBoobi ด้วย" closable type="info" showIcon className="mt-3 mb-5 " /> */}
       <table className="queue-table">
         <tr>

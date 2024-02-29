@@ -6,11 +6,12 @@ import { useForm } from "react-hook-form"
 import "../css/indexx.css";
 import "../css/allbutton.css";
 import "../css/profileimg.css";
-import "../css/main.css";
+import "../styles/main.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { Helmet } from "react-helmet";
 // import DefaultInput from "../components/DefaultInput";
-import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../components/Navbar";
+import { NavbarUser, NavbarAdmin, NavbarGuest } from "../components/Navbar";
 import CmsItem from "../components/CmsItem";
 import { Cascader, Input, Select, Space, Tabs } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -31,13 +32,13 @@ export default function Index() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const type = localStorage.getItem("type");
-  
+
   useEffect(() => {
-    if (token && type === "user" ) {
+    if (token && type === "user") {
       getAritisIFollow();
       getGalleryArtistIfollow();
       getArtistCommission();
-    } 
+    }
     getLatestCommission();
     getGalleryLatest();
   }, []);
@@ -77,7 +78,7 @@ export default function Index() {
     })
   }
   const getGalleryArtistIfollow = async () => {
-    await axios.get(`${host}/gallerry/Ifollow`,{
+    await axios.get(`${host}/gallerry/Ifollow`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
@@ -86,32 +87,32 @@ export default function Index() {
       const data = response.data;
       if (data.status === 'ok') {
         setGalleryIFollow(data.results)
-      } 
+      }
     })
   }
 
   //หาคนที่เรากำลังติดตามและติดตามเรา
   const getAritisIFollow = async () => {
     await axios
-    .get(`${host}/profile`, {
+      .get(`${host}/profile`, {
         headers: {
-        Authorization: "Bearer " + token,
+          Authorization: "Bearer " + token,
         },
-    })
-    .then((response) => {
+      })
+      .then((response) => {
         const data = response.data;
         if (data.status === "ok") {
-            setIFollowingIDs(data.IFollowingsIds);
-            const formData = new FormData();
-            formData.append("iFollowing", data.IFollowingsIds);
-            axios .post(`${host}/ArtistIndex`, formData).then((response) => {
-                const data = response.data;
-                setIFollowerData(data.results)
-            })
+          setIFollowingIDs(data.IFollowingsIds);
+          const formData = new FormData();
+          formData.append("iFollowing", data.IFollowingsIds);
+          axios.post(`${host}/ArtistIndex`, formData).then((response) => {
+            const data = response.data;
+            setIFollowerData(data.results)
+          })
         } else {
-            console.log("error");
+          console.log("error");
         }
-    })
+      })
   }
 
   const { Search } = Input;
@@ -164,11 +165,11 @@ export default function Index() {
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      
+
       {isLoggedIn ? (
         type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
       ) : (
-        <NavbarHomepage />
+        <NavbarGuest/>
       )}
 
       <div class="body-nopadding" style={body}>
@@ -182,10 +183,10 @@ export default function Index() {
           <div className=" content-container user-profile-contentCard" >
             {submenu !== 'search' ? <>
               <div>
-                <Tabs defaultActiveKey="1" items={menus}/>
+                <Tabs defaultActiveKey="1" items={menus} />
               </div>
-              {submenu == null 
-              ? null : submenu == "search" && <Search />}
+              {submenu == null
+                ? null : submenu == "search" && <Search />}
             </> :
               <SearchResults />}
           </div>
@@ -196,12 +197,12 @@ export default function Index() {
 }
 
 
-function Commissions({IFollowingIDs}) {
+function Commissions({ IFollowingIDs }) {
 
   const [Message, setMessage] = useState('');
   const [sortBy, setSortBy] = useState('ล่าสุด');
   const [filterBy, setFilterBy] = useState('all');
-  const [topicValues, setTopicValues] = useState([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
+  const [topicValues, setTopicValues] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
   const [topics, setTopics] = useState([]);
   const [commission, setCommission] = useState([]);
 
@@ -227,7 +228,7 @@ function Commissions({IFollowingIDs}) {
       label: data.tp_name,
     })),
   ]
-  
+
   const { Option } = Select;
 
   const children = [];
@@ -243,7 +244,7 @@ function Commissions({IFollowingIDs}) {
       children.push(<Option key={item.key} value={item.value}>{item.label}</Option>)
     )
   ));
-  
+
   // const [topicValues, setTopicValues] = useState([0])
   const newTopicValues = [];
   const [checkAll, setCheckAll] = useState(false)
@@ -306,7 +307,7 @@ function Commissions({IFollowingIDs}) {
     setSortBy(selectedOption);
   };
 
-  
+
   return (
     <>
       <div className="content-box">
@@ -357,7 +358,7 @@ function Commissions({IFollowingIDs}) {
             >
               {/* {children} */}
             </Select>
-            
+
             กรองจาก :
             <Select
               value={{ value: filterBy, label: filterBy === 'all' ? 'นักวาดทั้งหมด' : 'นักวาดที่ติดตาม' }}
@@ -370,16 +371,16 @@ function Commissions({IFollowingIDs}) {
 
           </div>
         </div>
-          
+
 
         {Message == '' ? (
-        <div className="content-items">
-          {commission.map((cms)=>(
-            <Link to={`/cmsdetail/${cms.cms_id}`}>
-              <CmsItem src={cms.ex_img_path} headding={cms.cms_name} price={cms.pkg_min_price} desc={cms.cms_desc} />
-            </Link>
-          ))}
-        </div>
+          <div className="content-items">
+            {commission.map((cms) => (
+              <Link to={`/cmsdetail/${cms.cms_id}`}>
+                <CmsItem src={cms.ex_img_path} headding={cms.cms_name} price={cms.pkg_min_price} desc={cms.cms_desc} />
+              </Link>
+            ))}
+          </div>
         ) : (
           <div className="artistbox-items">
             <h2>{Message}</h2>
@@ -391,71 +392,69 @@ function Commissions({IFollowingIDs}) {
 
 }
 
-function Foryou({type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gallerylatest, galleryIfollow }) {
+function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gallerylatest, galleryIfollow }) {
   return (
     <>
       {isLoggedIn === true && type === "user" ? (
         <>
-          <div className="content-box">
-            <div className="content-top">
-              <p className="h3">นักวาดที่คุณกำลังติดตาม</p>
-              <Link to="/homepage/artists"><p>ดูทั้งหมด&gt;</p></Link>
-            </div>
+          {IFollowerData !== 'คุณไม่มีนักวาดที่ติดตาม' &&
+            <div className="content-box">
+              <div className="content-top">
+                <p className="h3">นักวาดที่คุณกำลังติดตาม</p>
+                <Link to="/homepage/artists"><p>ดูทั้งหมด&gt;</p></Link>
+              </div>
 
-            <Swiper
-              slidesPerView="auto"
-              centeredSlides={false}
-              slidesPerGroupSkip={1}
-              spaceBetween={10}
-              modules={[Navigation]}
-              className="artistbox-swiper"
-            >
-              {IFollowerData === 'คุณไม่มีนักวาดที่ติดตาม' ? (
-                <p>คุณไม่มีนักวาดที่ติดตาม</p>
-              ) : (
-                IFollowerData.map(data => (
-                    <SwiperSlide>
-                      <a key={data.id} href={`/profile/${data.id}`}>
-                        <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
-                      </a>
-                    </SwiperSlide>
+              <Swiper
+                slidesPerView="auto"
+                centeredSlides={false}
+                slidesPerGroupSkip={1}
+                spaceBetween={10}
+                modules={[Navigation]}
+                className="artistbox-swiper"
+              >
+                {IFollowerData.map(data => (
+                  <SwiperSlide>
+                    <a key={data.id} href={`/profile/${data.id}`}>
+                      <ArtistBox img={data.urs_profile_img} name={data.urs_name} />
+                    </a>
+                  </SwiperSlide>
                 ))
-              )}
-            </Swiper>
-          </div>
-
-          <div className="content-box">
-            <div className="content-top">
-              <p className="h3">คอมมิชชันของนักวาดที่ติดตาม</p>
-              <Link to="/homepage/commissions"><p>ดูทั้งหมด&gt;</p></Link>
+                }
+              </Swiper>
             </div>
-            <Swiper
-            slidesPerView="auto"
-            centeredSlides={false}
-            slidesPerGroupSkip={1}
-            spaceBetween={10}
-            grabCursor={true}
-            keyboard={{
-              enabled: true,
-            }}
-            scrollbar={false}
-            navigation={true}
-            modules={[Keyboard, Scrollbar, Navigation]}
-            className="cms-item-swiper"
-          >
-            {cmsArtists === 'คุณไม่มีนักวาดที่ติดตาม' ? (
-              <p>คุณไม่มีนักวาดที่ติดตาม</p>
-            ) : (
-              cmsArtists.map(cmsArtstdata => (
-                <SwiperSlide key={cmsArtstdata.cms_id}>
-                  <Link to={`/cmsdetail/${cmsArtstdata.cms_id}`}>
-                    <CmsItem src={cmsArtstdata.ex_img_path} headding={cmsArtstdata.cms_name} price={cmsArtstdata.pkg_min_price} desc={cmsArtstdata.cms_desc}/>
-                  </Link>
-                </SwiperSlide>
-              ))
-            )}
-          </Swiper >
-          </div>
+          }
+
+          {cmsArtists !== 'คุณไม่มีนักวาดที่ติดตาม' &&
+
+            <div className="content-box">
+              <div className="content-top">
+                <p className="h3">คอมมิชชันของนักวาดที่ติดตาม</p>
+                <Link to="/homepage/commissions"><p>ดูทั้งหมด&gt;</p></Link>
+              </div>
+              <Swiper
+                slidesPerView="auto"
+                centeredSlides={false}
+                slidesPerGroupSkip={1}
+                spaceBetween={10}
+                grabCursor={true}
+                keyboard={{
+                  enabled: true,
+                }}
+                scrollbar={false}
+                navigation={true}
+                modules={[Keyboard, Scrollbar, Navigation]}
+                className="cms-item-swiper"
+              >
+                {cmsArtists.map(cmsArtstdata => (
+                  <SwiperSlide key={cmsArtstdata.cms_id}>
+                    <Link to={`/cmsdetail/${cmsArtstdata.cms_id}`}>
+                      <CmsItem src={cmsArtstdata.ex_img_path} headding={cmsArtstdata.cms_name} price={cmsArtstdata.pkg_min_price} desc={cmsArtstdata.cms_desc} />
+                    </Link>
+                  </SwiperSlide>
+                ))
+                }
+              </Swiper >
+            </div>}
 
           <div class="content-box">
             <div class="content-top">
@@ -540,7 +539,7 @@ function Foryou({type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galler
           modules={[Keyboard, Scrollbar, Navigation]}
           className="gall-item-swiper"
         >
-          {gallerylatest.map(data=>(
+          {gallerylatest.map(data => (
             <SwiperSlide key={data.artw_id}>
               <Link to={`/artworkdetail/${data.artw_id}`}><img src={data.ex_img_path} /></Link>
             </SwiperSlide>
@@ -552,10 +551,10 @@ function Foryou({type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galler
   )
 }
 
-function Gallery({IFollowingIDs}) {
+function Gallery({ IFollowingIDs }) {
   const [allGallery, setAllGallery] = useState([]);
   const [Message, setMessage] = useState('');
-  
+
   const [sortBy, setSortBy] = useState('ล่าสุด'); //เรียงตาม
   const [filterBy, setFilterBy] = useState('all'); //กรองจาก
   const [selectedTopic, setSelectedTopic] = useState('เลือกทั้งหมด'); //หัวข้อ
@@ -594,7 +593,7 @@ function Gallery({IFollowingIDs}) {
       setMessage('');
     });
   }
-  
+
   //หาก filter กรองจาก ทำอันนี้
   const filter = () => {
     axios.get(`${host}/galleryIFollowArtist?sortBy=${sortBy}&IFollowingIDs=${IFollowingIDs}&topic=${selectedTopic}`).then((response) => {
@@ -636,17 +635,17 @@ function Gallery({IFollowingIDs}) {
           />
           หัวข้อ :
           <Select
-          value={{ value: selectedTopic, label: selectedTopic.label }}
-          style={{ width: 120 }}
-          onChange={handleTopicChange}
-          options={[
-            { value: 'เลือกทั้งหมด', label: 'เลือกทั้งหมด' },
-            ...topics.map((data) => ({
-              value: data.tp_id,
-              label: data.tp_name,
-            })),
-          ]}
-        />
+            value={{ value: selectedTopic, label: selectedTopic.label }}
+            style={{ width: 120 }}
+            onChange={handleTopicChange}
+            options={[
+              { value: 'เลือกทั้งหมด', label: 'เลือกทั้งหมด' },
+              ...topics.map((data) => ({
+                value: data.tp_id,
+                label: data.tp_name,
+              })),
+            ]}
+          />
           กรองจาก :
           <Select
             value={{ value: filterBy, label: filterBy === 'all' ? 'นักวาดทั้งหมด' : 'นักวาดที่ติดตาม' }}
@@ -661,7 +660,7 @@ function Gallery({IFollowingIDs}) {
 
       </div>
       {Message == '' ? (
-       
+
         <div className="content-items">
           {allGallery.map((data) => (
             <Link key={data.artw_id} to={`/artworkdetail/${data.artw_id}`}>
@@ -680,7 +679,7 @@ function Gallery({IFollowingIDs}) {
   )
 }
 
-function Artists({IFollowingIDs}) {
+function Artists({ IFollowingIDs }) {
   const [allartist, setAllArtist] = useState([]);
   const [Message, setMessage] = useState('');
   const [sortBy, setSortBy] = useState('ล่าสุด');
@@ -693,7 +692,7 @@ function Artists({IFollowingIDs}) {
     } else {
       fetchData2();
     }
-  },[sortBy, filterBy])
+  }, [sortBy, filterBy])
 
   const fetchData = () => {
     axios.get(`${host}/allArtist?sortBy=${sortBy}&filterBy=${filterBy}`).then((response) => {
@@ -735,7 +734,7 @@ function Artists({IFollowingIDs}) {
               { value: 'เก่าสุด', label: 'เก่าสุด' },
             ]}
           />
-          
+
           กรองจาก :
           <Select
             value={{ value: filterBy, label: filterBy === 'all' ? 'นักวาดทั้งหมด' : 'นักวาดที่ติดตาม' }}
@@ -750,12 +749,12 @@ function Artists({IFollowingIDs}) {
       </div>
       {Message == '' ? (
         <div className="artistbox-items">
-        {allartist.map(data => (
-          <a key={data.id} href={`/profile/${data.id}`}>
-            <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
-          </a>
-        ))}
-      </div>
+          {allartist.map(data => (
+            <a key={data.id} href={`/profile/${data.id}`}>
+              <ArtistBox img={data.urs_profile_img} name={data.urs_name} />
+            </a>
+          ))}
+        </div>
       ) : (
         <div className="artistbox-items">
           <h2>{Message}</h2>
@@ -781,7 +780,7 @@ function SearchResults(props) {
         setCmsSearchResults(data.cms_uniqueResults)
         setArtSearchResults(data.artwork)
       })
-      
+
     } catch (error) {
       console.error('Error searching:', error);
     }
@@ -828,13 +827,13 @@ function SearchResults(props) {
           {user_SearchResult.map(data => (
             <SwiperSlide>
               <a key={data.id} href={`/profile/${data.id}`}>
-                <ArtistBox img={data.urs_profile_img} name={data.urs_name}/>
+                <ArtistBox img={data.urs_profile_img} name={data.urs_name} />
               </a>
             </SwiperSlide>
-            ))
+          ))
           }
         </Swiper>
-        
+
       </div>
 
       <div className="content-box">
@@ -857,17 +856,17 @@ function SearchResults(props) {
         modules={[Keyboard, Scrollbar, Navigation]}
         className="cms-item-swiper"
       >
-      {/* <SwiperSlide >
+        {/* <SwiperSlide >
         <CmsItem src="/monlan.png" headding="คอมมิชชัน SD" price="100" desc="คมช.เส้นเปล่า-ลงสีรับทุกสเกล สามารถเพิ่มตัวละครหรือเพิ่มพร็อพได้ โดยราคาขึ้นอยู่กับรายละเอียดที่เพิ่มเข้ามา" />
       </SwiperSlide> */}
-      {cms_SearchResult.map(data => (
-        <SwiperSlide key={data.cms_id}>
-          <Link to={`/cmsdetail/${data.cms_id}`}>
-            <CmsItem src={data.ex_img_path} headding={data.cms_name} price={data.pkg_min_price} desc={data.cms_desc}/>
-          </Link>
-        </SwiperSlide>
+        {cms_SearchResult.map(data => (
+          <SwiperSlide key={data.cms_id}>
+            <Link to={`/cmsdetail/${data.cms_id}`}>
+              <CmsItem src={data.ex_img_path} headding={data.cms_name} price={data.pkg_min_price} desc={data.cms_desc} />
+            </Link>
+          </SwiperSlide>
         ))
-      }
+        }
       </Swiper >
 
       <div class="content-box">
@@ -896,7 +895,7 @@ function SearchResults(props) {
           <SwiperSlide >
             <Link to={`/artworkdetail/${data.artw_id}`}><img src={data.ex_img_path} /></Link>
           </SwiperSlide>
-          ))
+        ))
         }
       </Swiper>
 

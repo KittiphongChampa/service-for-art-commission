@@ -4,17 +4,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import Lottie from "lottie-react";
-// import loading from "../loading.json";
 import "../css/indexx.css";
 import "../css/allbutton.css";
-
-//import { Button } from 'react-bootstrap';
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Helmet } from "react-helmet";
 import DefaultInput from "../components/DefaultInput";
-// import Navbar from "../components/Navbar";
 import ProfileImg from "../components/ProfileImg.js";
-// import ImportScript from "../components/ImportScript";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
 import * as alertData from "../alertdata/alertData";
@@ -295,7 +291,7 @@ export default function SignUp() {
                     className={`role-item ${roleName == "artist" && "select"}`}
                   >
                     <button onClick={() => handleRole("artist")}>
-                      <ggIcon.Palette className="iconn" />
+                        <PaletteOutlinedIcon className="iconn" />
                     </button>
                     <p>นักวาด</p>
                   </div>

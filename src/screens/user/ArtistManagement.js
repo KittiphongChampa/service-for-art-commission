@@ -3,13 +3,13 @@ import * as Icon from 'react-feather';
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form"
 import "../../css/indexx.css";
-import '../../css/main.css';
+import '../../styles/main.css';
 import "../../css/allbutton.css";
 import "../../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Helmet } from "react-helmet";
 import Dashboard from "./Dashboard";
-import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest} from "../../components/Navbar";
+import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest } from "../../components/Navbar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as ggIcon from '@mui/icons-material';
 import Switch from 'react-switch';
@@ -34,7 +34,7 @@ export default function ArtistManagement() {
             <div className="chatbox-container">
                 <div className="aside-chatbox">
                     <div className="setting-menu">
-                        <h1 style={{ fontWeight: "200", color: "white", marginBottom: "1rem" }}>
+                        <h1 className="h3" style={{ fontWeight: "200", color: "white", marginBottom: "1rem" }}>
                             artist panel
                         </h1>
 
