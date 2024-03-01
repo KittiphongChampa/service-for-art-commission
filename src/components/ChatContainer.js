@@ -1480,7 +1480,7 @@ export default function ChatContainer({ currentChat, test }) {
   function submitChangeOrder(values) {
     Swal.fire({
       title: `เปลี่ยนแปลงออเดอร์หรือไม่`,
-      icon: "info",
+      icon: "question",
       showCancelButton: true,
       confirmButtonText: "ตกลง",
       cancelButtonText: "ยกเลิก",
@@ -1502,7 +1502,7 @@ export default function ChatContainer({ currentChat, test }) {
               (checkPrice ? `เปลี่ยนจากราคา ${orderDetail.od_price} บาท ⇒ ${values.new_price} บาท` : '') +
               (checkTou && allTou[0].old_tou !== touValue ? ` เปลี่ยนประเภทการใช้งานจาก ${allTou[0].old_tou_name} ⇒ ${newTouName}` : ''),
             timestamp_chat,
-            step_id: currentStepId.current,
+            step_id: 0,
             step_name: currentStepName.current,
             od_id: chat_order_id,
             status: "e",
@@ -1518,7 +1518,7 @@ export default function ChatContainer({ currentChat, test }) {
           msg: (checkPrice ? `เปลี่ยนจากราคา ${orderDetail.od_price} บาท ⇒ ${values.new_price} บาท` : '') +
             (checkTou && allTou[0].old_tou !== touValue ? ` เปลี่ยนประเภทการใช้งานจาก ${allTou[0].old_tou_name} ⇒ ${newTouName}` : ''),
           timestamp_chat,
-          step_id: currentStepId.current,
+          step_id: 0,
           step_name: currentStepName.current,
           od_id: chat_order_id,
           status: "e",
@@ -1532,9 +1532,9 @@ export default function ChatContainer({ currentChat, test }) {
           to: currentChat.id,
           message: (checkPrice ? `เปลี่ยนจากราคา ${orderDetail.od_price} บาท ⇒ ${values.new_price} บาท` : '') +
             (checkTou && allTou[0].old_tou !== touValue ? ` เปลี่ยนประเภทการใช้งานจาก ${allTou[0].old_tou_name} ⇒ ${newTouName}` : ''),
-          step_id: currentStepId.current,
+          step_id: 0,
           od_id: chat_order_id,
-          status: "a",
+          status: "e",
           checked: 1,
         });
 

@@ -294,7 +294,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                 </>
             }
 
-            {message?.step_name == "แอดมินอนุมัติผลงาน" &&
+            {message?.step_name == "แอดมินอนุมัติ" &&
                 <>
                     <Flex key={message.index} gap="small" justify="center" align="center" vertical style={flexSysDialog}>
                         {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
