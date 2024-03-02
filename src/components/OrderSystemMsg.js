@@ -170,6 +170,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {message.step_name == "ระบุราคา" && message.status == null && message.status == undefined && orderDetail.artist_id == myId &&
                 <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                    {message.msgId}
                     <p className="h4"> ระบุราคาคอมมิชชัน</p>
                     {message.checked == 0 ?
                         <>
@@ -242,6 +243,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {message?.step_name?.includes("ภาพ") && message.status == null && message.status == undefined &&
                 <Flex className="system-message progress" gap="small" justify="center" align="center" vertical style={flexSysDialogWip}>
+                    {message.msgId}
                     <p className="h4">{message.step_name}</p>
                     <div className="progress-img-container">
                         {Array.isArray(message.img) && message.img.map((img) => {
@@ -256,13 +258,17 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                                 message.checked == 0 ? <>
                                     <Button size="large" shape="round" onClick={() => editProgress(message.step_id, message.step_name)} >แก้ไขภาพ {orderDetail.od_number_of_edit}/{orderDetail.pkg_edits}</Button>
                                     <Button size="large" shape="round" onClick={() => approveProgress(message.step_id, message.step_name)} >อนุมัติภาพ</Button>
-                                    <Button size="large" shape="round" onClick={() => delProgress(message.step_id, message.step_name, message.msgId)} danger icon={<DeleteOutlined />}></Button>
+                                    
                                 </>
                                     : <p>ดำเนินการแล้ว</p>
                                 : message.checked == 0 ? <>
-                                    <Flex justify='flex-start' style={{ width: "100%" }}>
+                                    <Flex justify='flex-start' gap="middle" vertical style={{ width: "100%" }}>
                                         <p><InfoCircleOutlined /> รอลูกค้าตรวจสอบว่าต้องการอนุมัติหรือแก้ไขภาพ ({orderDetail.od_number_of_edit}/{orderDetail.pkg_edits})</p>
+                                        <Flex justify='center'>
+                                            <Button size="large" shape="round" onClick={() => delProgress(message.step_id, message.step_name, message.msgId)} style={{ width: "fit-content" }} danger icon={<DeleteOutlined />}></Button>
+                                        </Flex>
                                     </Flex>
+                                    
                                 </>
                                     : <p>ดำเนินการแล้ว</p>
                         }

@@ -405,6 +405,10 @@ td {
   vertical-align: baseline !important;
 }
 
+button {
+  border: none;
+}
+
 @media (min-width: 0px) and (max-width: 767px) {
   .ham-menu {
     display: block !important;

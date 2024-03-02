@@ -10,7 +10,7 @@ import "../css/allbutton.css";
 import "../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { format, isToday, isYesterday } from 'date-fns';
+import { format, isToday, isYesterday, addHours } from 'date-fns';
 
 import Switch from 'react-switch';
 // import 'rsuite/styles/index.less';
@@ -21,6 +21,12 @@ import { waitFor } from "@testing-library/react";
 import { Container } from 'react-bootstrap/Container';
 
 export default function ChatOrderDetail({ myId, isBriefOpen, handleBrief, currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
+
+    function isTodayUTC7(date) {
+        const dateUTC7 = addHours(date, 7); // เพิ่ม 7 ชั่วโมงเพื่อเปลี่ยนเป็นเวลาในโซนเวลา UTC+7
+        return isToday(dateUTC7);
+    }
+
 
     const odModalRef = useRef();
     const briefModalRef = useRef();
@@ -261,33 +267,21 @@ export default function ChatOrderDetail({ myId, isBriefOpen, handleBrief, curren
             </div>
 
 
-            <Modal title="ประวัติการดำเนินการ" ref={historyModalRef} open={isHistoryModalOpen} footer="" onCancel={handleHistoryModal} width={"50vw"} style={{ maxWidth: "1000px" }}>
+            <Modal title="ประวัติการดำเนินการ" ref={historyModalRef} open={isHistoryModalOpen} footer="" onCancel={handleHistoryModal} width={1000} >
                 <table className="history-order-detail">
 
                     {messages.map((message, index) => {
                         // let currentDate = message.created_at
-                        let currentDate;
+                        let currentDate = message.created_at;
                         if (!Number.isNaN(new Date(message.created_at).getTime())) {
-                            currentDate = format(message.created_at, 'dd/MM HH:mm น.');
-                            if (isToday(message.created_at)) {
-                                currentDate = format(message.created_at, 'วันนี้ HH:mm น.')
-                            } else if (isYesterday(message.created_at)) {
-                                currentDate = format(message.created_at, 'เมื่อวานนี้ HH:mm น.')
+                            currentDate = format(new Date(message.created_at), 'dd/MM HH:mm น.');
+                            if (isToday(new Date(message.created_at))) {
+                                currentDate = format(new Date(message.created_at), 'วันนี้ HH:mm น.')
+                            } else if (isYesterday(new Date(message.created_at))) {
+                                currentDate = format(new Date(message.created_at), 'เมื่อวานนี้ HH:mm น.')
                             }
-
-                        } else if (!Number.isNaN(new Date(message.current_time).getTime())) {
-                            currentDate = format(message.current_time, 'dd/MM HH:mm น.');
-                            if (isToday(message.current_time)) {
-                                currentDate = format(message.current_time, 'วันนี้ HH:mm น.')
-                            } else if (isYesterday(message.current_time)) {
-                                currentDate = format(message.current_time, 'เมื่อวานนี้ HH:mm น.')
-                            }
-                        } else {
-                            currentDate = message.current_time;
                         }
-
-
-                        return currentDate != null && currentDate != undefined && message.step_id !== 0 && message.step_id !== undefined && message.message != null && !message.message.includes("แนบ") ? (
+                        return message.step_id !== 0 && message.step_id !== undefined && message.message != null && !message.message.includes("แนบ") ? (
                             <tr key={index}>
                                 <td>{currentDate}</td>
                                 <td>{message.sender == myId && 'คุณ'}{message.message}</td>

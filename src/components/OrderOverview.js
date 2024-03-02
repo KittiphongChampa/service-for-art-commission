@@ -384,25 +384,25 @@ export default function OrderOverview() {
                         // <ShowData filteredArray={searchQuery} />
                         <>
                             {searchQuery.map((req, index) => {
-                        var currentDate;
+                                var currentDate = req.ordered_at;
                         var deadline;
 
-                        if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                            currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
-                            let raw_deadline = addDays(req.ordered_at, 10)
-                            deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                            if (isToday(req.ordered_at)) {
-                                currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
-                                let raw_deadline = addDays(req.ordered_at, 10)
-                                deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
+                        // if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
+                        //     currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
+                        //     let raw_deadline = addDays(req.ordered_at, 10)
+                        //     deadline = format(raw_deadline, 'dd/MM HH:mm น.');
+                        //     if (isToday(req.ordered_at)) {
+                        //         currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
+                        //         let raw_deadline = addDays(req.ordered_at, 10)
+                        //         deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
 
-                            } else if (isYesterday(req.ordered_at)) {
-                                currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
-                                let raw_deadline = addDays(req.ordered_at, 10)
-                                deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
-                            }
-                            //ต้องเป็นวันที่รับคำขอจ้าง
-                        }
+                        //     } else if (isYesterday(req.ordered_at)) {
+                        //         currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
+                        //         let raw_deadline = addDays(req.ordered_at, 10)
+                        //         deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                        //     }
+                        //     //ต้องเป็นวันที่รับคำขอจ้าง
+                        // }
 
                         return (
                             <>
@@ -435,25 +435,25 @@ export default function OrderOverview() {
 
                         <>
                             {filterCmsReq && filterCmsReq.map((req, index) => {
-                                var currentDate;
+                                var currentDate = req.ordered_at;
                                 var deadline;
 
-                                if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                                    currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
-                                    let raw_deadline = addDays(req.ordered_at, 10)
-                                    deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                                    if (isToday(req.ordered_at)) {
-                                        currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
-                                        let raw_deadline = addDays(req.ordered_at, 10)
-                                        deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
+                                // if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
+                                //     currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
+                                //     let raw_deadline = addDays(req.ordered_at, 10)
+                                //     deadline = format(raw_deadline, 'dd/MM HH:mm น.');
+                                //     if (isToday(req.ordered_at)) {
+                                //         currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
+                                //         let raw_deadline = addDays(req.ordered_at, 10)
+                                //         deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
 
-                                    } else if (isYesterday(req.ordered_at)) {
-                                        currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
-                                        let raw_deadline = addDays(req.ordered_at, 10)
-                                        deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
-                                    }
-                                    //ต้องเป็นวันที่รับคำขอจ้าง
-                                }
+                                //     } else if (isYesterday(req.ordered_at)) {
+                                //         currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
+                                //         let raw_deadline = addDays(req.ordered_at, 10)
+                                //         deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                                //     }
+                                //     //ต้องเป็นวันที่รับคำขอจ้าง
+                                // }
 
                                 return (
                                     <>

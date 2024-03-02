@@ -26,7 +26,7 @@ export default function ArtistManagement() {
     return (
         <div className="body-con">
             <Helmet>
-                <title>a</title>
+                <title>artist panel</title>
             </Helmet>
             {/* <ImgFullscreen />
             <div className="modall">aaaaaaaaaaaaaaaaaaaaa</div> */}
