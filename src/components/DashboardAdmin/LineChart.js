@@ -57,6 +57,7 @@ const LineChart = () => {
     const currentDate = new Date();
     let newStartDate = new Date();
     let newEndDate = new Date();
+    console.log(currentDate.getDate());
   
     switch (filterType) {
       case 'year':
@@ -64,8 +65,8 @@ const LineChart = () => {
         newEndDate = new Date(currentDate.getFullYear(), 11, 31);
         break;
       case 'today':
-        newStartDate.setDate(currentDate.getDate());
-        newEndDate.setDate(currentDate.getDate() + 1);
+        newStartDate.setDate(currentDate.getDate() - 1);
+        newEndDate.setDate(currentDate.getDate()) ;
         break;
       case 'last7days':
         newStartDate.setDate(currentDate.getDate() - 6);

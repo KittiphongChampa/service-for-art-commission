@@ -101,8 +101,8 @@ export default function Dashboard() {
         newEndDate = new Date(currentDate.getFullYear(), 11, 31);
         break;
       case "today":
-        newStartDate.setDate(currentDate.getDate()  );
-        newEndDate.setDate(currentDate.getDate() + 1) ;
+        newStartDate.setDate(currentDate.getDate() - 1);
+        newEndDate.setDate(currentDate.getDate() ) ;
         break;
       case "last7days":
         newStartDate.setDate(currentDate.getDate() - 6);

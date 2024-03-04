@@ -63,8 +63,10 @@ export default function CmsDetail() {
   const [topics, setTopics] = useState([]);
   const [isOwner, setIsOwner] = useState(false);
 
+  const [queueTotal, setQueueTotal] = useState([]); //ข้อมูลของคิวที่ถูกจองและคิวทั้งหมด
+  const [queueData, setQueueData] = useState([]); //ข้อมูล
+
   const { userdata, isLoggedIn, socket } = useAuth();
-  console.log(isLoggedIn);
 
 
 
@@ -73,9 +75,18 @@ export default function CmsDetail() {
   const thaiDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear() + 543}`;
 
   useEffect(() => {
-    getDetailCommission(); //ใช้ได้ไม่มีปัญหา
+    getDetailCommission();
     topic();
+    getQueueData()
   }, []);
+
+  const getQueueData = async () => {
+    await axios.get(`${host}/get/queue/${cmsID}`).then((response) => {
+      const data = response.data;
+      setQueueTotal(data.QueueInfo[0])
+      setQueueData(data.QueueData)
+    })
+  }
 
   const topic = () => {
     axios.get(`${host}/getTopic`).then((response) => {
@@ -551,7 +562,7 @@ export default function CmsDetail() {
     {
       key: '3',
       label: "คิว",
-      children: <Queue cmsID={cmsID.id} />,
+      children: <Queue cmsID={cmsID.id} cms_amount_q={cmsDetail.cms_amount_q}  queueTotal={queueTotal} queueData={queueData}/>,
     },
   ];
 
@@ -653,7 +664,7 @@ export default function CmsDetail() {
                 <>
                 {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
-                    <h1 className="h3 me-3">คอมมิชชัน Full Scale<span class="cms-status-detail">เปิด</span></h1>
+                    <h1 className="h3 me-3">{cmsDetail.cms_name}<span class="cms-status-detail">{cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}</span></h1>
                     {isLoggedIn &&
                       <Flex gap="small" justify="flex-end" flex={1}>
                         <Dropdown
@@ -677,7 +688,7 @@ export default function CmsDetail() {
 
                         <div>
                           <p>{artistDetail.artistName}</p>
-                          <p>4.0<ggIcon.Star className='fill-icon' /><span className="q">(3) | ว่าง 3 คิว</span></p>
+                          <p>{artistDetail.all_review}<ggIcon.Star className='fill-icon' /><span className="q">({artistDetail.total_reviews}) | ว่าง {cmsDetail.cms_amount_q - (queueTotal?.used_slots || 0)} คิว</span></p>
                         </div>
 
                       </div>
@@ -964,7 +975,7 @@ export default function CmsDetail() {
                                 title={`แพ็กเกจ ${index + 1}`}
                                 key={field.key}
                                 extra={
-                                  fields.length > 0 && (
+                                  fields.length > 1 && (
                                     <Button
                                       type="danger"
                                       onClick={() => {
@@ -1331,37 +1342,13 @@ function Review() {
 
 function Queue(props) {
   const cmsID = props.cmsID;
-  const [queue, setQueue] = useState("");
-  const [queueTotal, setQueueTotal] = useState([]);
-  const [queueData, setQueueData] = useState([]);
-
-
-  useEffect(() => {
-    getQueueData()
-    fetchData();
-  }, [])
-
-  const fetchData = async () => {
-    await axios.get(`${host}/queue/${cmsID}`).then((response) => {
-      const data = response.data;
-      setQueue(data.Queue);
-    })
-  }
-
-  const getQueueData = async () => {
-    await axios.get(`${host}/get/queue/${cmsID}`).then((response) => {
-      const data = response.data;
-      setQueueTotal(data.QueueInfo[0])
-      setQueueData(data.QueueData)
-    })
-  }
-
-
-
+  const cms_amount_q = props.cms_amount_q;
+  const queueTotal = props.queueTotal;
+  const queueData = props.queueData;
 
   return (
     <>
-      <h2>คิว ({queueTotal?.used_slots || 0}/{queueTotal?.cms_amount_q || queue})</h2>
+      <h2>คิว ({queueTotal?.used_slots || 0}/{cms_amount_q})</h2>
       {/* <Alert message="ในตารางคิวนี้รวมคิวของคอมมิชชันอื่นของคุณBoobi ด้วย" closable type="info" showIcon className="mt-3 mb-5 " /> */}
       <table className="queue-table">
         <tr>

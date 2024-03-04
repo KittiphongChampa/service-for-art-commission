@@ -29,6 +29,17 @@ const title = "แชท";
 // const bgImg = { backgroundImage: "url('mainmoon.jpg')", backgroundSize: " cover", backgroundOpacity: "0.5" }
 const body = { backgroundImage: "url('images/seamoon.jpg')" };
 
+const currentDate = new Date();
+const date = new Date();
+const date_now = date.toLocaleDateString("th-TH", {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const timestamp_chat = date_now.split(" ")[1];
+
 export default function ChatBox() {
   const navigate = useNavigate();
   const { userdata, isLoggedIn, socket } = useAuth();
@@ -60,7 +71,7 @@ export default function ChatBox() {
   // console.log("partnerChat : ",partnerChat);
 
   const [contacts, setContacts] = useState([]);
-  const userRef = useRef([]);
+  const [contacts_order, setContactsOrder] = useState([]);
 
   const [currentChat, setCurrentChat] = useState(undefined); //คนที่เราเลือกสนทนา
   // console.log("currentChat : ",currentChat);
@@ -86,74 +97,32 @@ export default function ChatBox() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await axios.get(`${host}/allchat`, {
-        // headers: {
-        //   Authorization: "Bearer " + token,
-        // },
-  //     });
-  //     const sortedContacts = response.data.sort((a, b) => {
-  //       return new Date(b.last_message_timestamp) - new Date(a.last_message_timestamp);
-  //     });
-  //     setContacts(sortedContacts);
-  //     userRef.current = response.data;
-  //   };
-  
-  //   fetchData();
-  // }, [userRef.current]);
+  const [messages, setMessages] = useState([]);
 
+  // Callback function ที่จะส่งไปยัง child
+  const updateMessages = (messages) => {
+    console.log(messages);
+    setMessages(messages);
+  };
 
-  // useEffect(() => {
-  //   try {
-  //     axios
-  //       .get(`${host}/allchat`,{
-  //         headers: {
-  //           Authorization: "Bearer " + token,
-  //         },
-  //       })
-  //       .then((response) => {
-  //         // console.log(response.data);
-  //         setContacts(response.data); //แสดงผลคนที่เราสามารถแชทด้วยได้ทั้งหมด
-  //       });
-  //   } catch (error) {
-  //     // Handle error
-  //     console.log("catch");
-  //   }
-  // }, [contacts])
-  // }, [])
-
+  // ทำงานแล้วดึงข้อมูลของผู้ติดต่อและข้อความ
   useEffect(() => {
-    
     const fetchData = async () => {
-      const response = await axios.get(`${host}/allchat`, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      setContacts(response.data);
-      userRef.current = response.data;
-    }
+      try {
+        const response = await axios.get(`${host}/allchat`, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+        setContacts(response.data.contacts);
+        setContactsOrder(response.data.contacts_order);
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      }
+    };
+
     fetchData();
-  
-  }, [userRef.current])
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get(`${host}/allchat`, {
-  //         headers: {
-  //           Authorization: "Bearer " + token,
-  //         },
-  //       });
-  //       setContacts(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching contacts:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  }, [messages]);
 
 
   const handleChatChange = (chat) => {
@@ -203,6 +172,7 @@ export default function ChatBox() {
                 partnerID={chat_partner_id}
                 orderID={chat_order_id}
                 contacts={contacts}
+                contacts_order={contacts_order}
                 changeChat={handleChatChange}
                 Toggled={isToggled}
                 selectedChatType={selectedChatType}
@@ -217,7 +187,7 @@ export default function ChatBox() {
         {/* -----ดิฟ2  กดแล้วให้เปลี่ยนตรงนี้------*/}
         <div className="chat-room">
           {partnerChat != undefined ? (
-            <ChatContainer currentChat={partnerChat} orderId={chat_order_id} chatId={partnerChat.id} />
+            <ChatContainer currentChat={partnerChat} orderId={chat_order_id} chatId={partnerChat.id} updateMessages={updateMessages}/>
           ) : currentChat === undefined ? (
             <Flex justify="center" align="center" height="100%"
               style={{ flex: 1 }}>
@@ -228,7 +198,7 @@ export default function ChatBox() {
               } />
             </Flex>
           ) : (
-            <ChatContainer currentChat={currentChat} chatId={currentChat.id} />
+            <ChatContainer currentChat={currentChat} chatId={currentChat.id} updateMessages={updateMessages}/>
           )}
         </div>
       </div>

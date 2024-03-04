@@ -17,7 +17,7 @@ import OrderSystemMsg from "./OrderSystemMsg";
 import 'animate.css'
 // import { format } from 'date-fns';
 import QRCode from "qrcode.react";
-import io from "socket.io-client";
+
 import { useAuth } from '../context/AuthContext';
 
 import { host } from "../utils/api";
@@ -33,18 +33,25 @@ const getBase64 = (file) =>
     reader.onerror = (error) => rreject(error);
   });
 
-export default function ChatContainer({ currentChat, test }) {
+export default function ChatContainer({ currentChat, updateMessages  }) {
   const { userdata, socket } = useAuth();
   const token = localStorage.getItem("token");
   const [userid, setUserid] = useState();
 
+  // จะมีแชททั้งหมดที่เคยคุยกัน และ จะเช็คพวก fromself ว่าเป็น true or false
   const [messages, setMessages] = useState([]);
+
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const queryParams = new URLSearchParams(window.location.search);
 
   const chat_order_id = queryParams.get("od_id");
   const partnerChat = queryParams.get("id");
+
+  useEffect(() => {
+    // ตัวอย่าง: เมื่อมีการอัปเดต arrivalMessage
+    updateMessages(messages.length);
+  }, [ messages ]);
 
   // เวลา วันที่
   const currentDate = new Date();
@@ -111,7 +118,7 @@ export default function ChatContainer({ currentChat, test }) {
       axios.get(`${host}/getalltou/${chat_order_id}`).then((response) => {
         setAllTou(response.data)
         setTouValue(response.data[0].old_tou)
-        console.log(response.data)
+        // console.log(response.data)
       }
       )
     }
@@ -150,8 +157,8 @@ export default function ChatContainer({ currentChat, test }) {
   useEffect(() => {
     if (socket) {
       socket.on("msg-receive", ({ img, msgId, msg, to, od_id, step_id, step_name, status, checked, isSystemMsg, from }) => {
-        console.log("partnerChat : ", partnerChat);
-        console.log("from : ", from);
+        // console.log("partnerChat : ", partnerChat);
+        // console.log("from : ", from);
         // เช็คเพื่อไม่ให้แชทไปแสดงที่คนอื่น
         if (partnerChat == from) {
           if (od_id === orderId.current) {
@@ -1954,8 +1961,6 @@ export default function ChatContainer({ currentChat, test }) {
 
 
       </Modal>
-
-
     </>
   );
 }
