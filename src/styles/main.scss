@@ -26,6 +26,14 @@
     font-family: 'Prompt', sans-serif;
 }
 
+.ant-select-selector{
+    border-radius: 1rem !important;
+}
+
+// .ql-editor{
+//     min-height: 1px;
+// }
+
 
 .h1,
 .h2,
@@ -191,6 +199,11 @@ a:focus {
         overflow: hidden;
         padding: 0px !important;
         height: fit-content;
+        background-color: white;
+        
+        h1{
+            color: $darkMineral;
+        }
 
         .login-col-img {
 
@@ -284,7 +297,7 @@ a:focus {
         flex-wrap: wrap;
     }
 
-    p.h3{
+    p.h3 {
         color: $darkMineral;
     }
 }
@@ -613,10 +626,12 @@ div#cms-artist-profile {
     }
 }
 
-.displaydesc{
+.displaydesc {
     line-height: 1;
-    *{
-        margin-bottom:0;
+    min-height: 1px !important;
+
+    * {
+        margin-bottom: 0;
     }
 }
 
@@ -808,11 +823,13 @@ table.queue-table {
     /* *ฝั่งด้านข้างแชท */
 
 
-    .aside-chatbox {
+    .aside-chatbox,
+    .aside-panel {
         flex-basis: 20rem;
         flex-shrink: 0;
         user-select: none;
         height: 100%;
+
         .headding {
             display: grid;
             grid-template-columns: 1.3rem 8fr 1.3rem;
@@ -888,9 +905,8 @@ table.queue-table {
         display: grid;
         grid-template-columns: 1.3rem 8fr 1.3rem;
         grid-template-rows: repeat(auto-fill, minmax(0, auto));
-        &::-webkit-scrollbar {
-            
-        }
+
+        &::-webkit-scrollbar {}
 
 
 
@@ -905,7 +921,7 @@ table.queue-table {
             display: flex;
             align-items: center;
             border-radius: 1.25rem;
-            border: 1px solid #d4d6ff;
+            // border: 1px solid #d4d6ff;
             background: rgba(255, 255, 255, 0.61);
             overflow: hidden;
             // box-sizing: border-box;
@@ -1029,12 +1045,19 @@ table.queue-table {
             overflow: hidden;
             border-radius: 26px 0 0 0;
 
+            .back-btn{
+                display: none;
+            }
+
             div.chat-name {
                 display: flex;
                 min-width: 0;
                 /*เพิ่ม min-width ให้เพื่อย่อตัว div p ข้างในให้มันย่อลงได้*/
                 // background-color: pink;
                 // overflow: hidden;
+                // justify-content: center;
+                align-items: center;
+                row-gap: 1rem;
 
                 div {
                     min-width: 0;
@@ -1366,6 +1389,26 @@ table.queue-table {
 
 }
 
+.sys-dialog {
+    width: 50%;
+    align-self: center;
+    margin: 1rem 0;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px;
+    background-color: white;
+}
+
+.sys-dialog-wip {
+    width: 80%;
+    align-self: center;
+    margin: 1rem 0;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px;
+    background-color: white;
+}
+
 .modall {
     min-width: 100vw;
     min-height: 100vh;
@@ -1435,7 +1478,7 @@ table.queue-table {
 .backdrop-modal-area {
     z-index: 19;
     background-color: rgba(0, 0, 0, 0.358);
-    width: 30rem;
+    width: 40rem;
     // min-width: 1px;
     height: 100%;
     position: absolute;
@@ -1455,7 +1498,7 @@ table.queue-table {
         row-gap: 2rem;
         align-items: center;
         overflow-y: auto;
-        box-shadow: 0px 0px 47px 1px rgba(176, 186, 209, 0.701);
+        // box-shadow: 0px 0px 47px 1px rgba(176, 186, 209, 0.701);
 
         .od-headder {
             width: 100%;
@@ -2114,7 +2157,7 @@ table.overview-order-table {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
     gap: 0.6rem;
-    
+
 
     div.artwork {
         overflow: hidden;
@@ -2152,11 +2195,6 @@ table.overview-order-table {
 
         .iconn {
             font-size: 4rem;
-            // font-variation-settings:
-            //     'FILL'0,
-            //     'wght'200,
-            //     'GRAD'0,
-            //     'opsz'48
         }
 
         button {
@@ -2167,6 +2205,7 @@ table.overview-order-table {
             background-color: transparent;
             border: 1px solid #A7B4CE;
             margin-bottom: 1rem;
+            color : #A7B4CE;
 
 
         }

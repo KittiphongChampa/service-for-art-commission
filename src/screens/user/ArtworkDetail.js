@@ -306,7 +306,7 @@ export default function ArtworkDetail() {
                                             }}
                                             trigger={['click']}
                                         >
-                                            <Button className="icon-btn" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
+                                            <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
                                             </Button>
                                         </Dropdown>
                                     </Flex>

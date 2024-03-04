@@ -98,6 +98,60 @@ export default function ChatBox() {
   }, []);
 
   const [messages, setMessages] = useState([]);
+  useEffect(() => {
+    reportWindowSize()
+  }, [chat_order_id])
+
+  useEffect(() => {
+    reportWindowSize()
+  }, [partnerChat])
+
+  function reportWindowSize() {
+    // console.log(window.innerHeight, window.innerWidth)
+    if (chat_order_id == null && partnerChat == null) {
+      //ถ้าเปิดหน้าเลือกแชท
+      // linear - gradient(180deg, #1E1C7B 0 %, #6394DE 100 %);
+      if (window.innerWidth <= 999) {
+        document.querySelector(".aside-chatbox").style.display = 'block';
+        document.querySelector(".chat-room").style.display = 'none';
+        document.querySelector(".aside-chatbox").classList.add("container");
+      } else {
+        document.querySelector(".aside-chatbox").style.display = 'block';
+        document.querySelector(".chat-room").style.display = 'flex';
+        document.querySelector(".aside-chatbox").classList?.remove("container");
+      }
+    } else {
+      //ถ้าเปิดหน้าแชท
+      if (window.innerWidth <= 999) {
+        document.querySelector(".aside-chatbox").style.display = 'none';
+        document.querySelector(".chat-room").style.display = 'flex';
+      } else {
+        document.querySelector(".aside-chatbox").style.display = 'block';
+        document.querySelector(".chat-room").style.display = 'flex';
+      }
+    }
+  }
+
+  window.onresize = reportWindowSize;
+
+
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const response = await axios.get(`${host}/allchat`, {
+        // headers: {
+        //   Authorization: "Bearer " + token,
+        // },
+  //     });
+  //     const sortedContacts = response.data.sort((a, b) => {
+  //       return new Date(b.last_message_timestamp) - new Date(a.last_message_timestamp);
+  //     });
+  //     setContacts(sortedContacts);
+  //     userRef.current = response.data;
+  //   };
+  
+  //   fetchData();
+  // }, [userRef.current]);
 
   // Callback function ที่จะส่งไปยัง child
   const updateMessages = (messages) => {

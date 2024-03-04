@@ -190,6 +190,30 @@ export default function CmsDetail() {
     setAttImgComponents(updatedComponents);
   };
 
+  function manageStatusCms() {
+    axios
+      .patch(`${host}/changestatus/${cmsID.id}`, {
+        cmsStatus: cmsDetail.cms_status
+      }).then((response) => {
+        console.log()
+        console.log(response.data)
+        if (response.data.status == 'ok') {
+          var newStatus = 'เปิด';
+          if (cmsDetail.cms_status == 'open') {
+            newStatus = 'ปิด'
+          }
+          Swal.fire({
+            icon: "success",
+            title: `${newStatus}คอมมิชชันแล้ว`,
+            confirmButtonText: 'ตกลง',
+          })
+
+        }
+
+      })
+
+  }
+
   // เช็คว่าเป็น post ของตัวเองหรือไม่
   let items = [];
   if (userdata.id === artistDetail.artistId) {
@@ -201,6 +225,12 @@ export default function CmsDetail() {
       {
         label: <div onClick={delCms}>ลบ</div>,
         key: '2',
+      },
+      {
+        label: <div onClick={manageStatusCms}>
+          {cmsDetail.cms_status == 'open' ? 'ปิดคอมมิชชัน' : 'เปิดคอมมิชชัน'}
+        </div>,
+        key: '3',
       }
     ];
   } else {
@@ -371,35 +401,35 @@ export default function CmsDetail() {
       });
       if (response.status === 200) {
 
-          // เพิ่มการส่งข้อมูลไปยัง socket server
-          const reportData = {
-              sender_id: userdata.id,
-              sender_name: userdata.urs_name,
-              sender_img: userdata.urs_profile_img,
-              cms_Id: cmsID.id,
-              reportId: response.data.reportId,
-              msg: "ได้รายงานคอมมิชชัน"
-          };
-          socket.emit('reportCommission', reportData);
+        // เพิ่มการส่งข้อมูลไปยัง socket server
+        const reportData = {
+          sender_id: userdata.id,
+          sender_name: userdata.urs_name,
+          sender_img: userdata.urs_profile_img,
+          cms_Id: cmsID.id,
+          reportId: response.data.reportId,
+          msg: "ได้รายงานคอมมิชชัน"
+        };
+        socket.emit('reportCommission', reportData);
 
-          // บันทึก notification
-          await axios.post(`${host}/admin/noti/add`, {
-              reporter: userdata.id,
-              reported: 0,
-              reportId: response.data.reportId,
-              msg: "ได้รายงานคอมมิชชัน"
-          }).then((response) => {
-            if (response.status === 200){
-              Swal.fire({
-                  title: "รายงานสำเร็จ",
-                  icon: "success"
-              }).then(() => {
-                  window.location.reload(false);
-              });
-            } else {
-                console.log("เกิดข้อผิดพลาดในการบันทึกข้อมูลการแจ้งเตือนของแอดมิน");
-            }
-          });
+        // บันทึก notification
+        await axios.post(`${host}/admin/noti/add`, {
+          reporter: userdata.id,
+          reported: 0,
+          reportId: response.data.reportId,
+          msg: "ได้รายงานคอมมิชชัน"
+        }).then((response) => {
+          if (response.status === 200) {
+            Swal.fire({
+              title: "รายงานสำเร็จ",
+              icon: "success"
+            }).then(() => {
+              window.location.reload(false);
+            });
+          } else {
+            console.log("เกิดข้อผิดพลาดในการบันทึกข้อมูลการแจ้งเตือนของแอดมิน");
+          }
+        });
       } else {
         Swal.fire({
           title: "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่",
@@ -453,7 +483,7 @@ export default function CmsDetail() {
       formData.append("edits", pkg.pkgEdit);
     }
 
-    axios .patch(`${host}/commission/update/${cmsID.id}?deletedPkgIds=${deletedPkgIds}`, formData, {
+    axios.patch(`${host}/commission/update/${cmsID.id}?deletedPkgIds=${deletedPkgIds}`, formData, {
       headers: {
         Authorization: "Bearer " + token,
         "Content-type": "multipart/form-data",
@@ -537,7 +567,7 @@ export default function CmsDetail() {
   const [deletedPkgIds, setDeletedPkgIds] = useState([]);
   const handleDelete = (pkg_id) => {
     setDeletedPkgIds(prevDeletedPkgIds => [...prevDeletedPkgIds, pkg_id]);
-    
+
   };
   // console.log(deletedPkgIds);
   const menus = [
@@ -659,10 +689,10 @@ export default function CmsDetail() {
         <div className="container">
           <div className="content-card">
             {
-              
+
               !openEditForm ?
                 <>
-                {/* กรณีไม่กดแก้ไข */}
+                  {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
                     <h1 className="h3 me-3">{cmsDetail.cms_name}<span class="cms-status-detail">{cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}</span></h1>
                     {isLoggedIn &&
@@ -801,7 +831,7 @@ export default function CmsDetail() {
                 </>
                 :
                 <>
-                {/* กรณีกดแก้ไข */}
+                  {/* กรณีกดแก้ไข */}
                   <ImgSlide imgDetail={imgDetail} />
                   <Form
                     form={form}
@@ -993,9 +1023,9 @@ export default function CmsDetail() {
                                   label="ไอดีแพ็กเกจ"
                                   name={[field.name, 'pkg_id']}
                                 >
-                                  <Input disabled/>
+                                  <Input disabled />
                                 </Form.Item>
-                              
+
                                 <Form.Item
                                   label="ชื่อแพ็กเกจ"
                                   name={[field.name, 'pkgName']}
@@ -1360,17 +1390,17 @@ function Queue(props) {
         </tr>
         {queueData.length == 0 ? (<div>
           <h4>ยังไม่มีออเดอร์</h4>
-        </div>) 
-        : 
-        (queueData.map((data, index)=> (
-          <tr key={data.od_id}>
-            <td>{index + 1}</td>
-            <td>{data.cms_name} : {data.pkg_name}</td>
-            <td>{data.urs_name}</td>
-            <td>{data.ordered_at}</td>
-            <td>{data.step_name}</td>
-          </tr>
-        )))}
+        </div>)
+          :
+          (queueData.map((data, index) => (
+            <tr key={data.od_id}>
+              <td>{index + 1}</td>
+              <td>{data.cms_name} : {data.pkg_name}</td>
+              <td>{data.urs_name}</td>
+              <td>{data.ordered_at}</td>
+              <td>{data.step_name}</td>
+            </tr>
+          )))}
       </table>
     </>
   );

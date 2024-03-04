@@ -26,20 +26,20 @@ export default function ArtistManagement() {
     return (
         <div className="body-con">
             <Helmet>
-                <title>a</title>
+                <title>artist panel</title>
             </Helmet>
             {/* <ImgFullscreen />
             <div className="modall">aaaaaaaaaaaaaaaaaaaaa</div> */}
             <NavbarUser />
             <div className="chatbox-container">
-                <div className="aside-chatbox">
+                <div className="aside-panel">
                     <div className="setting-menu">
                         <h1 className="h3" style={{ fontWeight: "200", color: "white", marginBottom: "1rem" }}>
                             artist panel
                         </h1>
 
-                        <Link to={`/artistmanagement/dashboard`}><div><ggIcon.GridView /><p>แดชบอร์ด</p></div></Link>
-                        <Link to={`/artistmanagement/orderoverview`} ><div><Icon.List /><p>รายการคอมมิชชัน</p></div></Link>
+                        <Link to={`/artistmanagement/dashboard`}><div className={menu === "dashboard" && 'active'}><ggIcon.GridView /><p>แดชบอร์ด</p></div></Link>
+                        <Link to={`/artistmanagement/orderoverview`} ><div className={menu === "orderoverview" && 'active'}><Icon.List /><p>รายการคอมมิชชัน</p></div></Link>
                         {/* <Link to={`/artistmanagement/chat`} ><div><Icon.MessageCircle /><p>แชท</p></div></Link> */}
                         {/* <Link to={`/artistmanagement/setting`}><div><Icon.Settings /><p>การตั้งค่า</p></div></Link> */}
                     </div>

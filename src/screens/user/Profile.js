@@ -154,7 +154,7 @@ export default function Profile() {
         },
         {
             key: '2',
-            label: "แกลเลอรี",
+            label: "งานวาด",
             children: <AllArtworks myGallery={myGallery} />,
         },
         {
@@ -194,7 +194,7 @@ export default function Profile() {
 
     // }, [])
 
-    const submitChangeCoverForm = (event,data) => {
+    const submitChangeCoverForm = (event, data) => {
         // const colorPicker = document.getElementById("color-input");
         // const colorValue = colorPicker.value;
         event.preventDefault()
@@ -334,7 +334,7 @@ export default function Profile() {
                     {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนสีปก</h2> */}
                     <div className="setting-img-box">
                         <div className="setting-cover">
-                            <input onChange={(e) => {setSelectedColor(e.target.value)}} defaultValue={userdata.urs_cover_color}  type="color" id="color-input" style={{ cursor: "pointer" }} />
+                            <input onChange={(e) => { setSelectedColor(e.target.value) }} defaultValue={userdata.urs_cover_color} type="color" id="color-input" style={{ cursor: "pointer" }} />
                         </div>
                         <ProfileImg src={userdata.urs_profile_img} type="only-show" />
 

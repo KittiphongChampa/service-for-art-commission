@@ -41,7 +41,9 @@ import {
   Select,
   Flex,
   InputNumber,
-  Tabs
+  Tabs,
+  Col,
+  Row
 } from "antd";
 import * as Icon from "react-feather";
 import ReactQuill from "react-quill";
@@ -72,7 +74,7 @@ export default function ManageCommission() {
   const navigate = useNavigate();
   const { userdata, isLoggedIn, socket } = useAuth();
   const jwt_token = localStorage.getItem("token");
-  let  userID = userdata.id;
+  let userID = userdata.id;
   const [isLoading, setLoading] = useState(false);
   const [topics, setTopics] = useState([]);
 
@@ -134,7 +136,7 @@ export default function ManageCommission() {
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
-  const handleChange = ({ fileList: newFileList }) => {setFileList(newFileList);};
+  const handleChange = ({ fileList: newFileList }) => { setFileList(newFileList); };
   const ref = useRef();
 
   const [topicValues, setTopicValues] = useState([]);
@@ -156,7 +158,7 @@ export default function ManageCommission() {
   const [uploadStatus, setUploadStatus] = useState(null);
 
   const onFinish = (values) => {
-    
+
     const formData = new FormData();
     fileList.forEach((file) => {
       formData.append("image_file", file.originFileObj);
@@ -168,6 +170,7 @@ export default function ManageCommission() {
     formData.append("good", values.cmsGood);
     formData.append("bad", values.cmsBad);
     formData.append("no_talking", values.cmsNo);
+    formData.append("cms_status", cmsStatus);
     for (const pkg of values.pkgs) {
       formData.append("package_name", pkg.pkgName);
       formData.append("package_detail", pkg.pkgDesc);
@@ -203,40 +206,40 @@ export default function ManageCommission() {
           formData.append("arr_imageID", arr_imageID)
           formData.append("arr_image_name", arr_image_name)
           formData.append("userID", userID);
-          axios.post("http://127.0.0.1:5000/upload-json", formData ,{
+          axios.post("http://127.0.0.1:5000/upload-json", formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+              'Content-Type': 'multipart/form-data'
             }
-            }).then((response) => {
-              console.log(response.data.status);
-              if (response.data.status === "ok") {
-                // btn = null;
-                // setUploadStatus('success');
-                Swal.fire({
-                  title: "สำเร็จ",
-                  icon: "success"
-                }).then(() => {
-                  window.location.reload(false);
-                });
-              } else if ( response.data.status === "similar" ) {
-                // btn = null;
-                // setUploadStatus('success');
-                Swal.fire({
-                  title: "ระบบตรวจพบรูปภาพที่ซ้ำ รอแอดมินตรวจสอบ",
-                  icon: "warning"
-                }).then(() => {
-                  window.location.reload(false);
-                });
-              } else {
-                // setUploadStatus('error');
-                Swal.fire({
-                  title: "เกิดข้อผิดพลาดในการอัปโหลดไฟล",
-                  icon: "error"
-                }).then(() => {
-                  window.location.reload(false);
-                });
-              }
-            })
+          }).then((response) => {
+            console.log(response.data.status);
+            if (response.data.status === "ok") {
+              // btn = null;
+              // setUploadStatus('success');
+              Swal.fire({
+                title: "สำเร็จ",
+                icon: "success"
+              }).then(() => {
+                window.location.reload(false);
+              });
+            } else if (response.data.status === "similar") {
+              // btn = null;
+              // setUploadStatus('success');
+              Swal.fire({
+                title: "ระบบตรวจพบรูปภาพที่ซ้ำ รอแอดมินตรวจสอบ",
+                icon: "warning"
+              }).then(() => {
+                window.location.reload(false);
+              });
+            } else {
+              // setUploadStatus('error');
+              Swal.fire({
+                title: "เกิดข้อผิดพลาดในการอัปโหลดไฟล",
+                icon: "error"
+              }).then(() => {
+                window.location.reload(false);
+              });
+            }
+          })
         } else if (data.status == "error") {
           console.log("error");
           setUploadStatus('error');
@@ -249,7 +252,7 @@ export default function ManageCommission() {
     const onCancelUpload = () => {
 
     }
-    
+
     const btn = (
       <Space>
         <Button type="link" danger size="small" onClick={onCancelUpload}>
@@ -297,6 +300,8 @@ export default function ManageCommission() {
     'align', 'indent'
   ];
 
+  const [cmsStatus, setCmsStatus] = useState('open')
+
   return (
     <div className="body-con">
       {contextHolder}
@@ -325,6 +330,7 @@ export default function ManageCommission() {
                 autoComplete="off"
                 initialValues={{
                   final: 3,
+                  status: 'open'
                 }}
               >
                 <Form.Item label="ภาพตัวอย่าง" name="">
@@ -347,7 +353,7 @@ export default function ManageCommission() {
                     </div>
                   </Upload>
 
-       
+
                   <Modal
                     open={previewOpen}
                     title={previewTitle}
@@ -364,20 +370,50 @@ export default function ManageCommission() {
                   </Modal>
                 </Form.Item>
 
-                <Form.Item
-                  label="ชื่อคอมมิชชัน"
-                  name="cmsName"
-                  id="cmsName"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณาใส่ชื่อคอมมิชชัน",
-                    },
-                    { type: "text" },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
+
+
+
+                <Row>
+                  <Col flex="auto" >
+                    <Form.Item
+                      label="ชื่อคอมมิชชัน"
+                      name="cmsName"
+                      id="cmsName"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณาใส่ชื่อคอมมิชชัน",
+                        },
+                        { type: "text" },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+                  <Col flex="100px" style={{marginLeft:"10px"}}>
+                    <Form.Item
+                      name="status"
+                      label="สถานะ"
+                    >
+                      <Select
+                        value={cmsStatus}
+                        onChange={setCmsStatus}
+                        size="large"
+                        options={[
+                          {
+                            value: 'open',
+                            label: 'เปิด',
+                          },
+                          {
+                            value: 'close',
+                            label: 'ปิด',
+                          }
+                        ]} />
+                    </Form.Item>
+                  </Col>
+
+                </Row>
+
 
                 <Form.Item
                   name="cmsTou"
@@ -655,7 +691,7 @@ export default function ManageCommission() {
                                 <>
                                   ขั้นตอนการทำงาน
                                   <Tooltip
-                                    title="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งให้ลูกค้าดู การจ่ายเงินครั้งแรกคือหลังจากที่นักวาดส่งภาพไปแล้ว จ่ายเงินครึ่งหลังจะได้จ่ายเมื่องานดำเนินไปถึง 50% แล้ว"
+                                    title="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งความคืบหน้าให้ลูกค้าดู"
                                     color="#2db7f5"
                                   >
                                     <Icon.Info />
@@ -667,7 +703,7 @@ export default function ManageCommission() {
                               {field.name == 0 && (
                                 <Alert
                                   style={{ marginBottom: "1rem" }}
-                                  message="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งให้ลูกค้าดู การจ่ายเงินครั้งแรกคือหลังจากที่นักวาดส่งภาพไปแล้ว จ่ายเงินครึ่งหลังจะได้จ่ายเมื่องานดำเนินไปถึง 50% แล้ว"
+                                  message="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งความคืบหน้าให้ลูกค้าดู"
                                   type="info"
                                   closable
                                   showIcon
