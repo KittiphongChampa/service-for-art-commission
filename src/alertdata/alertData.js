@@ -1,12 +1,12 @@
 export const verifyEmainSuccess = {
-  title: 'ส่ง OTP สำเร็จ โปรดตรวจสอบรหัสยืนยันบนอีเมลของท่าน',
+  title: 'ส่ง OTP สำเร็จ โปรดตรวจสอบรหัสยืนยันบนอีเมลของคุณ',
   icon: 'success',
   iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const verifyEmainFailed = {
-  title: 'อีเมลถูกใช้งานแล้ว',
+  title: 'อีเมลนี้ถูกใช้งานแล้ว',
   icon: 'error',
   iconColor: 'red',
   confirmButtonText: 'ตกลง',

@@ -48,7 +48,7 @@ export default function AdminManagement() {
       </Helmet>
       <NavbarAdmin />
       <div className="chatbox-container">
-        <div className="aside-chatbox">
+        <div className="aside-panel">
           <AdminMenuAside onActive={menu} />
         </div>
         <div className="aside-main-card" style={{ padding: "1.3rem 3rem" }}>

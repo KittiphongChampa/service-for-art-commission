@@ -27,8 +27,8 @@ const beforeUpload = (file) => {
 
 export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
     // console.log(orderDetail);
-    const flexSysDialog = { width: "50%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
-    const flexSysDialogWip = { width: "80%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
+    // const flexSysDialog = { width: "50%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
+    // const flexSysDialogWip = { width: "80%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
 
     const [IsModalOpen, setIsModalOpen] = useState(false)
     const stepIdRef = useRef()
@@ -77,8 +77,8 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
     );
     const priceRef = useRef()
     async function uploadSlip(stepId) {
-        const res = await submitSlip(stepId)
-        res == true && ModalToggle()
+        const res = await submitSlip(stepId,ModalToggle)
+        // res == true && ModalToggle()
         console.log("res=", res)
     }
     const [reviewValue, setReviewValue] = useState(5);
@@ -130,7 +130,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             <ImgFullscreen src={src} opened={fullImgOpened} handleFullImg={handleFullImg} acceptRequest={acceptRequest} />
 
             {message.step_id == 0 && message.status == "e" &&
-                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     {message.message}
                     {/* {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดได้เปลี่ยนแปลงรายละเอียดออเดอร์แล้ว จากราคา XXX เป็น xxx และ XXX เป็น xxxx</p>} */}
                 </Flex>}
@@ -139,13 +139,13 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             {
                 message.step_name == "ส่งคำขอจ้าง" &&
                 <>
-                    <Flex key={message.index} gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                    <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
                         {orderDetail.artist_id == myId ? <p>ลูกค้าส่งคำขอจ้างถึงคุณ</p> : <p>คุณส่งคำขอจ้างแล้ว</p>}
                         <Button size='large' type='link' onClick={handleBrief}>ดูบรีฟ</Button>
 
                         {orderDetail.artist_id == myId ?
                             message.checked == 0 ?
-                                <Flex gap="small">
+                                <Flex wrap='wrap' gap="small" justify="center">
                                     <Button size="large" shape="round" onClick={() => acceptRequest(message.step_id, message.step_name)} > ยอมรับคำขอจ้าง</Button>
                                     <Button size="large" danger shape="round" onClick={() => cancelRequest(message.step_id, message.step_name)} > ยกเลิกคำขอจ้าง</Button>
                                 </Flex>
@@ -158,18 +158,18 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
 
             {message.step_name == "รับคำขอจ้าง" && message.status !== "c" &&
-                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดยอมรับคำขอจ้างแล้ว</p>}
                 </Flex>}
 
             {/*! -----but ปฏิเสธ-------*/}
             {message.step_name == "รับคำขอจ้าง" && message.status == "c" &&
-                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     {orderDetail.artist_id == myId ? <p>ยกเลิกคำขอจ้างแล้ว</p> : <p>นักวาดยกเลิกคำขอจ้างแล้ว</p>}
                 </Flex>}
 
             {message.step_name == "ระบุราคา" && message.status == null && message.status == undefined && orderDetail.artist_id == myId &&
-                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     {message.msgId}
                     <p className="h4"> ระบุราคาคอมมิชชัน</p>
                     {message.checked == 0 ?
@@ -184,12 +184,13 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             }
 
             {message.step_name == "ระบุราคา" && message.status !== null && message.status !== undefined &&
-                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     <p>{orderDetail.artist_id == myId ? 'คุณ' : 'นักวาด'}{message.message}</p>
                 </Flex>}
 
             {message?.step_name?.includes('แนบสลิป') && message.status == null && message.status == undefined &&
-                <Flex className="system-message qrcode" gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical>
+                    {message.msgId}
                     <p className="h4">{!message?.step_name?.includes('2') ? 'ชำระเงินครึ่งแรก' : "ชำระเงินครึ่งหลัง"}
                         <Tooltip title="มีการจ่ายเงินสองรอบ จ่ายครั้งแรกหลังนักวาดส่งภาพร่าง จ่ายเงินครั้งที่สองหลังจากที่งานดำเนินไปได้ 50% แล้ว" color="#2db7f5">
                             <Icon.Info />
@@ -217,12 +218,13 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {/*ส่งสลิปลแว้ รอเช็คสลิป */}
             {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status == null && message.status == undefined && orderDetail.artist_id == myId &&
-                <Flex className="system-message qrcode" gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical>
+                    {message.msgId}
                     <p className="h4">{!message?.step_name?.includes('2') ? 'ตรวจสอบใบเสร็จชำระเงินครึ่งแรก' : "ตรวจสอบใบเสร็จชำระเงินครึ่งหลัง"}</p>
                     <div onClick={() => handleFullImg("https://s359.kapook.com/pagebuilder/ba154685-db18-4ac7-b318-a4a2b15b9d4c.jpg")}>
                         <img src="https://s359.kapook.com/pagebuilder/ba154685-db18-4ac7-b318-a4a2b15b9d4c.jpg" />
                     </div>
-                    <Flex gap='small' justify='center'>
+                    <Flex wrap='wrap' gap='small' justify='center'>
                         {message.checked == 0 ? <>
                             <Button size="large" shape="round" onClick={() => approveSlip(message.step_id, message.step_name)} >ยอมรับสลิป</Button>
                             <Button size="large" shape="round" onClick={() => rejectSlip(message.step_id, message.step_name)} danger >ไม่ยอมรับสลิป</Button>
@@ -236,13 +238,13 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {/*  = สลิปผ่าน */}
             {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status !== null && message.status !== undefined &&
-                <Flex className="system-message qrcode" gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical >
                     <p>{message.message}</p>
                 </Flex>
             }
 
             {message?.step_name?.includes("ภาพ") && message.status == null && message.status == undefined &&
-                <Flex className="system-message progress" gap="small" justify="center" align="center" vertical style={flexSysDialogWip}>
+                <Flex wrap='wrap' className="system-message progress sys-dialog-wip" gap="small" justify="center" align="center" vertical>
                     {message.msgId}
                     <p className="h4">{message.step_name}</p>
                     <div className="progress-img-container">
@@ -252,7 +254,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                         {!Array.isArray(message.img) && <div onClick={() => handleFullImg(message.img)}><img src={message.img} /></div>
                         }
                     </div>
-                    <Flex gap="small">
+                    <Flex wrap='wrap' gap="small" justify="center">
                         {
                             orderDetail.artist_id !== myId ?
                                 message.checked == 0 ? <>
@@ -262,9 +264,9 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                                 </>
                                     : <p>ดำเนินการแล้ว</p>
                                 : message.checked == 0 ? <>
-                                    <Flex justify='flex-start' gap="middle" vertical style={{ width: "100%" }}>
+                                    <Flex wrap='wrap' justify='flex-start' gap="middle" vertical style={{ width: "100%" }}>
                                         <p><InfoCircleOutlined /> รอลูกค้าตรวจสอบว่าต้องการอนุมัติหรือแก้ไขภาพ ({orderDetail.od_number_of_edit}/{orderDetail.pkg_edits})</p>
-                                        <Flex justify='center'>
+                                        <Flex wrap='wrap' justify='center'>
                                             <Button size="large" shape="round" onClick={() => delProgress(message.step_id, message.step_name, message.msgId)} style={{ width: "fit-content" }} danger icon={<DeleteOutlined />}></Button>
                                         </Flex>
                                     </Flex>
@@ -277,14 +279,14 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                 </Flex>}
 
             {message?.step_name?.includes("ภาพ") && message.status !== null && message.status !== undefined &&
-                <Flex gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     <p>{message.message}</p>
                 </Flex>
             }
 
             {message?.step_name == "รีวิว" &&
                 <>
-                    <Flex key={message.index} gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                    <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
                         {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
                         <p><u>ลิ้งโหลดงาน</u></p>
 
@@ -302,7 +304,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {message?.step_name == "แอดมินอนุมัติ" &&
                 <>
-                    <Flex key={message.index} gap="small" justify="center" align="center" vertical style={flexSysDialog}>
+                    <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
                         {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
                         <p><u>อันนี้แอดมินต้องเป็นคนอนุมัติแต่ให้userมากดเองก่อนยังไม่มีหน้า</u></p>
                         <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
@@ -319,7 +321,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             }
 
             <Modal title="แนบใบเสร็จชำระเงิน" open={IsModalOpen} footer="" onCancel={ModalToggle} style={{ maxWidth: "1000px" }}>
-                <Flex gap="small" justify="center" align="center" vertical className="big-uploader">
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="big-uploader">
                     <Upload
                         name="avatar"
                         listType="picture-card"
@@ -348,11 +350,11 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             </Modal>
 
             <Modal title="รีวิว" open={IsReviewModalOpen} footer="" onCancel={ReviewModalHandle} style={{ maxWidth: "1000px" }}>
-                {/* <Flex gap="small" justify="center" align="center" vertical className="big-uploader"> */}
+                {/* <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="big-uploader"> */}
                 <Form
                     layout="vertical"
                     onFinish={submitReview}>
-                    <Flex justify='center'>
+                    <Flex wrap='wrap' justify='center'>
                         <Rate  onChange={setReviewValue} value={reviewValue} allowClear={false} />
                     </Flex>
                     <Form.Item name='comment' label="ความคิดเห็น" style={{ textAlign: "center" }}>
@@ -364,7 +366,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                             }} />
                     </Form.Item>
                     <Form.Item >
-                        <Flex gap="small" justify='flex-end'>
+                        <Flex wrap='wrap' gap="small" justify='flex-end'>
                             <Button htmlType="submit" size="large" shape="round">ยกเลิก</Button>
                             <Button size="large" type="primary" shape="round" htmlType='submit'>ส่งรีวิว</Button>
                         </Flex>

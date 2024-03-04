@@ -13,9 +13,9 @@ import { Helmet } from "react-helmet";
 // import DefaultInput from "../components/DefaultInput";
 import { NavbarUser, NavbarAdmin, NavbarGuest } from "../components/Navbar";
 import CmsItem from "../components/CmsItem";
-import { Cascader, Input, Select, Space, Tabs } from 'antd';
+import { Pagination, Input, Select, Form, Tabs } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Keyboard, Scrollbar, Navigation, Pagination } from 'swiper/modules';
+import { Keyboard, Scrollbar, Navigation} from 'swiper/modules';
 import ArtistBox from '../components/ArtistBox'
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -119,23 +119,23 @@ export default function Index() {
   const { submenu } = useParams();
 
 
-  useEffect(() => {
-    // console.log(submenu)
-    const oldSelected = document?.getElementsByClassName("selected")
-    oldSelected[0]?.classList.remove("selected")
-    if (submenu == null) {
-      const menuSelected = document?.getElementById("foryou")
-      menuSelected?.classList.add("selected")
-    } else {
-      if (document.getElementById(submenu)) {
-        document.getElementById(submenu).classList.add("selected")
-      } else {
-        if (submenu !== 'search') {
-          window.location.href = `${host}/`;
-        }
-      }
-    }
-  }, [submenu])
+  // useEffect(() => {
+  //   // console.log(submenu)
+  //   const oldSelected = document?.getElementsByClassName("selected")
+  //   oldSelected[0]?.classList.remove("selected")
+  //   if (submenu == null) {
+  //     const menuSelected = document?.getElementById("foryou")
+  //     menuSelected?.classList.add("selected")
+  //   } else {
+  //     if (document.getElementById(submenu)) {
+  //       document.getElementById(submenu).classList.add("selected")
+  //     } else {
+  //       if (submenu !== 'search') {
+  //         window.location.href = `${host}/`;
+  //       }
+  //     }
+  //   }
+  // }, [submenu])
 
   const menus = [
     {
@@ -150,7 +150,7 @@ export default function Index() {
     },
     {
       key: '3',
-      label: <Link to="/gallery" id="gallery">แกลเลอรี</Link>,
+      label: <Link to="/gallery" id="gallery">งานวาด</Link>,
       children: <Gallery IFollowingIDs={IFollowingIDs} />,
     },
     {
@@ -159,6 +159,26 @@ export default function Index() {
       children: <Artists IFollowingIDs={IFollowingIDs} />,
     },
   ];
+
+  const [search, setSearch] = useState('');
+  const [user_SearchResult, setUserSearchResults] = useState([]);
+  const [cms_SearchResult, setCmsSearchResults] = useState([]);
+  const [art_SearchResult, setArtSearchResults] = useState([]);
+
+  const handleSearch = async () => {
+    // e.preventDefault();
+    try {
+      const response = await axios.get(`${host}/search?search=${search}`).then((response) => {
+        const data = response.data;
+        setUserSearchResults(data.users)
+        setCmsSearchResults(data.cms_uniqueResults)
+        setArtSearchResults(data.artwork)
+      })
+
+    } catch (error) {
+      console.error('Error searching:', error);
+    }
+  };
 
   return (
     <div className="body-con">
@@ -169,14 +189,27 @@ export default function Index() {
       {isLoggedIn ? (
         type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
       ) : (
-        <NavbarGuest/>
+        <NavbarGuest />
       )}
 
       <div class="body-nopadding" style={body}>
         <div className="container">
           <div class="search-container">
             <div className="search-box">
-              <Link to="/search" id="search" ><Search placeholder="ค้นหา.." allowClear size="large" /></Link>
+              {/* <Form
+                onFinish={handleSearch}
+              >
+
+              </Form> */}
+              <Link to="/search" id="search" >
+                <Search placeholder="ค้นหา.."
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  htmlType="submit"
+                  onSearch={handleSearch}
+                  allowClear size="large"/>
+              </Link>
             </div>
           </div>
 
@@ -188,7 +221,7 @@ export default function Index() {
               {submenu == null
                 ? null : submenu == "search" && <Search />}
             </> :
-              <SearchResults />}
+              <SearchResults search={search} user_SearchResult={user_SearchResult} cms_SearchResult={cms_SearchResult} art_SearchResult={art_SearchResult} />}
           </div>
         </div>
       </div>
@@ -285,6 +318,8 @@ function Commissions({ IFollowingIDs }) {
     axios.get(`${host}/getCommission?sortBy=${sortBy}&topicValues=${topicValues}`).then((response) => {
       const data = response.data;
       setCommission(data.commissions)
+      setFilteredCms(data.commissions.slice(startIndex, endIndex))
+      
       setMessage('');
     });
   }
@@ -295,9 +330,11 @@ function Commissions({ IFollowingIDs }) {
       const data = response.data;
       if (data.status === 'ok') {
         setCommission(data.commissions)
+        setFilteredCms(data.commissions.slice(startIndex, endIndex))
         setMessage('');
       } else {
         setCommission([]);
+        setFilteredCms([])
         setMessage("ไม่มีคอมมิชชัน")
       }
     });
@@ -306,6 +343,27 @@ function Commissions({ IFollowingIDs }) {
   const handleSortByChange = (selectedOption) => {
     setSortBy(selectedOption);
   };
+
+  const [activePage, setActivePage] = useState(1);
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(5);
+  const [filteredCms, setFilteredCms] = useState()
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    if (commission) {
+      //หน้าเพจ - 1 = index 0 * จำนวนแสดงต่อหน้า 0-9 10-19 20-29
+      const newStartIndex = (activePage - 1) * itemsPerPage;
+      //เอาจำนวนที่เริ่ม + จำนวนที่แสดง (0+10 = 10) จะเป็น index 0-10 
+      const newEndIndex = newStartIndex + (itemsPerPage);
+      //index เริ่มและ index สุดท้าย
+      setFilteredCms(commission.slice(newStartIndex, newEndIndex))
+      setStartIndex(newStartIndex);
+      setEndIndex(newEndIndex);
+      // setFilterCmsReq(allData);
+      console.log(activePage, newStartIndex, newEndIndex)
+    }
+  }, [activePage]);
 
 
   return (
@@ -375,7 +433,7 @@ function Commissions({ IFollowingIDs }) {
 
         {Message == '' ? (
           <div className="content-items">
-            {commission.map((cms) => (
+            {filteredCms?.map((cms) => (
               <Link to={`/cmsdetail/${cms.cms_id}`}>
                 <CmsItem src={cms.ex_img_path} headding={cms.cms_name} price={cms.pkg_min_price} desc={cms.cms_desc} />
               </Link>
@@ -386,6 +444,15 @@ function Commissions({ IFollowingIDs }) {
             <h2>{Message}</h2>
           </div>
         )}
+        <Pagination
+          total={commission == undefined ? 0 : commission.length}
+          showQuickJumper
+          showTotal={(total) => `จำนวน ${total} รายการ`}
+          defaultPageSize={itemsPerPage}
+          current={activePage}
+          responsive
+          onChange={setActivePage}
+        />
       </div>
     </>
   )
@@ -456,37 +523,39 @@ function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galle
               </Swiper >
             </div>}
 
-          <div class="content-box">
-            <div class="content-top">
-              <p className="h3">ผลงานนักวาดที่กำลังติดตาม</p>
-              <Link to="/homepage/gallery"><p>ดูทั้งหมด&gt;</p></Link>
-            </div>
-            <Swiper
-              slidesPerView="auto"
-              centeredSlides={false}
-              slidesPerGroupSkip={1}
-              spaceBetween={10}
-              grabCursor={true}
-              keyboard={{
-                enabled: true,
-              }}
-              scrollbar={false}
-              navigation={true}
-              modules={[Keyboard, Scrollbar, Navigation]}
-              className="gall-item-swiper"
-            >
-              {galleryIfollow === 'คุณไม่มีนักวาดที่ติดตาม' ? (
-                <p>คุณไม่มีนักวาดที่ติดตาม</p>
-              ) : (
-                galleryIfollow.map((data, index) => (
+          {galleryIfollow !== 'คุณไม่มีนักวาดที่ติดตาม' &&
+
+            <div class="content-box">
+              <div class="content-top">
+                <p className="h3">ผลงานนักวาดที่กำลังติดตาม</p>
+                <Link to="/homepage/gallery"><p>ดูทั้งหมด&gt;</p></Link>
+              </div>
+              <Swiper
+                slidesPerView="auto"
+                centeredSlides={false}
+                slidesPerGroupSkip={1}
+                spaceBetween={10}
+                grabCursor={true}
+                keyboard={{
+                  enabled: true,
+                }}
+                scrollbar={false}
+                navigation={true}
+                modules={[Keyboard, Scrollbar, Navigation]}
+                className="gall-item-swiper"
+              >
+
+                {galleryIfollow.map((data, index) => (
                   <SwiperSlide key={index}>
                     <Link to={`/artworkdetail/${data.artw_id}`}><img src={data.ex_img_path} /></Link>
                   </SwiperSlide>
-                ))
-              )}
+                ))}
 
-            </Swiper>
-          </div>
+
+              </Swiper>
+            </div>
+          }
+
         </>
       ) : (
         <></>
@@ -764,31 +833,53 @@ function Artists({ IFollowingIDs }) {
   )
 }
 
-function SearchResults(props) {
+function SearchResults({ search, user_SearchResult, cms_SearchResult, art_SearchResult }) {
 
-  const [search, setSearch] = useState('');
-  const [user_SearchResult, setUserSearchResults] = useState([]);
-  const [cms_SearchResult, setCmsSearchResults] = useState([]);
-  const [art_SearchResult, setArtSearchResults] = useState([]);
+  // const [search, setSearch] = useState('');
+  // const [user_SearchResult, setUserSearchResults] = useState([]);
+  // const [cms_SearchResult, setCmsSearchResults] = useState([]);
+  // const [art_SearchResult, setArtSearchResults] = useState([]);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.get(`${host}/search?search=${search}`).then((response) => {
-        const data = response.data;
-        setUserSearchResults(data.users)
-        setCmsSearchResults(data.cms_uniqueResults)
-        setArtSearchResults(data.artwork)
-      })
+  // const handleSearch = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await axios.get(`${host}/search?search=${search}`).then((response) => {
+  //       const data = response.data;
+  //       setUserSearchResults(data.users)
+  //       setCmsSearchResults(data.cms_uniqueResults)
+  //       setArtSearchResults(data.artwork)
+  //     })
 
-    } catch (error) {
-      console.error('Error searching:', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Error searching:', error);
+  //   }
+  // };
+  const menus = [
+    {
+      key: '1',
+      label: <Link to="/" id="foryou" >ทั้งหมด</Link>,
+      // children: <Foryou type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
+    },
+    {
+      key: '2',
+      label: <Link to="/commissions" id="commissions">คอมมิชชัน</Link>,
+      // children: <Commissions IFollowingIDs={IFollowingIDs} />,
+    },
+    {
+      key: '3',
+      label: <Link to="/gallery" id="gallery">งานวาด</Link>,
+      // children: <Gallery IFollowingIDs={IFollowingIDs} />,
+    },
+    {
+      key: '4',
+      label: <Link to="/artists" id="artists" >นักวาด</Link>,
+      // children: <Artists IFollowingIDs={IFollowingIDs} />,
+    },
+  ];
 
   return (
     <>
-      <form onSubmit={handleSearch}>
+      {/* <form onSubmit={handleSearch}>
         <input
           type="text"
           value={search}
@@ -796,14 +887,10 @@ function SearchResults(props) {
           placeholder="ค้นหาา..."
         />
         <button type="submit">Search</button>
-      </form>
+      </form> */}
 
-      <div className="content-type">
-        {/* <Link to="/homepage" id="foryou" className="sub-menu selected"  >สำหรับคุณ</Link> */}
-        <Link className="sub-menu" >ทั้งหมด</Link>
-        <Link className="sub-menu" >คอมมิชชัน</Link>
-        <Link className="sub-menu" >งานวาด</Link>
-        <Link className="sub-menu" >นักวาด</Link>
+      <div>
+        <Tabs defaultActiveKey="1" items={menus} />
       </div>
       <h3>ผลการค้นหาของ {search}</h3>
       <div className="content-box">

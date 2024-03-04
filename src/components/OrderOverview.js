@@ -96,7 +96,7 @@ export default function OrderOverview() {
             const allreqData = await axios.get(
                 `${host}/getcmsreq`,
                 {
-                    headers : {Authorization: "Bearer " + token}
+                    headers: { Authorization: "Bearer " + token }
                 }
             )
             // console.log(allreqData)
@@ -109,7 +109,7 @@ export default function OrderOverview() {
     useEffect(() => {
         if (filterCmsReq) {
             const newStartIndex = (activePage - 1) * itemsPerPage;
-            const newEndIndex = newStartIndex + itemsPerPage-1;
+            const newEndIndex = newStartIndex + itemsPerPage;
             setFilterCmsReq(filterCmsReq.slice(newStartIndex, newEndIndex))
 
             setStartIndex(newStartIndex);
@@ -238,7 +238,7 @@ export default function OrderOverview() {
     const handleSearch = (event) => {
         const query = event.target.value.toLowerCase();
         setSearchValue(query)
-        const filtered = filterCmsReq.filter(
+        const filtered = filterCmsReq?.filter(
             (item) =>
                 String(item.od_id).toLowerCase().includes(query) ||
                 String(item.cms_name).toLowerCase().includes(query) ||
@@ -332,128 +332,29 @@ export default function OrderOverview() {
                         <th>ความคืบหน้า</th>
                     </tr>
 
-                    {/* {filterCmsReq && filterCmsReq.map((req, index) => {
-                        var currentDate;
-                        var deadline;
-
-                        if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                            currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
-                            let raw_deadline = addDays(req.ordered_at, 10)
-                            deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                            if (isToday(req.ordered_at)) {
-                                currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
-                                let raw_deadline = addDays(req.ordered_at, 10)
-                                deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
-
-                            } else if (isYesterday(req.ordered_at)) {
-                                currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
-                                let raw_deadline = addDays(req.ordered_at, 10)
-                                deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
-                            }
-                            //ต้องเป็นวันที่รับคำขอจ้าง
-                        }
-
-                        return (
-                            <>
-                                <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
-                                    <td>{req.od_q_number}</td>
-                                    <td>{req.od_id}</td>
-                                    <td>{req.cms_name} : {req.pkg_name}</td>
-                                    <td>{req.od_price}</td>
-                                    <td>{req.customer_name}</td>
-                                    <td>{req.step_name == undefined ? "-" : req.step_name}</td>
-                                </tr>
-                                {showDetail === index + 1 + startIndex && <tr className="tr-detail">
-                                    <td colSpan="12">
-                                        <div>
-                                            <p>วันที่ส่งคำขอจ้างส่งคำขอจ้าง : <span>{currentDate}</span></p>
-                                            <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
-                                            <p>กำหนดส่ง : <span>{deadline}</span></p>
-                                            <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                            <p>ราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
-                                            <p>รวมราคา : <span>{req.od_edit_amount_price + req.od_price}</span></p>
-                                        </div>
-                                    </td>
-                                </tr>}
-                            </>
-                        );
-                    })} */}
-
-                    
                     {searchQuery ?
                         // <ShowData filteredArray={searchQuery} />
                         <>
                             {searchQuery.map((req, index) => {
                                 var currentDate = req.ordered_at;
-                        var deadline;
-
-                        // if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                        //     currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
-                        //     let raw_deadline = addDays(req.ordered_at, 10)
-                        //     deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                        //     if (isToday(req.ordered_at)) {
-                        //         currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
-                        //         let raw_deadline = addDays(req.ordered_at, 10)
-                        //         deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
-
-                        //     } else if (isYesterday(req.ordered_at)) {
-                        //         currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
-                        //         let raw_deadline = addDays(req.ordered_at, 10)
-                        //         deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
-                        //     }
-                        //     //ต้องเป็นวันที่รับคำขอจ้าง
-                        // }
-
-                        return (
-                            <>
-                                <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
-                                    <td>{req.od_q_number}</td>
-                                    <td>{req.od_id}</td>
-                                    <td>{req.cms_name} : {req.pkg_name}</td>
-                                    <td>{req.od_price}</td>
-                                    <td>{req.customer_name}</td>
-                                    <td>{req.step_name == undefined ? "-" : req.step_name}</td>
-                                </tr>
-                                {showDetail === index + 1 + startIndex && <tr className="tr-detail">
-                                    <td colSpan="12">
-                                        <div>
-                                            <p>วันที่ส่งคำขอจ้างส่งคำขอจ้าง : <span>{currentDate}</span></p>
-                                            <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
-                                            <p>กำหนดส่ง : <span>{deadline}</span></p>
-                                            <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                            <p>ราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
-                                            <p>รวมราคา : <span>{req.od_edit_amount_price + req.od_price}</span></p>
-                                        </div>
-                                    </td>
-                                </tr>}
-                            </>
-                        );
-                    })}
-                        </>
-                        :
-                        // <ShowData filteredArray={filterCmsReq} />
-
-                        <>
-                            {filterCmsReq && filterCmsReq.map((req, index) => {
-                                var currentDate = req.ordered_at;
                                 var deadline;
 
-                                // if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                                //     currentDate = format(req.ordered_at, 'dd/MM HH:mm น.');
-                                //     let raw_deadline = addDays(req.ordered_at, 10)
-                                //     deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                                //     if (isToday(req.ordered_at)) {
-                                //         currentDate = format(req.ordered_at, 'วันนี้ HH:mm น.');
-                                //         let raw_deadline = addDays(req.ordered_at, 10)
-                                //         deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
+                                if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
+                                    currentDate = format(new Date(req.ordered_at), 'dd/MM HH:mm น.');
+                                    let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                    deadline = format(raw_deadline, 'dd/MM HH:mm น.');
+                                    if (isToday(new Date(req.ordered_at))) {
+                                        currentDate = format(new Date(req.ordered_at), 'วันนี้ HH:mm น.');
+                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                        deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
 
-                                //     } else if (isYesterday(req.ordered_at)) {
-                                //         currentDate = format(req.ordered_at, 'เมื่อวานนี้ HH:mm น.');
-                                //         let raw_deadline = addDays(req.ordered_at, 10)
-                                //         deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
-                                //     }
-                                //     //ต้องเป็นวันที่รับคำขอจ้าง
-                                // }
+                                    } else if (isYesterday(new Date(req.ordered_at))) {
+                                        currentDate = format(new Date(req.ordered_at), 'เมื่อวานนี้ HH:mm น.');
+                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                        deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                                    }
+                                    //ต้องเป็นวันที่รับคำขอจ้าง
+                                }
 
                                 return (
                                     <>
@@ -472,7 +373,58 @@ export default function OrderOverview() {
                                                     <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
                                                     <p>กำหนดส่ง : <span>{deadline}</span></p>
                                                     <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                                    <p>ราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
+                                                    <p>รวมราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
+                                                    <p>รวมราคา : <span>{req.od_edit_amount_price + req.od_price}</span></p>
+                                                </div>
+                                            </td>
+                                        </tr>}
+                                    </>
+                                );
+                            })}
+                        </>
+                        :
+                        // <ShowData filteredArray={filterCmsReq} />
+
+                        <>
+                            {filterCmsReq && filterCmsReq.map((req, index) => {
+                                var currentDate = req.ordered_at;
+                                var deadline;
+
+                                if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
+                                    currentDate = format(new Date(req.ordered_at), 'dd/MM HH:mm น.');
+                                    let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                    deadline = format(raw_deadline, 'dd/MM HH:mm น.');
+                                    if (isToday(new Date(req.ordered_at))) {
+                                        currentDate = format(new Date(req.ordered_at), 'วันนี้ HH:mm น.');
+                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                        deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
+
+                                    } else if (isYesterday(new Date(req.ordered_at))) {
+                                        currentDate = format(new Date(req.ordered_at), 'เมื่อวานนี้ HH:mm น.');
+                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                        deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                                    }
+                                    //ต้องเป็นวันที่รับคำขอจ้าง
+                                }
+
+                                return (
+                                    <>
+                                        <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
+                                            <td>{req.od_q_number}</td>
+                                            <td>{req.od_id}</td>
+                                            <td>{req.cms_name} : {req.pkg_name}</td>
+                                            <td>{req.od_price}</td>
+                                            <td>{req.customer_name}</td>
+                                            <td>{req.step_name == undefined ? "-" : req.step_name}</td>
+                                        </tr>
+                                        {showDetail === index + 1 + startIndex && <tr className="tr-detail">
+                                            <td colSpan="12">
+                                                <div>
+                                                    <p>วันที่ส่งคำขอจ้างส่งคำขอจ้าง : <span>{currentDate}</span></p>
+                                                    <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
+                                                    <p>กำหนดส่ง : <span>{deadline}</span></p>
+                                                    <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
+                                                    <p>รวมราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
                                                     <p>รวมราคา : <span>{req.od_edit_amount_price + req.od_price}</span></p>
                                                 </div>
                                             </td>

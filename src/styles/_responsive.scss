@@ -72,14 +72,14 @@
 //login
 
 
-@media (min-width: 0px) and (max-width: 767px) {
+@media (min-width: 0px) and (max-width: 899px) {
     .body {
         // display: flex;
         // justify-content: center;
         // align-items: center;
     }
-
-    .login-soloCard {
+    .login-soloCard,
+    .createaccount-soloCard {
         margin-inline: 0 !important;
         flex-direction: column !important;
 
@@ -99,8 +99,9 @@
 
 
 
-@media (min-width: 768px) and (max-width: 1200px) {
-    .login-soloCard {
+@media (min-width: 900px) and (max-width: 1200px) {
+    .login-soloCard,
+    .createaccount-soloCard {
         margin-inline: 0 !important;
     }
 }
@@ -140,28 +141,34 @@
 //artist admin panel
 
 @media (min-width: 0px) and (max-width: 767px) {
-    .aside-chatbox {
+    .aside-panel {
         // flex: 15rem 1 auto;
         flex-basis: 4rem !important;
-        .setting-menu{
+
+        .setting-menu {
             padding: 0;
         }
-        p,h1{
+
+        p,
+        h1 {
             display: none;
         }
-        div{
-            width:fit-content;
+
+        div {
+            width: fit-content;
         }
     }
-    .aside-main-card{
+
+    .aside-main-card {
         flex: 1 1 auto;
     }
 }
 
 @media (min-width: 768px) and (max-width: 1200px) {
-    .aside-chatbox {
+    .aside-panel {
         // flex: 15rem 1 auto;
         flex-basis: 14rem !important;
+
         // h1{
         //     font-size: 16px;
         //     font-weight:400;
@@ -170,7 +177,131 @@
             // padding: 0;
         }
     }
-    
+
+}
+
+@media (min-width: 1901px) {}
+
+//chat
+
+@media (min-width: 0px) and (max-width: 799px) {
+    .status-chat-header {
+        display: none;
+    }
+
+    .chat-header {
+        grid-template-columns: 1fr auto !important;
+    }
+
+    .sys-dialog,
+    .sys-dialog-wip {
+        width: 100% !important;
+    }
+
+    .back-btn {
+        display: block !important;
+    }
+
+    //สำหรับเลือกแชท
+    .aside-chatbox {
+        flex: 1;
+
+        .chat-item.selected {
+            // background-color: initial !important;
+            box-shadow: initial !important;
+            border: initial !important;
+            align-items: center !important;
+            border-radius: 1.25rem !important;
+            background: rgba(255, 255, 255, 0.61) !important;
+            overflow: hidden !important;
+        }
+
+        .qq .arrow {
+            display: none !important;
+        }
+    }
+
+    //สำหรับ หน้าแชท
+    .chat-room {
+        border-radius: 0 !important;
+
+        .backdrop-modal-area {
+            width: 100% !important;
+        }
+
+    }
+
+
+}
+
+@media (min-width: 800px) and (max-width: 999px) {
+    // .aside-chatbox {
+    //     display: none
+    // }
+
+    .sys-dialog,
+    .sys-dialog-wip {
+        width: 100% !important;
+    }
+
+    .back-btn {
+        display: block !important;
+    }
+
+    //สำหรับเลือกแชท
+    .aside-chatbox {
+        flex: 1;
+
+        .chat-item.selected {
+            // background-color: initial !important;
+            box-shadow: initial !important;
+            border: initial !important;
+            align-items: center !important;
+            border-radius: 1.25rem !important;
+            background: rgba(255, 255, 255, 0.61) !important;
+            overflow: hidden !important;
+        }
+
+        .qq .arrow {
+            display: none !important;
+        }
+    }
+
+    //สำหรับ หน้าแชท
+    .chat-room {
+        border-radius: 0 !important;
+
+        .backdrop-modal-area {
+            width: 100% !important;
+        }
+
+    }
+
+}
+
+@media (min-width: 1000px) and (max-width: 1200px) {
+    // .aside-chatbox {
+    //     display: none
+    // }
+
+    .sys-dialog-wip {
+        width: 100% !important;
+    }
+
+    // .back-btn {
+    //     display: block !important;
+    // }
+
+    //สำหรับ หน้าแชท
+    .chat-room {
+        // border-radius: 0 !important;
+
+        .backdrop-modal-area {
+            width: 100% !important;
+        }
+
+    }
+
 }
 
 @media (min-width: 1901px) {}

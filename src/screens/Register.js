@@ -17,7 +17,8 @@ import * as alertData from "../alertdata/alertData";
 import * as Icon from 'react-feather';
 import * as ggIcon from '@mui/icons-material';
 import { host } from "../utils/api.js";
-
+import { Button, Space, Form, Input, Checkbox, Flex, Col, Row } from "antd";
+import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest } from "../components/Navbar";
 const title = "สร้างบัญชี";
 
 
@@ -38,7 +39,7 @@ export default function SignUp() {
   const userID = new URLSearchParams(location.search).get("userID");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   const [pdpaAccept, setPdpaAccept] = useState(false);
   const [values, setValues] = useState({
     username: "",
@@ -95,74 +96,125 @@ export default function SignUp() {
     return true;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (handleValidation()) {
-      setIsLoading(true);
-      const formData = new FormData();
-      formData.append("userID", userID);
-      formData.append("email", email);
-      formData.append("file", file);
-      formData.append("username", values.username);
-      formData.append("password", values.password);
-      formData.append("bankAccName", values.bankAccName);
-      formData.append("ppNumber", values.ppNumber);
-      formData.append("pdpaAccept", pdpaAccept);
-      formData.append("roleName", roleName);
-      const token = localStorage.getItem("token");
-      await axios
-        .post(`${host}/register`, formData, {
-          headers: {
-            "Content-type": "multipart/form-data",
-            Authorization: "Bearer " + token,
-          },
-        })
-        .then((response) => {
-          const data = response.data;
-          if (data.status === "ok") {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("type", "user");
-            // navigate("/");
-            Swal.fire({ ...alertData.registerSuccess }).then(
-              // navigate("/")
-              window.location.href = "/"
-            );
-          } else if (data.status === "error") {
-            toast.error(data.message, toastOptions);
-          } else {
-            toast.error("Register Failed", toastOptions);
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  };
-  const [roleName,setRoleName] =useState(null)
+  const [form] = Form.useForm();
+  // const handleSubmit = async (event) => {
+  //   event.preventDefault();
+  //   if (handleValidation()) {
+  //     setIsLoading(true);
+  //     const formData = new FormData();
+  //     formData.append("userID", userID);
+  //     formData.append("email", email);
+  //     formData.append("file", file);
+  //     formData.append("username", values.username);
+  //     formData.append("password", values.password);
+  //     formData.append("bankAccName", values.bankAccName);
+  //     formData.append("ppNumber", values.ppNumber);
+  //     formData.append("pdpaAccept", pdpaAccept);
+  //     formData.append("roleName", roleName);
+  //     const token = localStorage.getItem("token");
+  //     await axios
+  //       .post(`${host}/register`, formData, {
+  //         headers: {
+  //           "Content-type": "multipart/form-data",
+  //           Authorization: "Bearer " + token,
+  //         },
+  //       })
+  //       .then((response) => {
+  //         const data = response.data;
+  //         if (data.status === "ok") {
+  //           localStorage.setItem("token", data.token);
+  //           localStorage.setItem("type", "user");
+  //           // navigate("/");
+  //           Swal.fire({ ...alertData.registerSuccess }).then(
+  //             // navigate("/")
+  //             window.location.href = "/"
+  //           );
+  //         } else if (data.status === "error") {
+  //           toast.error(data.message, toastOptions);
+  //         } else {
+  //           toast.error("Register Failed", toastOptions);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error:", error);
+  //       })
+  //       .finally(() => {
+  //         setIsLoading(false);
+  //       });
+  //   }
+  // };
+  const [roleName, setRoleName] = useState(null)
   console.log(roleName);
 
-    const [roleConfirm,setRoleConfirm] = useState(false)
-    const icon = {
-        fontVariationSettings: "'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 48",
-    };
+  const [roleConfirm, setRoleConfirm] = useState(false)
+  const icon = {
+    fontVariationSettings: "'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 48",
+  };
 
-    function handleRole(role) {
-        setRoleName(role)
-        // alert(role)
-    }
+  function handleRole(role) {
+    setRoleName(role)
+    // alert(role)
+  }
 
-    function roleCheck() {
-        setRoleConfirm(!roleConfirm)
-    }
+  function roleCheck() {
+    setRoleConfirm(!roleConfirm)
+  }
+
+  const handleSubmit = async (values) => {
+    // event.preventDefault();
+    console.log(values)
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("userID", userID);
+    formData.append("email", email);
+    formData.append("file", file);
+    formData.append("username", values.username);
+    formData.append("password", values.password);
+    formData.append("bankAccName", values.bankAccName);
+    formData.append("ppNumber", values.ppNumber);
+    formData.append("pdpaAccept", pdpaAccept);
+    formData.append("roleName", roleName);
+    console.log(values)
+    console.log(roleName)
+    console.log(userID)
+    const token = localStorage.getItem("token");
+    await axios
+      .post(`${host}/register`, formData, {
+        headers: {
+          "Content-type": "multipart/form-data",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.status === "ok") {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("type", "user");
+          // navigate("/");
+          Swal.fire({ ...alertData.registerSuccess }).then(
+            // navigate("/")
+            window.location.href = "/"
+          );
+        } else if (data.status === "error") {
+          toast.error(data.message, toastOptions);
+        } else {
+          toast.error("Register Failed", toastOptions);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   return (
     <div className="body-con">
       <Helmet>
         <title>{title}</title>
       </Helmet>
+      <NavbarGuest />
       {/* <NavbarGuest /> */}
 
       <div
@@ -191,50 +243,50 @@ export default function SignUp() {
                 <div></div>
               </div>
               <div className="createaccount-col-text">
-                <ProfileImg src={previewUrl} onPress={addProfileImg}/>
+                <ProfileImg src={previewUrl} onPress={addProfileImg} />
                 <p className="text-center">รูปโปรไฟล์</p>
-                <form onSubmit={handleSubmit}>
+                {/* <form onSubmit={handleSubmit}>
                   <DefaultInput
                     headding="อีเมล"
-                    type="email" 
+                    type="email"
                     id="email"
                     name="email"
                     defaultValue={email}
                     disabled={true}
                   />
-                  <DefaultInput 
+                  <DefaultInput
                     headding="ชื่อผู้ใช้"
-                    type="text"          
+                    type="text"
                     id="username"
                     name="username"
                     onChange={(e) => handleChange(e)}
                   />
-                  <DefaultInput 
-                    headding="รหัสผ่าน" 
-                    type="password" 
+                  <DefaultInput
+                    headding="รหัสผ่าน"
+                    type="password"
                     id="password"
                     name="password"
                     onChange={(e) => handleChange(e)}
                   />
-                  <DefaultInput 
-                    headding="ยืนยันรหัสผ่าน" 
-                    type="password" 
+                  <DefaultInput
+                    headding="ยืนยันรหัสผ่าน"
+                    type="password"
                     id="confirmpassword"
                     name="confirmpassword"
                     onChange={(e) => handleChange(e)}
                   />
                   {roleName == "artist" && (
                     <>
-                      <DefaultInput 
-                        headding="ชื่อบัญชีธนาคาร" 
-                        type="text" 
+                      <DefaultInput
+                        headding="ชื่อบัญชีธนาคาร"
+                        type="text"
                         id="bankAccName"
                         name="bankAccName"
                         onChange={(e) => handleChange(e)}
                       />
-                      <DefaultInput 
-                        headding="เลขพร้อมเพย์" 
-                        type="text" 
+                      <DefaultInput
+                        headding="เลขพร้อมเพย์"
+                        type="text"
                         id="ppNumber"
                         name="ppNumber"
                         onChange={(e) => handleChange(e)}
@@ -242,13 +294,13 @@ export default function SignUp() {
                     </>
                   )}
                   <div class="form-check">
-                    <input  class="form-check-input"
+                    <input class="form-check-input"
                       type="checkbox"
                       name="pdpaAccept"
                       value={pdpaAccept}
                       id="flexCheckDefault"
                       onChange={handleChange}
-                      className="checkbox-accecpt"/>
+                      className="checkbox-accecpt" />
                     <label class="form-check-label" for="flexCheckDefault">
                       ยอมรับเงื่อนไขการใช้บริการ
                     </label>
@@ -261,7 +313,157 @@ export default function SignUp() {
                       ยกเลิก
                     </button>
                   </div>
-                </form>
+                </form> */}
+                <Form
+                  onFinish={handleSubmit}
+                  name="submitArtist"
+                  form={form}
+                  layout="vertical"
+                  initialValues={
+                    { email: email }}>
+                  <Form.Item
+                    label="อีเมล"
+                    name="email"
+                    id="email"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกอีเมล",
+                      },
+                      { type: "email" },
+                    ]}
+
+                  >
+                    <Input disabled />
+                  </Form.Item>
+                  <Form.Item
+                    label="ชื่อผู้ใช้"
+                    id="username"
+                    name="username"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกชื่อผู้ใช้",
+                      },
+                      {
+                        min: 4,
+                        message: "กรุณากรอกรหัสผ่านอย่างน้อย 4 ตัว",
+                      },
+                      { type: "text" },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  {/* <Form.Item
+                    label="รหัสผ่าน"
+                    type="password"
+                    id="password"
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกรหัสผ่าน",
+                      },
+                      { type: "password" },
+                    ]}
+                  >
+                    <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+                  </Form.Item>
+                  <Form.Item
+                    label="ยืนยันรหัสผ่าน"
+                    id="confirmpassword"
+                    name="confirmpassword"
+                    className="to"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกรหัสผ่าน",
+                      },
+                      { type: "password" },
+                    ]}
+                  >
+                    <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+                  </Form.Item> */}
+
+                  <Form.Item
+                    label="รหัสผ่าน"
+                    name="password"
+                    id="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกรหัสผ่าน",
+                      },
+                      {
+                        min: 8,
+                        message: "กรุณากรอกรหัสผ่านอย่างน้อย 8 ตัว",
+                      },
+                      { type: "password" },
+                    ]}
+                  >
+                    <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+                  </Form.Item>
+
+                  {/* Field */}
+                  <Form.Item
+                    label="ยืนยันรหัสผ่าน"
+                    name="confirmpassword"
+                    dependencies={['password']}
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกรหัสผ่าน",
+                      },
+                      { type: "password" },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue('password') === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(new Error('รหัสผ่านไม่ตรงกัน'));
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+                  </Form.Item>
+                  <Form.Item
+                    label="ชื่อบัญชีธนาคาร"
+                    id="bankAccName"
+                    name="bankAccName"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกชื่อบัญชีธนาคาร",
+                      },
+                      { type: "text" },
+                    ]}
+
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    label="เลขพร้อมเพย์"
+                    id="ppNumber"
+                    name="ppNumber"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกเลขพร้อมเพย์",
+                      },
+                      { type: "text" },
+                    ]}
+                  >
+                    <Input maxLength={13} />
+                  </Form.Item>
+                  <Flex>
+                    <Checkbox checked={pdpaAccept} onChange={(e) => setPdpaAccept(e.target.checked)}>ยอมรับเงื่อนไขการใช้บริการ</Checkbox>
+
+                  </Flex>
+                  <Flex justify="center">
+                    <Button htmlType="submit" shape="round" size="large" type="primary" disabled={!pdpaAccept}>ลงทะเบียน</Button>
+                  </Flex>
+                </Form>
               </div>
             </div>
           ) : (
@@ -278,9 +480,8 @@ export default function SignUp() {
                 </div>
                 <div className="roles-container">
                   <div
-                    className={`role-item ${
-                      roleName == "customer" && "select"
-                    }`}
+                    className={`role-item ${roleName == "customer" && "select"
+                      }`}
                   >
                     <button onClick={() => handleRole("customer")}>
                       <ggIcon.Person className="iconn" />
@@ -291,7 +492,7 @@ export default function SignUp() {
                     className={`role-item ${roleName == "artist" && "select"}`}
                   >
                     <button onClick={() => handleRole("artist")}>
-                        <PaletteOutlinedIcon className="iconn" />
+                      <PaletteOutlinedIcon className="iconn" />
                     </button>
                     <p>นักวาด</p>
                   </div>

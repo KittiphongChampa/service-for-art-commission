@@ -27,14 +27,6 @@ import { host } from "../../utils/api";
 import _ from 'lodash';
 
 const title = "ตั้งค่าโปรไฟล์";
-const toastOptions = {
-    position: "bottom-right",
-    autoClose: 1000,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "dark",
-};
-
 export default function MyReq() {
     const token = localStorage.getItem("token");
 
@@ -80,7 +72,7 @@ export default function MyReq() {
             const newStartIndex = (activePage - 1) * itemsPerPage;
             //เอาจำนวนที่เริ่ม + จำนวนที่แสดง (0+10 = 10) จะเป็น index 0-10 
             
-            const newEndIndex = newStartIndex + (itemsPerPage-1);
+            const newEndIndex = newStartIndex + (itemsPerPage);
             //index เริ่มและ index สุดท้าย
             setFilteredData(filteredData.slice(newStartIndex, newEndIndex))
             setStartIndex(newStartIndex);

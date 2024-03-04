@@ -96,7 +96,7 @@ p {
 [class$="-soloCard"] {
     /* padding-top: 2.5rem; */
     /* padding-bottom: 2.5rem; */
-    background: rgba(255, 255, 255, 0.857);
+    background: white;
     border-radius: 1.25rem;
     height: fit-content;
     backdrop-filter: blur(20px);
@@ -135,13 +135,8 @@ p {
 
 /* ---------------------------- */
 
-
-
-
-
-
 .createaccount-col-text {
-    width: 60%;
+    width: 100%;
 }
 
 .text-align-center a {

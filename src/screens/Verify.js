@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 import DefaultInput from "../components/DefaultInput";
 
 // import Navbar from "../components/Navbar";
-
+import { Button, Space, Form, Input } from "antd";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useState, useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
@@ -16,7 +16,7 @@ import Lottie from "lottie-react";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
 import * as alertData from "../alertdata/alertData";
-import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest} from "../components/Navbar";
+import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest } from "../components/Navbar";
 import { host } from "../utils/api";
 
 const toastOptions = {
@@ -49,8 +49,14 @@ export default function Verify() {
   });
   console.log(values.otp);
 
-  const handleChange = (event) => {
-    setValues({ ...values, [event.target.name]: event.target.value });
+  const handleChangeEmail = (event) => {
+    setValues({ ...values, email: event.target.value });
+    // console.log(event.target.value)
+  };
+
+  const handleChangeOtp = (event) => {
+    setValues({ ...values, otp: event.target.value });
+    // console.log(event.target.value)
   };
 
   const handleValidation = () => {
@@ -71,46 +77,11 @@ export default function Verify() {
     return true;
   };
 
-  const [userID,setuserID] = useState('');
+  const [userID, setuserID] = useState('');
 
-  const handleSubmitotp = async (event) => {
-    event.preventDefault();
-    setIsLoading(true);
-    if (handleValidation()) {
-      const { email } = values;
-      const jsondata = {
-        email,
-      };
-      await fetch(`${host}/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsondata),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status === "ok") {
-            Swal.fire({ ...alertData.verifyEmainSuccess })
-            setuserID(data.insertedUserID);
-            const submitOtpBtn = document.getElementById("submit-otp-btn");
-            submitOtpBtn.classList.remove("disabled-btn");
-            submitOtpBtn.removeAttribute("disabled");
-          } else {
-            toast.error("Send OTP Failed " + data.message, toastOptions);
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
+    // event.preventDefault();
+    // console.log('aaaaaaaaaaaaaaaaaaaaaa')
     if (handleValidationOTP()) {
       const { otp, email } = values;
       const jsondata = {
@@ -141,6 +112,46 @@ export default function Verify() {
     }
   };
 
+  const handleSubmitotp = async () => {
+    // event.preventDefault();
+    setIsLoading(true);
+    if (handleValidation()) {
+      const { email } = values;
+      const jsondata = {
+        email,
+      };
+      await fetch(`${host}/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jsondata),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "ok") {
+            Swal.fire({ ...alertData.verifyEmainSuccess })
+            setuserID(data.insertedUserID);
+            const submitOtpBtn = document.getElementById("submit-otp-btn");
+            submitOtpBtn.classList.remove("disabled-btn");
+            submitOtpBtn.removeAttribute("disabled");
+          } else {
+            alert("Send OTP Failed " + data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  };
+
+  const suffix = (
+    <Button>ส่งรหัสยืนยัน</Button>
+  );
+
 
 
   return (
@@ -158,6 +169,55 @@ export default function Verify() {
             <div className="login-col-text">
               <div className="input-login-box">
                 <h1>{title} </h1>
+                <Form
+                  layout="vertical"
+                  name="subotp"
+                  onFinish={handleSubmitotp}
+                >
+                  <Form.Item
+                    label="อีเมล"
+                    name="email"
+                    id="email"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกอีเมล",
+                      },
+                      { type: "email" },
+                    ]}
+                  >
+                    <Space.Compact
+                      style={{
+                        width: '100%',
+                      }}
+                    >
+                      <Input onChange={(e) => handleChangeEmail(e)} />
+                      <Button size="large" htmlType="submit" loading={isLoading}>ส่งรหัสยืนยัน</Button>
+                    </Space.Compact>
+                  </Form.Item>
+                </Form>
+                <Form
+                  name="verify"
+                  layout="vertical"
+                  onFinish={handleSubmit}>
+                  <Form.Item
+                    label="รหัสยืนยัน"
+                    id="otp"
+                    name="otp"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกรหัสยืนยัน",
+                      },
+                      { type: "text" },
+                    ]}
+                  >
+                    <Input onChange={(e) => handleChangeOtp(e)} />
+                  </Form.Item>
+                  <div className="login-btn-group">
+                    <Button htmlType="submit" type="primary" shape="round" size="large" disabled={values.otp == ''}>ยืนยันอีเมล</Button>
+                  </div>
+                </Form>
                 {/* 
                   {isLoading ? (
                     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -165,7 +225,7 @@ export default function Verify() {
                     </div>
                   ) : ( */}
 
-                <form onSubmit={handleSubmitotp}>
+                {/* <form onSubmit={handleSubmitotp}>
                   <label class="onInput">อีเมล</label>
                   <div className="verify-email">
                     <input
@@ -176,19 +236,19 @@ export default function Verify() {
                     />
                     <button type="submit">ส่งรหัสยืนยัน</button>
                   </div>
-                </form>
+                </form> */}
 
                 {/* )} */}
 
-                <form onSubmit={handleSubmit}>
+                {/* <form onSubmit={handleSubmit}>
                   <DefaultInput
                     headding="ใส่รหัสยืนยัน"
                     type="text"
                     id="otp"
                     name="otp"
-                    onChange={(e) => handleChange(e)}
+                    onChange={(e) => handleChangeOtp(e)}
                   />
-                  
+
                   <div className="text-align-center">
                     <button
                       className="lightblue-btn disabled-btn"
@@ -199,7 +259,7 @@ export default function Verify() {
                       ยืนยันอีเมล
                     </button>
                   </div>
-                </form>
+                </form> */}
               </div>
             </div>
           </div>

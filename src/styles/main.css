@@ -373,6 +373,7 @@ h6 {
   margin: 0;
   padding: 0;
   font-weight: 400 !important;
+  color: #525764 !important;
 }
 
 h1 {
@@ -445,21 +446,25 @@ button {
     height: 50rem;
   }
 }
-@media (min-width: 0px) and (max-width: 767px) {
-  .login-soloCard {
+@media (min-width: 0px) and (max-width: 899px) {
+  .login-soloCard,
+  .createaccount-soloCard {
     margin-inline: 0 !important;
     flex-direction: column !important;
   }
-  .login-soloCard .login-col-img {
+  .login-soloCard .login-col-img,
+  .createaccount-soloCard .login-col-img {
     display: none;
   }
-  .login-soloCard .login-col-text {
+  .login-soloCard .login-col-text,
+  .createaccount-soloCard .login-col-text {
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
 }
-@media (min-width: 768px) and (max-width: 1200px) {
-  .login-soloCard {
+@media (min-width: 900px) and (max-width: 1200px) {
+  .login-soloCard,
+  .createaccount-soloCard {
     margin-inline: 0 !important;
   }
 }
@@ -481,16 +486,17 @@ button {
   }
 }
 @media (min-width: 0px) and (max-width: 767px) {
-  .aside-chatbox {
+  .aside-panel {
     flex-basis: 4rem !important;
   }
-  .aside-chatbox .setting-menu {
+  .aside-panel .setting-menu {
     padding: 0;
   }
-  .aside-chatbox p, .aside-chatbox h1 {
+  .aside-panel p,
+  .aside-panel h1 {
     display: none;
   }
-  .aside-chatbox div {
+  .aside-panel div {
     width: -moz-fit-content;
     width: fit-content;
   }
@@ -499,8 +505,80 @@ button {
   }
 }
 @media (min-width: 768px) and (max-width: 1200px) {
-  .aside-chatbox {
+  .aside-panel {
     flex-basis: 14rem !important;
+  }
+}
+@media (min-width: 0px) and (max-width: 799px) {
+  .status-chat-header {
+    display: none;
+  }
+  .chat-header {
+    grid-template-columns: 1fr auto !important;
+  }
+  .sys-dialog,
+  .sys-dialog-wip {
+    width: 100% !important;
+  }
+  .back-btn {
+    display: block !important;
+  }
+  .aside-chatbox {
+    flex: 1;
+  }
+  .aside-chatbox .chat-item.selected {
+    box-shadow: initial !important;
+    border: initial !important;
+    align-items: center !important;
+    border-radius: 1.25rem !important;
+    background: rgba(255, 255, 255, 0.61) !important;
+    overflow: hidden !important;
+  }
+  .aside-chatbox .qq .arrow {
+    display: none !important;
+  }
+  .chat-room {
+    border-radius: 0 !important;
+  }
+  .chat-room .backdrop-modal-area {
+    width: 100% !important;
+  }
+}
+@media (min-width: 800px) and (max-width: 999px) {
+  .sys-dialog,
+  .sys-dialog-wip {
+    width: 100% !important;
+  }
+  .back-btn {
+    display: block !important;
+  }
+  .aside-chatbox {
+    flex: 1;
+  }
+  .aside-chatbox .chat-item.selected {
+    box-shadow: initial !important;
+    border: initial !important;
+    align-items: center !important;
+    border-radius: 1.25rem !important;
+    background: rgba(255, 255, 255, 0.61) !important;
+    overflow: hidden !important;
+  }
+  .aside-chatbox .qq .arrow {
+    display: none !important;
+  }
+  .chat-room {
+    border-radius: 0 !important;
+  }
+  .chat-room .backdrop-modal-area {
+    width: 100% !important;
+  }
+}
+@media (min-width: 1000px) and (max-width: 1200px) {
+  .sys-dialog-wip {
+    width: 100% !important;
+  }
+  .chat-room .backdrop-modal-area {
+    width: 100% !important;
   }
 }
 /* *-------Navbar---------- */
@@ -687,6 +765,10 @@ a:visited {
   font-family: "Prompt", sans-serif;
 }
 
+.ant-select-selector {
+  border-radius: 1rem !important;
+}
+
 .h1,
 .h2,
 .h3,
@@ -838,6 +920,10 @@ a:focus {
   padding: 0px !important;
   height: -moz-fit-content;
   height: fit-content;
+  background-color: white;
+}
+.body .login-soloCard h1 {
+  color: #525764;
 }
 .body .login-soloCard .login-col-img {
   /* flex: fit-content; */
@@ -1142,6 +1228,7 @@ div#cms-artist-profile .q {
 
 .displaydesc {
   line-height: 1;
+  min-height: 1px !important;
 }
 .displaydesc * {
   margin-bottom: 0;
@@ -1300,7 +1387,8 @@ table.queue-table th.q {
   background: linear-gradient(180deg, #1E1C7B 0%, #6394DE 100%);
   /* *ฝั่งด้านข้างแชท */
 }
-.chatbox-container .aside-chatbox {
+.chatbox-container .aside-chatbox,
+.chatbox-container .aside-panel {
   flex-basis: 20rem;
   flex-shrink: 0;
   -webkit-user-select: none;
@@ -1308,12 +1396,14 @@ table.queue-table th.q {
           user-select: none;
   height: 100%;
 }
-.chatbox-container .aside-chatbox .headding {
+.chatbox-container .aside-chatbox .headding,
+.chatbox-container .aside-panel .headding {
   display: grid;
   grid-template-columns: 1.3rem 8fr 1.3rem;
   grid-template-rows: 5rem;
 }
-.chatbox-container .aside-chatbox .headding h1 {
+.chatbox-container .aside-chatbox .headding h1,
+.chatbox-container .aside-panel .headding h1 {
   align-self: center;
   grid-column-start: 2;
   font-weight: 200;
@@ -1373,7 +1463,6 @@ table.queue-table th.q {
   display: flex;
   align-items: center;
   border-radius: 1.25rem;
-  border: 1px solid #d4d6ff;
   background: rgba(255, 255, 255, 0.61);
   overflow: hidden;
   width: 100%;
@@ -1471,11 +1560,17 @@ table.queue-table th.q {
   overflow: hidden;
   border-radius: 26px 0 0 0;
 }
+.chatbox-container .chat-room .chat-header .back-btn,
+.chatbox-container .aside-main-card .chat-header .back-btn {
+  display: none;
+}
 .chatbox-container .chat-room .chat-header div.chat-name,
 .chatbox-container .aside-main-card .chat-header div.chat-name {
   display: flex;
   min-width: 0;
   /*เพิ่ม min-width ให้เพื่อย่อตัว div p ข้างในให้มันย่อลงได้*/
+  align-items: center;
+  row-gap: 1rem;
 }
 .chatbox-container .chat-room .chat-header div.chat-name div,
 .chatbox-container .aside-main-card .chat-header div.chat-name div {
@@ -1722,6 +1817,26 @@ table.queue-table th.q {
   overflow-wrap: break-word;
 }
 
+.sys-dialog {
+  width: 50%;
+  align-self: center;
+  margin: 1rem 0;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: rgba(133, 126, 139, 0) 0px 2px 6px 0px, rgba(188, 187, 193, 0.1) 0px 1px 11px 0px, rgba(195, 196, 207, 0.05) 0px 7px 28px 8px;
+  background-color: white;
+}
+
+.sys-dialog-wip {
+  width: 80%;
+  align-self: center;
+  margin: 1rem 0;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: rgba(133, 126, 139, 0) 0px 2px 6px 0px, rgba(188, 187, 193, 0.1) 0px 1px 11px 0px, rgba(195, 196, 207, 0.05) 0px 7px 28px 8px;
+  background-color: white;
+}
+
 .modall {
   min-width: 100vw;
   min-height: 100vh;
@@ -1778,7 +1893,7 @@ table.queue-table th.q {
 .backdrop-modal-area {
   z-index: 19;
   background-color: rgba(0, 0, 0, 0.358);
-  width: 30rem;
+  width: 40rem;
   height: 100%;
   position: absolute;
   right: 0;
@@ -1794,7 +1909,6 @@ table.queue-table th.q {
   row-gap: 2rem;
   align-items: center;
   overflow-y: auto;
-  box-shadow: 0px 0px 47px 1px rgba(176, 186, 209, 0.701);
 }
 .backdrop-modal-area .od-modal-card .od-headder {
   width: 100%;
@@ -2323,6 +2437,7 @@ table.overview-order-table th.number, table.overview-order-table th.q {
   background-color: transparent;
   border: 1px solid #A7B4CE;
   margin-bottom: 1rem;
+  color: #A7B4CE;
 }
 .roles-container .role-item p {
   text-align: center;

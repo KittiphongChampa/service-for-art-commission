@@ -21,7 +21,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
 import * as alertData from "../../alertdata/alertData";
 import { useAuth } from '../../context/AuthContext';
-import { Modal, Button, Input, Select, Tabs} from 'antd';
+import { Modal, Button, Input, Select, Tabs } from 'antd';
 import { host } from "../../utils/api";
 
 const title = "ViewProfile";
@@ -61,7 +61,7 @@ export default function ViewProfile() {
   useEffect(() => {
     getUserProfile();
     getUserCms();
-  },[])
+  }, [])
 
   // useEffect(() => {
   //   // setLoading(true);
@@ -174,7 +174,7 @@ export default function ViewProfile() {
 
   //admin
   const [banReason, setBanReason] = useState("");
-  
+
   const [popup, setpopup] = useState(false);
   const Close = () => {
     setBanReason("");
@@ -207,22 +207,22 @@ export default function ViewProfile() {
   };
 
   const menus = [
-        {
-            key: '1',
-            label: "คอมมิชชัน",
-            children: <AllCms myCommission={myCommission} userID={userdata.id} />,
-        },
-        {
-            key: '2',
-            label: "แกลเลอรี",
-            children: <AllArtworks />,
-        },
-        {
-            key: '3',
-            label: "รีวิว",
-            children: <AllReviews />,
-        }
-    ];
+    {
+      key: '1',
+      label: "คอมมิชชัน",
+      children: <AllCms myCommission={myCommission} userID={userdata.id} />,
+    },
+    {
+      key: '2',
+      label: "งานวาด",
+      children: <AllArtworks />,
+    },
+    {
+      key: '3',
+      label: "รีวิว",
+      children: <AllReviews />,
+    }
+  ];
 
   return (
     <>
@@ -233,16 +233,16 @@ export default function ViewProfile() {
       {showProfileModal}
 
       {isLoggedIn ? (
-            type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+        type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
       ) : (
-          <NavbarHomepage />
+        <NavbarHomepage />
       )}
 
       <div class="body-nopadding" style={body}>
         <div className="cover-grid">
           <div
             className="cover"
-            // onClick={openModal}
+          // onClick={openModal}
           >
             <div
               className="cover-color"
@@ -255,7 +255,7 @@ export default function ViewProfile() {
                 <ProfileImg
                   src={userdata.urs_profile_img}
                   type="show"
-                  // onPress={() => openModal("profile")}
+                // onPress={() => openModal("profile")}
                 />
                 {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
                 <p className="username-profile fs-5">{userdata.urs_name}</p>
@@ -263,7 +263,7 @@ export default function ViewProfile() {
                 {type != "admin" ? (
                   <div className="group-btn-area">
                     {follow === "no_follow" ? (
-                      <Button shape="round"  onClick={eventfollow}>
+                      <Button shape="round" onClick={eventfollow}>
                         ติดตาม
                       </Button>
                     ) : (
@@ -356,9 +356,9 @@ export default function ViewProfile() {
               </div>
             </div>
             <div className="user-profile-contentCard">
-               <div>
-                                <Tabs defaultActiveKey="1" items={menus} />
-                            </div>
+              <div>
+                <Tabs defaultActiveKey="1" items={menus} />
+              </div>
               {/* <button
                 className="sub-menu selected"
                 onClick={(event) => menuProfile(event, "cms")}
@@ -394,7 +394,7 @@ function AllCms(props) {
   const type = localStorage.getItem("type");
   const { myCommission, userID } = props;
   const handleRedirect = (cms_id) => {
-      window.location = (`/cmsdetail/${cms_id}`);
+    window.location = (`/cmsdetail/${cms_id}`);
   }
   return (
     <>
@@ -419,7 +419,7 @@ function AllCms(props) {
           <>
             {myCommission.map((mycms) => (
               <div key={mycms.cms_id} style={{ display: "flex" }}>
-                <Link onClick={()=>handleRedirect(mycms.cms_id)}>
+                <Link onClick={() => handleRedirect(mycms.cms_id)}>
                   <CmsItem
                     src={mycms.ex_img_path}
                     headding={mycms.cms_name}
@@ -439,7 +439,7 @@ function AllCms(props) {
 function AllArtworks(props) {
   return (
     <>
-      <p className="h3 mt-3 mb-2">แกลอรี่</p>
+      <p className="h3 mt-3 mb-2">งานวาด</p>
       <div className="profile-gallery">
         <img src="b3.png" />
         <img src="AB1.png" />
