@@ -40,6 +40,7 @@ const NavbarUser = (props) => {
         const token = localStorage.getItem("token");
         if (socket) {
             socket.on('getNotification', (data) => {
+                console.log(data);
                 setNotifications((prev) => {
                     // เพิ่มการแจ้งเตือนที่มาใหม่ไปที่ตำแหน่งแรกของอาร์เรย์
                     prev.unshift(data.data);
@@ -61,6 +62,7 @@ const NavbarUser = (props) => {
     };
 
     const displayNotification = (data) => {
+        console.log(data);
         let action;
         let read;
         let linked;
@@ -113,6 +115,8 @@ const NavbarUser = (props) => {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+        } else if (data.msg === 'ถูกลบโดยแอดมิน') {
+            action = data.msg
         }
 
         if (data.noti_read === 1) {

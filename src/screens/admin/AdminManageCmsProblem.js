@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest } from "../../components/Navbar";
+import * as Icon from 'react-feather';
+import { Select,Dropdown, Input, Radio, Space, Tag, Modal, Form, message, Button, Flex } from 'antd';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -70,57 +73,98 @@ export default function AdminManageCmsProblem() {
         })
     }
 
-    const approve = async(cmsID) => {
-      await axios
-      .patch(`${host}/commission/problem/approve/${cmsID}?array_imgSimilar=${array_imgSimilar}`, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.status === "ok") {
-          Swal.fire({
-            icon: "success",
-            title: "อนุมัติสำเร็จ",
-            confirmButtonText: 'ตกลง',
-          }).then(() => {
-              window.location.href = `/admin/adminmanage/allcms`;
-          });
-        } else {
-          console.log("error");
-          Swal.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
-          });
+    const [form] = Form.useForm();
+
+    const [deleteModal,setDeleteModal] = useState(false)
+
+    function openDelModal() {
+      setDeleteModal(!deleteModal)
+    }
+
+    function keep(cmsID) {
+      Swal.fire({
+        title: `เก็บไว้หรือไม่`,
+        showCancelButton: true,
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+        icon: "question"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await axios
+          .patch(`${host}/commission/problem/approve/${cmsID}?array_imgSimilar=${array_imgSimilar}`, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          })
+          .then((response) => {
+            const data = response.data;
+            if (data.status === "ok") {
+              Swal.fire({
+                icon: "success",
+                title: "บันทึกสำเร็จ",
+                confirmButtonText: 'ตกลง',
+              }).then(() => {
+                  window.location.href = `/admin/adminmanage/allcms`;
+              });
+            } else {
+              console.log("error");
+              Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
+              });
+            }
+          })
         }
       })
     }
 
-    const not_approve = async(cmsID) => {
-      await axios
-      .patch(`${host}/commission/problem/notapprove/${cmsID}`, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.status === "ok") {
-          Swal.fire({
-            icon: "success",
-            title: "ไม่อนุมัติสำเร็จ",
-            confirmButtonText: 'ตกลง',
-          }).then(() => {
-              window.location.href = `/admin/adminmanage/allcms`;
-          });
-        } else {
-          console.log("error");
-          Swal.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
-          });
-        }
+    function delCommission(values) {
+      const commissionId = cmsID.id;
+      const postData = {
+        reason: values['reason'],
+      };
+      console.log(postData);
+      Swal.fire({
+        title: `ต้องการลบหรือไม่`,
+        showCancelButton: true,
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+        icon: "question"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await axios
+          .patch(`${host}/commission/problem/notapprove/${commissionId}`, postData, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          })
+          .then((response) => {
+            const data = response.data;
+            if (data.status === "ok") {
+              Swal.fire({
+                icon: "success",
+                title: "บันทึกสำเร็จ",
+                confirmButtonText: 'ตกลง',
+              }).then(() => {
+                // const deleteWork = {
+                //   sender_id: 0,
+                //   sender_name: admindata.admin_name,
+                //   sender_img: admindata.admin_profile,
+                //   receiver_id: artistDetail.artistId,
+                //   msg: `งานของคุณถูกลบโดยแอดมิน เนื่องจากถูกรายงานว่าเป็น ${reportDetail.sendrp_header}`
+                // };
+                // socket.emit('workhasdeletedByadmin', deleteWork);
+                window.location.href = `/admin/adminmanage/allcms`;
+              });
+            } else {
+              console.log("error");
+              Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
+              });
+            }
+          })
+        } 
       })
     }
 
@@ -179,8 +223,40 @@ export default function AdminManageCmsProblem() {
         ))}
       </div>
 
-      <button onClick={() => approve(cmsID.id)}>อนุมัติ</button>
-      <button onClick={() => not_approve(cmsID.id)}>ไม่อนุมัติ</button>
+      {/* <button onClick={() => approve(cmsID.id)}>อนุมัติ</button>
+      <button onClick={() => not_approve(cmsID.id)}>ไม่อนุมัติ</button> */}
+
+      <Flex justify="center" gap="small">
+        <Button size="large" shape="round" onClick={() => keep(cmsID.id)}>
+          เก็บคอมมิชชันไว้
+        </Button>
+        <Button size="large" shape="round" danger onClick={openDelModal}>
+          ลบคอมมิชชัน
+        </Button>
+      </Flex>
+
+      <Modal title="ระบุเหตุผลการลบ" open={deleteModal} onCancel={openDelModal} footer="">
+        <Form
+          form={form}
+          name="delReport"
+          onFinish={delCommission}
+        >
+          <Flex gap='middle' vertical>
+            <Form.Item
+              name="reason"
+              label="ใส่เหตุผลการลบ"
+              rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'string', max: 100 }]}
+            >
+              <Input />
+            </Form.Item>
+            <Flex gap='small' justify="flex-end">
+              <Button shape="round" size="large" htmlType="submit" danger>ยืนยัน</Button>
+              <Button shape="round" size="large" onClick={openDelModal}>ยกเลิก</Button>
+            </Flex>
+        
+            </Flex>
+          </Form>
+      </Modal>
     </>
   )
 }

@@ -39,7 +39,7 @@ export default function Report(props) {
   const navigate = useNavigate();
   const type = localStorage.getItem("type");
   const jwt_token = localStorage.getItem("token");
-  const { admindata, isLoggedIn } = useAuth();
+  const { admindata, isLoggedIn, socket } = useAuth();
 
   const { reportid } = useParams();
 
@@ -164,6 +164,35 @@ export default function Report(props) {
         }).then((response) => {
           const data = response.data;
           if (data.status === "ok") {
+            // การแจ้งเตือนเจ้าของ cms หรือ artwork
+            // const deleteWork = {
+            //   sender_id: 0,
+            //   sender_name: admindata.admin_name,
+            //   sender_img: admindata.admin_profile,
+            //   receiver_id: artistDetail.artistId,
+            //   msg: `งานของคุณถูกลบโดยแอดมิน เนื่องจากถูกรายงานว่าเป็น ${reportDetail.sendrp_header}`
+            // };
+            // socket.emit('workhasdeletedByadmin', deleteWork);
+
+            // บันทึก notification
+            // await axios.post(`${host}/admin/noti/add`, {
+            //   reporter: userdata.id,
+            //   reported: 0,
+            //   reportId: response.data.reportId,
+            //   msg: "งานของคุณถูกลบโดยแอดมิน เนื่องจากถูกรายงานว่า"
+            // }).then((response) => {
+            //   if (response.status === 200) {
+            //     Swal.fire({
+            //       title: "รายงานสำเร็จ",
+            //       icon: "success"
+            //     }).then(() => {
+            //       window.location.reload(false);
+            //     });
+            //   } else {
+            //     console.log("เกิดข้อผิดพลาดในการบันทึกข้อมูลการแจ้งเตือนของแอดมิน");
+            //   }
+            // });
+
             Swal.fire({
               icon: "success",
               title: "ลบแล้ว",
@@ -408,7 +437,7 @@ export default function Report(props) {
                   <Input />
                 </Form.Item>
                 <Flex gap='small' justify="flex-end">
-                  <Button shape="round" size="large" htmlType="submit" danger>ลบคอมมิชชันนี้</Button>
+                  <Button shape="round" size="large" htmlType="submit" danger>ยืนยัน</Button>
                   <Button shape="round" size="large" onClick={openDelModal}>ยกเลิก</Button>
                 </Flex>
             

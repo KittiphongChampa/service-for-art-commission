@@ -1156,12 +1156,12 @@ export default function CmsDetail() {
                   <p className="report-desc ms-4">อคติ การเหมารวม ลัทธิคนผิวขาว การใช้คำพูดส่อเสียด</p>
                 </div>
 
-                <div>
+                {/* <div>
                   <Radio value={4}>
                     <p className="report-headding">อื่นๆ
                       {value === 4 ? <Input style={{ width: 200, marginLeft: 10 }} /> : null}</p>
                   </Radio>
-                </div>
+                </div> */}
 
 
               </Space>

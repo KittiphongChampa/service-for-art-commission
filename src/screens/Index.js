@@ -115,7 +115,7 @@ export default function Index() {
             setIFollowerData(data.results)
           })
         } else {
-          console.log("error");
+          // console.log("error");
         }
       })
   }
@@ -414,7 +414,6 @@ function Commissions({ IFollowingIDs }) {
               style={{ width: '10rem' }}
               placeholder="Please select"
               value={topicValues}
-              // value={["1", "2"]}
               id="topicSelector"
               onChange={handleChange}
               maxTagCount='responsive'
@@ -607,8 +606,9 @@ function Gallery({ IFollowingIDs }) {
 
   const [sortBy, setSortBy] = useState('ล่าสุด'); //เรียงตาม
   const [filterBy, setFilterBy] = useState('all'); //กรองจาก
-  const [selectedTopic, setSelectedTopic] = useState('เลือกทั้งหมด'); //หัวข้อ
+  // const [selectedTopic, setSelectedTopic] = useState('เลือกทั้งหมด'); //หัวข้อ
   const [topicValues, setTopicValues] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
+  
   //หัวข้อที่ดึงจาก DB
   const [topics, setTopics] = useState([]);
 
@@ -742,7 +742,6 @@ function Gallery({ IFollowingIDs }) {
               style={{ width: '10rem' }}
               placeholder="Please select"
               value={topicValues}
-              // value={["1", "2"]}
               id="topicSelector"
               onChange={handleChange}
               maxTagCount='responsive'

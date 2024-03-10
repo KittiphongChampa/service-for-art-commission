@@ -135,29 +135,13 @@ export default function ChatBox() {
   window.onresize = reportWindowSize;
 
 
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await axios.get(`${host}/allchat`, {
-        // headers: {
-        //   Authorization: "Bearer " + token,
-        // },
-  //     });
-  //     const sortedContacts = response.data.sort((a, b) => {
-  //       return new Date(b.last_message_timestamp) - new Date(a.last_message_timestamp);
-  //     });
-  //     setContacts(sortedContacts);
-  //     userRef.current = response.data;
-  //   };
-  
-  //   fetchData();
-  // }, [userRef.current]);
-
   // Callback function ที่จะส่งไปยัง child
   const updateMessages = (messages) => {
     console.log(messages);
     setMessages(messages);
   };
+
+  const [msg ,setArrivalMessage] = useState("")
 
   // ทำงานแล้วดึงข้อมูลของผู้ติดต่อและข้อความ
   useEffect(() => {
@@ -174,9 +158,26 @@ export default function ChatBox() {
         console.error("Error fetching contacts:", error);
       }
     };
-
+    if (socket) {
+      socket.on("msg-receive", ({ img, msgId, msg, to, od_id, step_id, step_name, status, checked, isSystemMsg, from }) => {
+        setArrivalMessage({
+          img: img,
+          msgId: msgId,
+          fromSelf: false,
+          message: msg,
+          timestamp_chat: timestamp_chat,
+          created_at: currentDate,
+          step_id: step_id,
+          step_name: step_name,
+          od_id: od_id,
+          status: status,
+          checked: checked,
+          isSystemMsg: isSystemMsg
+        })
+      })
+    }
     fetchData();
-  }, [messages]);
+  }, [msg, messages]);
 
 
   const handleChatChange = (chat) => {

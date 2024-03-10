@@ -21,6 +21,17 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
   const [currentSelected, setCurrentSelected] = useState();
   console.log(contacts);
 
+  const uniqueContactIds = new Set();
+  const filteredContacts = [];
+ 
+  contacts_order.forEach((contact_o) => {
+    const combinedId = contact_o.id + contact_o.od_id;
+    if (!uniqueContactIds.has(combinedId)) {
+      uniqueContactIds.add(combinedId);
+      filteredContacts.push(contact_o);
+    }
+  });
+
   useEffect(() => {
     if (partnerID !== null) {
       orderID == null ? setCurrentSelected(partnerID + 0) : setCurrentSelected(partnerID + orderID)
@@ -97,7 +108,7 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
             );
           })}
 
-          {contacts_order.map((contact_order, index) => {
+          {filteredContacts.map((contact_order, index) => {
             return (
               <>
                 {selectedChatType == "order" && contact_order.od_id != 0 || selectedChatType == "all" ?
