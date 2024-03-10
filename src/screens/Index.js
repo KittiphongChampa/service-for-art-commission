@@ -196,27 +196,33 @@ export default function Index() {
       ) : (
         <NavbarGuest />
       )}
-
-      <div class="body-nopadding" style={body}>
-        <div className="container">
-          <div class="search-container">
-            <div className="search-box">
-              {/* <Form
+      <div class="body-nopadding">
+        <div className="cover-index" style={{ backgroundImage: "url('images/seamoon_index.jpg')" }}>
+          <div className="container-xl">
+            <div class="search-container">
+              <div className="search-box">
+                {/* <Form
                 onFinish={handleSearch}
               >
 
               </Form> */}
-              <Link to="/search" id="search" >
-                <Search placeholder="ค้นหา.."
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  htmlType="submit"
-                  onSearch={handleSearch}
-                  allowClear size="large"/>
-              </Link>
+                <Link to="/search" id="search" >
+                  <Search placeholder="ค้นหา.."
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    htmlType="submit"
+                    onSearch={handleSearch}
+                    allowClear size="large" />
+                </Link>
+              </div>
             </div>
+
           </div>
+          
+        </div>
+        <div className="container-xl">
+          
 
           <div className=" content-container user-profile-contentCard" >
             {submenu !== 'search' ? <>
@@ -354,9 +360,9 @@ function Commissions({ IFollowingIDs }) {
   }
   const [activePage, setActivePage] = useState(1);
   const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(5);
+  const [endIndex, setEndIndex] = useState(30);
   const [filteredCms, setFilteredCms] = useState()
-  const itemsPerPage = 5;
+  const itemsPerPage = 30;
 
   useEffect(() => {
     if (commission) {

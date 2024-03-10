@@ -68,7 +68,7 @@ export default function Login() {
       </Helmet>
       <NavbarGuest />
       <div className="body" style={body}>
-        <div className="container">
+        <div className="container-xl">
           <div className="login-soloCard">
             <div className="login-col-img">
               <img className="login-img" src="images/ภาพตัด.png" alt="" />

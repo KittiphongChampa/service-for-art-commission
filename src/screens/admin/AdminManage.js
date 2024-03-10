@@ -51,7 +51,7 @@ export default function AdminManagement() {
         <div className="aside-panel">
           <AdminMenuAside onActive={menu} />
         </div>
-        <div className="aside-main-card" style={{ padding: "1.3rem 3rem" }}>
+        <div className="aside-main-card" style={{ padding: "1.3rem 2rem" }}>
           {menu == "alladmin" ? ( 
             <AdminManageAdmin />
           ) : menu == "report" ? ( 

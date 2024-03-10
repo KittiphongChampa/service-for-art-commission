@@ -227,7 +227,7 @@ export default function SignUp() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="container">
+        <div className="container-xl">
           {roleConfirm ? (
             <div className="createaccount-soloCard">
               <div className="card-header-tap">
@@ -354,36 +354,7 @@ export default function SignUp() {
                   >
                     <Input />
                   </Form.Item>
-                  {/* <Form.Item
-                    label="รหัสผ่าน"
-                    type="password"
-                    id="password"
-                    name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกรหัสผ่าน",
-                      },
-                      { type: "password" },
-                    ]}
-                  >
-                    <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
-                  </Form.Item>
-                  <Form.Item
-                    label="ยืนยันรหัสผ่าน"
-                    id="confirmpassword"
-                    name="confirmpassword"
-                    className="to"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกรหัสผ่าน",
-                      },
-                      { type: "password" },
-                    ]}
-                  >
-                    <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
-                  </Form.Item> */}
+
 
                   <Form.Item
                     label="รหัสผ่าน"
@@ -427,35 +398,39 @@ export default function SignUp() {
                   >
                     <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
                   </Form.Item>
-                  <Form.Item
-                    label="ชื่อบัญชีธนาคาร"
-                    id="bankAccName"
-                    name="bankAccName"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกชื่อบัญชีธนาคาร",
-                      },
-                      { type: "text" },
-                    ]}
+                  {roleName == "artist" && (
+                    <>
+                      <Form.Item
+                        label="ชื่อบัญชีธนาคาร"
+                        id="bankAccName"
+                        name="bankAccName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกชื่อบัญชีธนาคาร",
+                          },
+                          { type: "text" },
+                        ]}
 
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    label="เลขพร้อมเพย์"
-                    id="ppNumber"
-                    name="ppNumber"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกเลขพร้อมเพย์",
-                      },
-                      { type: "text" },
-                    ]}
-                  >
-                    <Input maxLength={13} />
-                  </Form.Item>
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                        label="เลขพร้อมเพย์"
+                        id="ppNumber"
+                        name="ppNumber"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกเลขพร้อมเพย์",
+                          },
+                          { type: "text" },
+                        ]}
+                      >
+                        <Input maxLength={13} />
+                      </Form.Item>
+                    </>)}
+
                   <Flex>
                     <Checkbox checked={pdpaAccept} onChange={(e) => setPdpaAccept(e.target.checked)}>ยอมรับเงื่อนไขการใช้บริการ</Checkbox>
 
@@ -497,13 +472,16 @@ export default function SignUp() {
                     <p>นักวาด</p>
                   </div>
                 </div>
-                <button
-                  className="lightblue-btn"
+                <Button
+                  // className="lightblue-btn"
+                  size="large"
+                  shape="round"
+                  type="primary"
                   onClick={roleCheck}
                   disabled={roleName === null}
                 >
                   ถัดไป
-                </button>
+                </Button>
               </div>
             </>
           )}

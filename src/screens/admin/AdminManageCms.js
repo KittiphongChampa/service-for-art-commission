@@ -68,9 +68,9 @@ export default function AdminManageCms() {
       <Helmet>
           <title>{title}</title>
       </Helmet>
-      <h1 className="">รูปภาพที่รอตรวจสอบความเหมือน</h1>
+      <h1 className="h3">รูปภาพที่รอตรวจสอบความเหมือน</h1>
       <div className="all-user-head">
-        <h2>จำนวนทั้งหมด ({cmsData.length})</h2>
+        <h2 className="h3">จำนวนทั้งหมด ({cmsData.length})</h2>
         <div>
           <Input type="search" onChange={handleSearch} placeholder=" ค้นหา..." />
         </div>

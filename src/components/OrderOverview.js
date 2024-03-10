@@ -17,7 +17,7 @@ import Scrollbars from 'react-scrollbars-custom';
 // import { Pagination } from 'rsuite';
 import { Link } from 'react-router-dom';
 // import { DateRangePicker } from 'rsuite';
-import { Pagination, Input, Select, Space, Tabs, Flex, DatePicker } from 'antd';
+import { Pagination, Input, Select, Space, Tabs, Flex, DatePicker, Table } from 'antd';
 import axios from "axios";
 import { host } from "../utils/api";
 import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
@@ -103,6 +103,7 @@ export default function OrderOverview() {
             setAllData(allreqData.data)
             setFilterCmsReq(allreqData.data)
         }
+
         getData()
     }, [])
 
@@ -126,14 +127,13 @@ export default function OrderOverview() {
             if (dateSelected == "ทั้งหมด") {
                 dateDuration = allData
             } else if (dateSelected == "วันนี้") {
-                dateDuration = allData.filter(d => isToday(d.ordered_at))
+                dateDuration = allData.filter(d => isToday(new Date(d.ordered_at)))
             } else if (dateSelected == "สัปดาห์นี้") {
-                dateDuration = allData.filter(d => isThisWeek(d.ordered_at))
+                dateDuration = allData.filter(d => isThisWeek(new Date(d.ordered_at)))
             } else if (dateSelected == "เดือนนี้") {
-                dateDuration = allData.filter(d => isThisMonth(d.ordered_at))
-            } else if (dateSelected == "6เดือนนี้") {
+                dateDuration = allData.filter(d => isThisMonth(new Date(d.ordered_at)))
             } else if (dateSelected == "ปีนี้") {
-                dateDuration = allData.filter(d => isThisYear(d.ordered_at))
+                dateDuration = allData.filter(d => isThisYear(new Date(d.ordered_at)))
             }
             // setFilterCmsReq(dateDuration)
             sortAllData(dateDuration)
@@ -166,7 +166,7 @@ export default function OrderOverview() {
     }
 
     function filterRangeDate(date, dateString) {
-        const qq = allData.filter(item => isAfter(item.ordered_at, dateString[0]) && isBefore(item.ordered_at, dateString[1]))
+        const qq = allData.filter(item => isAfter(new Date(item.ordered_at), dateString[0]) && isBefore(new Date(item.ordered_at), dateString[1]))
         //dateString = อาเรย์วันที่
         sortAllData(qq)
         // console.log(qq);
@@ -200,7 +200,7 @@ export default function OrderOverview() {
             // children: <Gallery IFollowingIDs={IFollowingIDs} />,
         },
         {
-            key: '4',
+            key: 'finish',
             label: "เสร็จสิ้น",
             // children: <Artists IFollowingIDs={IFollowingIDs} />,
         },
@@ -223,8 +223,11 @@ export default function OrderOverview() {
             req = allData.filter(menu => menu.step_name == "รับคำขอจ้าง")
         } else if (key == 'accepted') {
             req = allData.filter(menu => !menu.step_name?.includes('คำขอจ้าง') || !menu.step_name?.includes('แอดมินอนุมัติ'))
-        } else if (key == 'cencel') {
+        } else if (key == 'cancel') {
             req = allData.filter(menu => menu.od_cancel_by !== null)
+        }
+        else if (key == 'finish') {
+            req = allData.filter(menu => menu.finished_at !== null)
         }
         setFilterCmsReq(req)
         if (searchValue) {
@@ -297,7 +300,6 @@ export default function OrderOverview() {
                             { value: 'วันนี้', label: 'วันนี้' },
                             { value: 'สัปดาห์นี้', label: 'สัปดาห์นี้' },
                             { value: 'เดือนนี้', label: 'เดือนนี้' },
-                            { value: '6 เดือน', label: '6 เดือน' },
                             { value: 'ปีนี้', label: 'ปีนี้' },
                             { value: 'กำหนดเอง', label: 'กำหนดเอง' },
 
@@ -321,7 +323,7 @@ export default function OrderOverview() {
                         <th className="number">คิว</th>
                         {/* <th className="q">คิวที่</th> */}
                         <th>ไอดีออเดอร์</th>
-                        <th>คอมมิชชัน:แพ็คเกจ</th>
+                        <th>คอมมิชชัน:แพ็กเกจ</th>
                         {/* <th>ระยะเวลา(วัน)</th> */}
                         {/* <th>เวลาที่เหลือ<Icon.Info /></th> */}
                         <th>ราคาคมช.</th>
@@ -332,7 +334,7 @@ export default function OrderOverview() {
                         <th>ความคืบหน้า</th>
                     </tr>
 
-                    {searchQuery ?
+                    {searchQuery && searchValue != '' ?
                         // <ShowData filteredArray={searchQuery} />
                         <>
                             {searchQuery.map((req, index) => {
@@ -369,12 +371,11 @@ export default function OrderOverview() {
                                         {showDetail === index + 1 + startIndex && <tr className="tr-detail">
                                             <td colSpan="12">
                                                 <div>
-                                                    <p>วันที่ส่งคำขอจ้างส่งคำขอจ้าง : <span>{currentDate}</span></p>
+                                                    <p>ส่งคำขอจ้างเมื่อ : <span>{currentDate}</span></p>
                                                     <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
                                                     <p>กำหนดส่ง : <span>{deadline}</span></p>
                                                     <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                                    <p>รวมราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
-                                                    <p>รวมราคา : <span>{req.od_edit_amount_price + req.od_price}</span></p>
+                                                    <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at}</span></p>
                                                 </div>
                                             </td>
                                         </tr>}
@@ -420,12 +421,11 @@ export default function OrderOverview() {
                                         {showDetail === index + 1 + startIndex && <tr className="tr-detail">
                                             <td colSpan="12">
                                                 <div>
-                                                    <p>วันที่ส่งคำขอจ้างส่งคำขอจ้าง : <span>{currentDate}</span></p>
+                                                    <p>ส่งคำขอจ้างเมื่อ : <span>{currentDate}</span></p>
                                                     <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
                                                     <p>กำหนดส่ง : <span>{deadline}</span></p>
                                                     <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                                    <p>รวมราคาแก้ไข : <span>{req.od_edit_amount_price}</span></p>
-                                                    <p>รวมราคา : <span>{req.od_edit_amount_price + req.od_price}</span></p>
+                                                    <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at}</span></p>
                                                 </div>
                                             </td>
                                         </tr>}
@@ -434,10 +434,145 @@ export default function OrderOverview() {
                             })}
                         </>
                     }
-
-
-
                 </table>
+
+                {/* {searchQuery ?
+                    <Table
+                        showSizeChanger={false}
+                        columns={[
+                            {
+                                title: 'คิว',
+                                dataIndex: 'q',
+                                key: 'q',
+                            },
+                            {
+                                title: 'ไอดีออเดอร์',
+                                dataIndex: 'od_id',
+                                key: 'od_id',
+                            },
+                            {
+                                title: 'คอมมิชชัน:แพ็กเกจ',
+                                dataIndex: 'cms_name',
+                                key: 'cma_name',
+                            },
+                            {
+                                title: 'ราคาคมช.',
+                                dataIndex: 'od_price',
+                                key: 'od_price',
+                            },
+                            {
+                                title: 'ผู้จ้าง',
+                                dataIndex: 'customer_name',
+                                key: 'customer_name',
+                            },
+                            {
+                                title: 'ความคืบหน้า',
+                                dataIndex: 'step_name',
+                                key: 'step_name',
+                            },
+                        ]}
+                        dataSource={searchQuery?.map((req, index) => {
+                            var currentDate = req.ordered_at;
+                            var deadline;
+
+                            if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
+                                currentDate = format(new Date(req.ordered_at), 'dd/MM HH:mm น.');
+                                if (isToday(new Date(req.ordered_at))) {
+                                    currentDate = format(new Date(req.ordered_at), 'วันนี้ HH:mm น.');
+                                } else if (isYesterday(new Date(req.ordered_at))) {
+                                    currentDate = format(new Date(req.ordered_at), 'เมื่อวานนี้ HH:mm น.');
+                                }
+                                //ต้องเป็นวันที่รับคำขอจ้าง
+                            }
+
+                            return (
+                                {
+                                    key: req.od_id,
+                                    q: req.od_q_number,
+                                    od_id: req.od_id,
+                                    cms_name: req.cms_name + ":" + req.pkg_name,
+                                    od_price: req.od_price,
+                                    customer_name: req.customer_name,
+                                    step_name: req.step_name == undefined ? "-" : req.step_name,
+                                }
+                            )
+                        })}
+                    />
+
+                    :
+
+                    <Table
+                        showSizeChanger={false}
+                        columns={[
+                            {
+                                title: 'คิว',
+                                dataIndex: 'q',
+                                key: 'q',
+                            },
+                            {
+                                title: 'ไอดีออเดอร์',
+                                dataIndex: 'od_id',
+                                key: 'od_id',
+                            },
+                            {
+                                title: 'คอมมิชชัน:แพ็กเกจ',
+                                dataIndex: 'cms_name',
+                                key: 'cma_name',
+                            },
+                            {
+                                title: 'ราคาคมช.',
+                                dataIndex: 'od_price',
+                                key: 'od_price',
+                            },
+                            {
+                                title: 'ผู้จ้าง',
+                                dataIndex: 'customer_name',
+                                key: 'customer_name',
+                            },
+                            {
+                                title: 'ความคืบหน้า',
+                                dataIndex: 'step_name',
+                                key: 'step_name',
+                            },
+                        ]}
+                        dataSource={filterCmsReq?.map((req, index) => {
+                            var currentDate = req.ordered_at;
+                            var deadline;
+
+                            if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
+                                currentDate = format(new Date(req.ordered_at), 'dd/MM HH:mm น.');
+                                let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                deadline = format(raw_deadline, 'dd/MM HH:mm น.');
+                                if (isToday(new Date(req.ordered_at))) {
+                                    currentDate = format(new Date(req.ordered_at), 'วันนี้ HH:mm น.');
+                                    let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                    deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
+                                } else if (isYesterday(new Date(req.ordered_at))) {
+                                    currentDate = format(new Date(req.ordered_at), 'เมื่อวานนี้ HH:mm น.');
+                                    let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
+                                    deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                                }
+                                //ต้องเป็นวันที่รับคำขอจ้าง
+                            }
+
+                            return (
+                                {
+                                    key: req.od_id,
+                                    q: req.od_q_number,
+                                    od_id: req.od_id,
+                                    cms_name: req.cms_name + ":" + req.pkg_name,
+                                    od_price: req.od_price,
+                                    customer_name: req.customer_name,
+                                    step_name: req.step_name == undefined ? "-" : req.step_name,
+                                }
+                            )
+                        })}
+                    />
+
+
+                } */}
+
+
 
 
 

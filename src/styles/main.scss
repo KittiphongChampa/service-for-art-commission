@@ -26,7 +26,44 @@
     font-family: 'Prompt', sans-serif;
 }
 
-.ant-select-selector{
+.ant-image-mask-info {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.ant-image-preview-close{
+    background-color: white;
+    color: $darkMineral;
+}
+
+.toolbar-wrapper {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    padding: 0px 24px;
+    color: $darkMineral;
+    font-size: 20px;
+    background-color: white;
+    border-radius: 100px;
+    transform: translateX(-50%);
+}
+
+.toolbar-wrapper .anticon {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.toolbar-wrapper .anticon[disabled] {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.toolbar-wrapper .anticon:hover {
+    opacity: 0.3;
+}
+
+.ant-select-selector {
     border-radius: 1rem !important;
 }
 
@@ -200,8 +237,8 @@ a:focus {
         padding: 0px !important;
         height: fit-content;
         background-color: white;
-        
-        h1{
+
+        h1 {
             color: $darkMineral;
         }
 
@@ -332,8 +369,8 @@ a:focus {
     background-attachment: fixed;
     background-repeat: no-repeat;
     // margin-top: 0;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    // padding-top: 2rem;
+    padding-bottom: 1rem;
     z-index: 99;
     // overflow-y: scroll;
     // background-color: #c59494;
@@ -369,7 +406,7 @@ table.history-order-detail {
     width: 80%;
 
     tr {
-        border-bottom: 1px solid #A9AAC1;
+        border-bottom: 1px solid #d6d6d6;
         column-gap: 1rem;
 
         td {
@@ -511,7 +548,7 @@ div.form-order {
     width: 100%;
     background-color: rgba(255, 255, 255, 0.968);
     border-radius: 20px;
-    padding: 2rem;
+    // padding: 2rem;
     backdrop-filter: blur(25px);
 
     div.cms-overview {
@@ -545,6 +582,20 @@ div.form-order {
     }
 
 }
+
+
+.cover-index {
+    height: 20rem;
+    background-position: center calc(15% + 0px);
+
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+
+
+//---------------------------
 
 .cms-artist-box {
     display: flex;
@@ -760,7 +811,7 @@ table.queue-table {
 
 
     tr {
-        border-bottom: 1px solid #A9AAC1;
+        border-bottom: 1px solid #d6d6d6;
 
         td {
             padding: 1.5rem 0.5rem;
@@ -807,9 +858,16 @@ table.queue-table {
         }
 
         &:hover {
-            background-color: pink;
+            // background-color: pink;
         }
     }
+}
+
+p.time-sent {
+    white-space: nowrap;
+    color: $darkMineral;
+    font-size: 0.8rem;
+    // flex-basis: 100%;
 }
 
 .chatbox-container {
@@ -830,6 +888,7 @@ table.queue-table {
         user-select: none;
         height: 100%;
 
+
         .headding {
             display: grid;
             grid-template-columns: 1.3rem 8fr 1.3rem;
@@ -839,7 +898,7 @@ table.queue-table {
                 align-self: center;
                 grid-column-start: 2;
                 font-weight: 200;
-                color: white;
+                color: white !important;
             }
         }
     }
@@ -975,7 +1034,29 @@ table.queue-table {
                     }
 
                     span.stat {
-                        background-color: #BEC7F3;
+                        background-color: #faad14;
+                        color: white;
+                        font-weight: 500;
+                        font-size: 14px;
+                    }
+
+                    span.q-number {
+                        background-color: #fa1459;
+                        color: white;
+                        font-weight: 500;
+                        font-size: 14px;
+                    }
+                    span.finish {
+                        background-color: #42fa14;
+                        color: white;
+                        font-weight: 500;
+                        font-size: 14px;
+                    }
+
+                    span.cancel {
+                        background-color: #9c9c9c;
+                        color: white;
+                        font-weight: 500;
                         font-size: 14px;
                     }
                 }
@@ -1045,7 +1126,7 @@ table.queue-table {
             overflow: hidden;
             border-radius: 26px 0 0 0;
 
-            .back-btn{
+            .back-btn {
                 display: none;
             }
 
@@ -1116,14 +1197,6 @@ table.queue-table {
                 width: 100%;
             }
 
-            button {
-                // background-color: #061228;
-                border: 0px;
-                padding: 0;
-                border-radius: 20rem;
-
-
-            }
         }
 
         // /* Handle */
@@ -1182,12 +1255,14 @@ table.queue-table {
 
             .system-message {
                 border-radius: 0.8rem;
-                background: #f6f6fa;
+                background: #ffffff;
                 padding: 2rem 4rem;
                 width: fit-content;
                 height: fit-content;
                 margin-inline: auto;
-                margin-bottom: 1.5rem;
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+                // margin-bottom: 1.5rem;
                 display: block;
                 text-align: center;
                 display: flex;
@@ -1237,7 +1312,7 @@ table.queue-table {
 
                         div {
                             aspect-ratio: 1/1;
-                            background-color: pink;
+                            // background-color: pink;
                             width: 100%;
                             height: 100%;
                             border-radius: 0.5rem;
@@ -1313,12 +1388,7 @@ table.queue-table {
                             word-break: break-word;
                         }
 
-                        p.time-sent {
-                            white-space: nowrap;
-                            color: $darkMineral;
-                            font-size: 0.8rem;
-                            // flex-basis: 100%;
-                        }
+                        
 
                         div.att-image {
                             img {
@@ -1391,8 +1461,10 @@ table.queue-table {
 
 .sys-dialog {
     width: 50%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     align-self: center;
-    margin: 1rem 0;
+    // margin: 1rem 0;
     border-radius: 1rem;
     padding: 1rem;
     box-shadow: rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px;
@@ -1401,12 +1473,18 @@ table.queue-table {
 
 .sys-dialog-wip {
     width: 80%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     align-self: center;
-    margin: 1rem 0;
+    // margin: 1rem 0;
     border-radius: 1rem;
     padding: 1rem;
     box-shadow: rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px;
     background-color: white;
+    img{
+        pointer-events: none;
+        cursor: pointer;
+    }
 }
 
 .modall {
@@ -1420,7 +1498,7 @@ table.queue-table {
     z-index: 9999999 !important;
     display: flex;
     top: 0;
-    flex-direction: column;
+    // flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: auto;
@@ -1438,6 +1516,8 @@ table.queue-table {
 
     img {
         height: 100%;
+        width: 100%;
+        object-fit: contain;
     }
 
     .zoom-in {
@@ -1623,22 +1703,14 @@ table.queue-table {
 // --------------userprofile
 
 .profile-gallery-container {
-    display: block;
+    // display: block;
     max-width: 100%;
     margin: 20px auto;
-    // background-color: pink;
-    // border-radius: 100rem;
-    // overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: 0.6rem;
 
     .profile-gallery {
-        // background-color: #5c5b7b;
-        // display: flex;
-        // flex-wrap: wrap;
-        // row-gap: 0.5rem;
-        // column-gap: 0.5rem;
-        columns: 3 250px;
-        gap: 15px;
-
         img {
             margin-bottom: 10px;
             border-radius: 5px;
@@ -1718,7 +1790,7 @@ table.queue-table {
         width: 100%;
 
         tr {
-            border-bottom: 1px solid $lightPurple;
+            border-bottom: 1px solid #d6d6d6;
 
             td {
                 padding: 0.8rem 0.5rem;
@@ -2000,12 +2072,12 @@ table.overview-order-table {
 .search-container {
     box-sizing: border-box;
     /* height: 50vh; */
-    padding: 3rem 15%;
+    padding: 10rem 15%;
 
     /* background-color: #000000; */
     .search-box {
         width: 100%;
-        margin-top: 20vh;
+        // margin-top: 20vh;
         /* background-color: wheat; */
         // position: relative;
         background-color: transparent;
@@ -2137,7 +2209,7 @@ table.overview-order-table {
     width: 100%;
     background-color: #FCFBFF;
     border-radius: 1.25rem;
-    padding: 2rem;
+    padding: 1rem 0;
     background: rgba(255, 255, 255);
     backdrop-filter: blur(1.5rem);
 }
@@ -2156,7 +2228,9 @@ table.overview-order-table {
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    grid-template-rows:min-content;
     gap: 0.6rem;
+    min-height: 50rem;
 
 
     div.artwork {
@@ -2172,6 +2246,15 @@ table.overview-order-table {
 }
 
 .one-star {
+    &.profile {
+        width: 20px;
+
+        svg {
+            font-size: 1.2rem !important;
+            margin-left: 0.2rem;
+        }
+    }
+
     li:not(:first-of-type) {
         display: none;
     }
@@ -2205,7 +2288,7 @@ table.overview-order-table {
             background-color: transparent;
             border: 1px solid #A7B4CE;
             margin-bottom: 1rem;
-            color : #A7B4CE;
+            color: #A7B4CE;
 
 
         }
@@ -2255,7 +2338,7 @@ table.overview-order-table {
 
     .img-col {
         flex: 1;
-        background-color: black;
+        background-color: white;
 
 
         // min-width: 0rem;
@@ -2568,4 +2651,18 @@ div.text-wraper {
     display: grid;
     gap: 0.6rem;
     grid-template-columns: repeat(auto-fill, minmax(30vw, 1fr));
+}
+
+
+
+//------------------------
+
+.dashboard-item{
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: white;
+    color: #525764;
+    border: 1px solid #c7cbdd5d;
+    margin-right: 10;
+    width: 250px;
 }

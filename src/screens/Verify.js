@@ -132,11 +132,14 @@ export default function Verify() {
           if (data.status === "ok") {
             Swal.fire({ ...alertData.verifyEmainSuccess })
             setuserID(data.insertedUserID);
-            const submitOtpBtn = document.getElementById("submit-otp-btn");
-            submitOtpBtn.classList.remove("disabled-btn");
-            submitOtpBtn.removeAttribute("disabled");
           } else {
-            alert("Send OTP Failed " + data.message);
+            // alert("Send OTP Failed " + data.message);
+            Swal.fire({
+              title: 'ส่ง otp ล้มเหลว',
+              icon: 'error',
+              iconColor: 'red',
+              confirmButtonText: 'ตกลง'
+            })
           }
         })
         .catch((error) => {
@@ -148,12 +151,6 @@ export default function Verify() {
     }
   };
 
-  const suffix = (
-    <Button>ส่งรหัสยืนยัน</Button>
-  );
-
-
-
   return (
     <div className="body-con">
       <Helmet>
@@ -161,7 +158,7 @@ export default function Verify() {
       </Helmet>
       <NavbarGuest />
       <div className='body' style={body}>
-        <div className="container">
+        <div className="container-xl">
           <div className="login-soloCard">
             <div className="login-col-img">
               <img className="login-img" src="images/ภาพตัด.png" alt="" />
@@ -215,7 +212,7 @@ export default function Verify() {
                     <Input onChange={(e) => handleChangeOtp(e)} />
                   </Form.Item>
                   <div className="login-btn-group">
-                    <Button htmlType="submit" type="primary" shape="round" size="large" disabled={values.otp == ''}>ยืนยันอีเมล</Button>
+                    <Button htmlType="submit" type="primary" shape="round" size="large" disabled={values.otp == '' || values.email == ''}>ยืนยันอีเมล</Button>
                   </div>
                 </Form>
                 {/* 

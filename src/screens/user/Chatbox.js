@@ -114,20 +114,22 @@ export default function ChatBox() {
       if (window.innerWidth <= 999) {
         document.querySelector(".aside-chatbox").style.display = 'block';
         document.querySelector(".chat-room").style.display = 'none';
-        document.querySelector(".aside-chatbox").classList.add("container");
+        document.querySelector(".aside-chatbox").classList.add("container-xl");
       } else {
         document.querySelector(".aside-chatbox").style.display = 'block';
         document.querySelector(".chat-room").style.display = 'flex';
-        document.querySelector(".aside-chatbox").classList?.remove("container");
+        document.querySelector(".aside-chatbox").classList?.remove("container-xl");
       }
     } else {
       //ถ้าเปิดหน้าแชท
       if (window.innerWidth <= 999) {
         document.querySelector(".aside-chatbox").style.display = 'none';
         document.querySelector(".chat-room").style.display = 'flex';
+        document.querySelector(".aside-chatbox").classList.add("container-xl");
       } else {
         document.querySelector(".aside-chatbox").style.display = 'block';
         document.querySelector(".chat-room").style.display = 'flex';
+        document.querySelector(".aside-chatbox").classList?.remove("container-xl");
       }
     }
   }

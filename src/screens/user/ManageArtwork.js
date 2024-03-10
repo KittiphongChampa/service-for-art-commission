@@ -211,8 +211,8 @@ export default function ManageArtwork() {
             </Helmet>
             <NavbarUser />
 
-            <div class="body-nopadding" style={{ backgroundColor: "#F1F5F9" }}>
-                <div className="container mt-4">
+            <div class="body-nopadding" style={{ backgroundColor: "white" }}>
+                <div className="container-xl">
                     <div className="content-container">
 
                         <div className="content-body preview-cms">

@@ -28,8 +28,6 @@ export default function ArtistManagement() {
             <Helmet>
                 <title>artist panel</title>
             </Helmet>
-            {/* <ImgFullscreen />
-            <div className="modall">aaaaaaaaaaaaaaaaaaaaa</div> */}
             <NavbarUser />
             <div className="chatbox-container">
                 <div className="aside-panel">
@@ -46,7 +44,9 @@ export default function ArtistManagement() {
 
 
                 </div>
-                <div className="aside-main-card" style={{ padding: "1.3rem 3rem" }}>
+                
+                <div className="aside-main-card" style={{ padding: "1.3rem 2rem" }}>
+                    
                     {menu === "dashboard" ? <Dashboard /> : menu === "orderoverview" ? <OrderOverview /> : null}
                 </div>
             </div>

@@ -71,7 +71,7 @@ export default function MyReq() {
             //หน้าเพจ - 1 = index 0 * จำนวนแสดงต่อหน้า 0-9 10-19 20-29
             const newStartIndex = (activePage - 1) * itemsPerPage;
             //เอาจำนวนที่เริ่ม + จำนวนที่แสดง (0+10 = 10) จะเป็น index 0-10 
-            
+
             const newEndIndex = newStartIndex + (itemsPerPage);
             //index เริ่มและ index สุดท้าย
             setFilteredData(filteredData.slice(newStartIndex, newEndIndex))
@@ -91,7 +91,7 @@ export default function MyReq() {
             const allDataData = await axios.get(
                 `${host}/getreq`,
                 {
-                    headers: {Authorization: "Bearer " + token},
+                    headers: { Authorization: "Bearer " + token },
                 }
             )
             // console.log(allDataData.data)
@@ -149,15 +149,15 @@ export default function MyReq() {
 
     //ค้นหา
     const handleSearch = (event) => {
-            const query = event.target.value.toLowerCase();
-            setSearchValue(query)
-            const filtered = filteredData.filter(
-                (item) =>
-                    String(item.od_id).toLowerCase().includes(query) ||
-                    String(item.cms_name).toLowerCase().includes(query) ||
-                    String(item.artist_name).toLowerCase().includes(query)
-            );
-            setSearchQuery(filtered);
+        const query = event.target.value.toLowerCase();
+        setSearchValue(query)
+        const filtered = filteredData.filter(
+            (item) =>
+                String(item.od_id).toLowerCase().includes(query) ||
+                String(item.cms_name).toLowerCase().includes(query) ||
+                String(item.artist_name).toLowerCase().includes(query)
+        );
+        setSearchQuery(filtered);
     };
 
     function search2(req) {
@@ -183,8 +183,8 @@ export default function MyReq() {
             <NavbarUser />
 
             {/* <div className="setting-container"> */}
-            <div className="body-lesspadding" style={{ backgroundColor: "rgb(241, 241, 249)" }}>
-                <div className="container">
+            <div className="body-lesspadding" >
+                <div className="container-xl">
                     <div className="content-card">
                         <h1 className="h3">รายการจ้างของฉัน</h1>
                         <div>
@@ -218,7 +218,7 @@ export default function MyReq() {
                         <table className="overview-order-table">
                             <tr className="table-head">
                                 <th>ไอดีออเดอร์</th>
-                                <th>คอมมิชชัน:แพ็คเกจ</th>
+                                <th>คอมมิชชัน:แพ็กเกจ</th>
                                 <th>ราคาคมช.</th>
                                 <th>นักวาด</th>
                                 <th>ความคืบหน้า</th>
@@ -226,9 +226,9 @@ export default function MyReq() {
 
 
 
-                            {searchQuery ?
+                            {searchQuery && searchValue != '' ?
                                 <>
-                                    {searchQuery.map((req,index) => {
+                                    {searchQuery.map((req, index) => {
                                         //ถ้าช่องค้นหาไม่ว่างให้แสดงอีกตัวแทน
                                         return (
                                             <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
@@ -244,7 +244,7 @@ export default function MyReq() {
                                 </>
                                 :
                                 <>
-                                    {filteredData && filteredData.map((req,index) => {
+                                    {filteredData && filteredData.map((req, index) => {
                                         //ถ้าช่องค้นหาไม่ว่างให้แสดงอีกตัวแทน
                                         return (
                                             <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>

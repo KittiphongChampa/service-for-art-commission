@@ -9,9 +9,9 @@ import {
   Select,
   Space,
   Upload,
-  Switch,
+  Empty,
   Flex,
-  Radio,
+  Tabs,
   Card,Form
 } from "antd";
 import React, { useState, useEffect, useRef } from "react";
@@ -228,6 +228,24 @@ export default function Report(props) {
     setFilteredUser(filtered);
   };
 
+  const menus = [
+    {
+      key: 1,
+      label:'กำลังดำเนินการ',
+      children: ''
+    },
+    {
+      key: 2,
+      label: 'เก็บไว้แล้ว',
+      children: ''
+    },
+    {
+      key: 3,
+      label: 'ลบแล้ว',
+      children: ''
+    },
+  ]
+
   return (
     <>
       <Helmet>
@@ -235,9 +253,10 @@ export default function Report(props) {
       </Helmet>
       {!reportid ? (
         <>
-          <h1 className="">การรายงาน</h1>
-          <div className="all-user-head"></div>
-          <div className="sub-menu-group mt-4">
+          <h1 className="h3">การรายงาน</h1>
+          {/* <div className="all-user-head"></div> */}
+          <Tabs defaultActiveKey='1' items={menus} />
+          {/* <div className="sub-menu-group mt-4">
             <Link to="#" className="sub-menu selected">
               กำลังดำเนินการ
             </Link>
@@ -247,7 +266,7 @@ export default function Report(props) {
             <Link to="#" className="sub-menu">
               ลบแล้ว
             </Link>
-          </div>
+          </div> */}
           {/* <div className="report-item-area"> */}
             {/* <Link to="/admin/adminmanage/report/11"><ReportItem /></Link> */}
 
@@ -269,7 +288,7 @@ export default function Report(props) {
           {/* </div> */}
 
           <div className="all-user-head">
-            <h2>จำนวนทั้งหมด ({reportAll.length})</h2>
+            <h2 className="h4">จำนวนทั้งหมด ({reportAll.length})</h2>
             <div>
               <Input type="search" onChange={handleSearch} placeholder=" ค้นหา..." />
             </div>
@@ -304,7 +323,7 @@ export default function Report(props) {
         </>
       ) : (
         <>
-          <h1 className="">
+          <h1 className="h3">
             <Button
               className="icon-btn"
               size="large"
@@ -332,7 +351,7 @@ export default function Report(props) {
             </div>
             <ImgSlide imgDetail={imgDetail} />
 
-            <Flex justify="center" gap="small">
+            <Flex justify="center" gap="small" className="mt-3">
               <Button size="large" shape="round" onClick={keep}>
                 เก็บไว้
               </Button>
@@ -374,7 +393,7 @@ export default function Report(props) {
                 </Flex>
               </div>
             </Card>
-            <h5>รายงานที่เกี่ยวข้อง</h5>
+            <h5 className="h4 mt-4 mb-4">รายงานที่เกี่ยวข้อง</h5>
             <div className="report-grid">
               {relatedTo.map((data) => (
                 <Card key={data.id}>
@@ -419,7 +438,12 @@ export default function Report(props) {
               </Card>
               ))}
               
-            </div>
+              </div>
+              <Empty description={
+                <span>
+                  ไม่มีรายงานที่เกี่ยวข้อง
+                </span>
+              } />
           </div>
 
           <Modal title="ระบุเหตุผลการลบ" open={deleteModal} onCancel={openDelModal} footer="">

@@ -245,7 +245,7 @@ export default function ChatOrderDetail({ myId, isBriefOpen, handleBrief, curren
                         <p className="quota-headding">ประเภทงาน</p>
                         <p className="quota-amount">{orderDetail?.tou}</p>
                         <p className="quota-headding">กำหนดส่ง</p>
-                        <p className="quota-amount">xxxxxx</p>
+                        <p className="quota-amount">{format(new Date(orderDetail?.od_deadline),'dd/MM HH:mm น.')}</p>
                     </div>
                     <Flex justify="flex-start" style={{ width: "100%" }}>
 

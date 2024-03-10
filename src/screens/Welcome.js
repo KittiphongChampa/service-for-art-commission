@@ -43,7 +43,7 @@ export default function Welcome() {
         >
           {/* <img className="presenter" src="character.png" /> */}
           <div className="box-container" style={{ backgroundImage: "url('./images/seamoon.jpg')" }}>
-            <div className="container aa">
+            <div className="container-xl aa">
               <div className="text-col">
                 <div className="headding-box">
                   <h1 className="display-3">Service for Art Commissioning</h1>
@@ -63,7 +63,7 @@ export default function Welcome() {
           </div>
 
 
-          <div className="section-wrapper container" >
+          <div className="section-wrapper container-xl" >
             {/* ช่องคอมมิชชันคือไร */}
             <div className="cms-section">
               <div className="icon">
@@ -107,7 +107,7 @@ export default function Welcome() {
           </div>
 
           <footer className="w-100 py-4 flex-shrink-0" style={{ backgroundColor: "#525764" }}>
-            <div className="container py-4">
+            <div className="container-xl py-4">
               <div className="row gy-4 gx-5">
                 <div className="col-lg-4 col-md-6">
                   <h5 className="h1 text-white">FB.</h5>

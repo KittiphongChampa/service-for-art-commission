@@ -91,9 +91,9 @@ export default function AdminManageUser() {
         <title>{title}</title>
       </Helmet>
    
-      <h1 className="">การจัดการผู้ใช้งาน</h1>
+      <h1 className="h3">การจัดการผู้ใช้งาน</h1>
       <div className="all-user-head">
-        <h2>รายชื่อผู้ใช้ ({user.length})</h2>
+        <h2 className="h3">รายชื่อผู้ใช้ ({user.length})</h2>
         <div>
           <Input type="search" onChange={handleSearch} placeholder=" ค้นหา..." />
         </div>

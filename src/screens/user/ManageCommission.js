@@ -311,8 +311,8 @@ export default function ManageCommission() {
       </Helmet>
       <NavbarUser />
 
-      <div class="body-nopadding" style={{ backgroundColor: "#F1F5F9" }}>
-        <div className="container mt-4">
+      <div class="body-nopadding" style={{ backgroundColor: "white" }}>
+        <div className="container-xl">
           <div className="content-container">
             <div className="content-body preview-cms">
               {/* <div className="sub-menu-group">
@@ -391,7 +391,7 @@ export default function ManageCommission() {
                       <Input />
                     </Form.Item>
                   </Col>
-                  <Col flex="100px" style={{marginLeft:"10px"}}>
+                  <Col flex="100px" style={{ marginLeft: "10px" }}>
                     <Form.Item
                       name="status"
                       label="สถานะ"
@@ -856,7 +856,7 @@ export default function ManageCommission() {
                         ))}
 
                         <Button type="dashed" onClick={() => add()} block>
-                          + เพิ่มแพ็คเกจ
+                          + เพิ่มแพ็กเกจ
                         </Button>
                         {fields.length == 0 && add()}
                       </div>
