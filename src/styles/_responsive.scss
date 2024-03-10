@@ -17,6 +17,31 @@
     .setting-content-box {
         grid-template-columns: 1fr;
     }
+
+    //โมดัล
+
+    .ant-modal{
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        
+    }
+
+    .ant-modal-content{
+        width: 100% !important;
+        // height: 100% !important;
+        min-height: 100% !important;
+        max-height: fit-content !important;
+        border-radius: 0 !important;
+        
+    }
+
+    :where(.css-dev-only-do-not-override-1k979oh).ant-modal{
+        max-width:none !important;
+
+    }
 }
 
 
@@ -222,8 +247,16 @@
     }
 
     //สำหรับ หน้าแชท
+    .chat{
+        padding-inline:10px !important;
+    }
     .chat-room {
         border-radius: 0 !important;
+
+        .user-message {
+            grid-template-columns: auto 1fr !important;
+            column-gap: 0 !important;
+        }
 
         .backdrop-modal-area {
             width: 100% !important;

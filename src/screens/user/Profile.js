@@ -17,7 +17,7 @@ import ProfileImg from "../../components/ProfileImg";
 import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../../components/Navbar";
 import ArtistBox from '../../components/ArtistBox'
 import CmsItem from "../../components/CmsItem";
-import { Modal, Button, Input, Select, Tabs, Flex } from 'antd';
+import { Modal, Button, Rate, Select, Tabs, Flex } from 'antd';
 
 import ChangeProfileImgModal from "../../modal/ChangeProfileImgModal";
 import { ChangeCoverModal, openInputColor } from "../../modal/ChangeCoverModal"
@@ -29,7 +29,7 @@ import { host } from "../../utils/api";
 
 const title = 'Profile';
 const bgImg = ""
-const body = { backgroundColor: "#F1F5F9" }
+const body = { backgroundColor: "white" }
 
 
 export default function Profile() {
@@ -276,7 +276,7 @@ export default function Profile() {
                         <div className="cover-color" style={{ backgroundColor: userdata.urs_cover_color }}></div>
                         <div className="cover-hover"><p className="fs-5">เปลี่ยนสีปก</p></div>
                     </div>
-                    <div className="container profile-page">
+                    <div className="container-xl profile-page">
                         <div className="user-profile-area">
 
                             <div className="user-col-profile">
@@ -298,18 +298,22 @@ export default function Profile() {
                             <div className="user-col-about">
 
                                 <div className="user-about-content">
-                                    <div className="user-about-review mb-4"><p className="fs-3">4.0</p> <p>จาก 5 รีวิว</p></div>
+                                    <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
                                     <div className="user-about-text">
                                         <Flex gap="small" vertical>
-                                            <p>ผู้ติดตาม {myFollowerData.length} </p>
-                                            <p>กำลังติดตาม {IFollowerData.length} </p>
-                                            <p>งานสำเร็จแล้ว 10 งาน</p>
-                                            <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p>
-                                            <p>ตอบกลับภายใน 1 ชั่วโมง</p>
+                                            <p>ผู้ติดตาม {myFollowerData.length} คน</p>
+                                            <p>กำลังติดตาม {IFollowerData.length} คน </p>
+                                            <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
+                                            <p>เป็นสมาชิกเมื่อ {userdata.created_at}</p>
+                                            {/* <p>อัตราการทำงานสำเร็จ 
+                                                {userdata.success / userdata.cancel} %
+                                            </p> */}
+                                            {/* <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p> */}
+                                            {/* <p>ตอบกลับภายใน 1 ชั่วโมง</p> */}
                                         </Flex>
                                         <Flex gap="small" vertical>
                                             <p>คอมมิชชัน เปิด</p>
-                                            <p>คิวว่าง 1 คิว</p>
+                                            <p>คิวว่าง 5 คิว</p>
 
                                         </Flex>
                                     </div>
@@ -432,7 +436,7 @@ function AllArtworks(props) {
         <div className="profile-gallery-container">
             {myGallery.map((data) => (
                 <div className="profile-gallery" key={data.artw_id}>
-                    <img src={data.ex_img_path} />
+                    <img key={data.artw_id} src={data.ex_img_path} />
                 </div>
             ))}
             {/* <div className="profile-gallery">

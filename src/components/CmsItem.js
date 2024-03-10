@@ -24,7 +24,7 @@ export default function CmsItem(props) {
                         <p class="cms-card-headding text-center">{props.headding}</p>
                         <p class="cms-card-price">{props.price}+ THB</p>
                     </div>
-                    <div><Rate disabled defaultValue={2} className="one-star" />4.5 (12 รีวิว)</div>
+                    <div><Rate disabled defaultValue={2} className="one-star" />0 (0 รีวิว)</div>
                 </div>
             </div>
         </div>

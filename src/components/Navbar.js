@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button, Drawer, Radio, Flex, Avatar, Badge, Space } from 'antd';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 
 import { host } from '../utils/api'
 
@@ -173,7 +174,8 @@ const NavbarUser = (props) => {
                     </a> */}
                     <div  ref={dropdownRef} style={{position:"relative"}}>
                         <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
-                            <Badge dot={notifications.length > 0 ? true : false}>
+                            {/* <Badge dot={notifications.length > 0 ? true : false}> */}
+                                <Badge dot={false}>
                                 <Icon.Bell className='nav-icon' />
                             </Badge>
                             {/* --โนติแบบมีเลข ห้ามลบบบ */}
@@ -261,7 +263,7 @@ const NavbarUser = (props) => {
                                 <p>โปรไฟล์ของฉัน</p>
                             </Flex>
                         </a>
-                        <a href="/admin/adminmanage/alluser"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
+                        <a href="/"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
                         <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
                         <a href="/setting-profile"><Icon.Bell className='nav-icon mx-2' />การแจ้งเตือน</a>
                         <a href="/chatbox"><Icon.MessageCircle className='nav-icon mx-2' />แชท</a>
@@ -329,8 +331,8 @@ const NavbarGuest = (props) => {
         <div class="nav-box" >
             <nav class="nav-container" >
                 <div class="inline-nav" >
-                    <a href="/search"><Icon.Search className='nav-icon' /></a>
                     <a href="/"><Icon.Home className='nav-icon' /></a>
+                    <a href="/search"><Icon.Search className='nav-icon' /></a>
                 </div>
                 <div class="inline-nav">
                     {/* <a href="/"><Icon.Bell className='nav-icon' /><i data-feather="bell" class="nav-icon"></i></a> */}
@@ -461,7 +463,7 @@ const NavbarAdmin = (props) => {
                 </div>
                 <div class="inline-nav">
 
-                    <div className="dropdown-nav" ref={dropdownRef}>
+                    {/* <div className="dropdown-nav" ref={dropdownRef}>
                         <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
                             <Icon.Bell className='nav-icon' />
                             <div className="counter">{notifications.length > 0 ? notifications.length : 0}</div>
@@ -472,11 +474,33 @@ const NavbarAdmin = (props) => {
                         <div className="notifications">
                             {notifications.map((n) => displayNotification(n))}
                         </div>
+                    </div> */}
+
+                    <div ref={dropdownRef} style={{ position: "relative" }}>
+                        <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
+                            {/* <Badge dot={notifications.length > 0 ? true : false}> */}
+                            <Badge dot={false}>
+                                <Icon.Bell className='nav-icon' />
+                            </Badge>
+                        </button>
+                        <div className={`dropdown-area ${openNoti ? 'open' : 'close'}`} >
+                            <div className="notifications">
+                                {/* {notifications.map(data => (
+                                    <div key={data.reportId}>
+                                        <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {data.msg} </span>
+                                    </div>
+                                ))} */}
+                                {notifications.map((n) => displayNotification(n))}
+                                {/* <button className="nButton" onClick={handleRead}>
+                                    Mark as read
+                                </button> */}
+                            </div>
+                        </div>
                     </div>
 
                     {admindata.admin_type === 0 ? (
                         <>
-                            <a href="/admin/adminmanage/alladmin"><ggIcon.AdminPanelSettings className='nav-icon' /></a>
+                            <a href="/admin/adminmanage/alladmin"><AdminPanelSettingsOutlinedIcon className='nav-icon' /></a>
                         </>
                     ) : (
                         <></>
@@ -490,7 +514,7 @@ const NavbarAdmin = (props) => {
                             <a href="#" className="in-dropdown"><Icon.User className='nav-icon mx-2' />ตั้งค่าโปรไฟล์</a>
                             {admindata.admin_type === 0 ? (
                                 <>
-                                    <a href="/admin/adminmanage/alladmin" className="in-dropdown"><ggIcon.AdminPanelSettings className='nav-icon mx-2' />จัดการแอดมิน</a>
+                                    <a href="/admin/adminmanage/alladmin" className="in-dropdown"><AdminPanelSettingsOutlinedIcon className='nav-icon mx-2' />จัดการแอดมิน</a>
                                 </>
                             ) : (
                                 <></>

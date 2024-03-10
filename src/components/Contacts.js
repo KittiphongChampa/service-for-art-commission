@@ -5,7 +5,7 @@ import io from "socket.io-client";
 // import Logo from "../assets/logo.svg";
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import { Flex } from 'antd';
 import { host } from "../utils/api";
 
 
@@ -17,12 +17,12 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
   //   const usersArray = Array.from(onlineUsers);
   //   setUsersOnline(usersArray);
   // }, [onlineUsers]);
-  
+
   const [currentSelected, setCurrentSelected] = useState();
 
   const uniqueContactIds = new Set();
   const filteredContacts = [];
- 
+
   contacts.forEach((contact) => {
     const combinedId = contact.id + contact.od_id;
     if (!uniqueContactIds.has(combinedId)) {
@@ -32,7 +32,7 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
   });
   // console.log("filteredContacts", filteredContacts);
 
- 
+
 
   const token = localStorage.getItem("token");
 
@@ -49,7 +49,7 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
   };
   return (
     <>
-      
+
       {userdata.urs_name && userdata.urs_profile_img && (
         <>
 
@@ -67,48 +67,44 @@ export default function Contacts({ contacts, changeChat, Toggled, partnerID, ord
                     >
                       <img src={contact.urs_profile_img}></img>
                       <div>
-                        {!Toggled && (
-                          <>
-                            <p className="order h6">{contact.urs_name}</p>
-                            <p>
+                        <p className="order h6">{contact.urs_name}</p>
+                        <Flex>
+                          {contact.message_text?.split("images")[0] === `${host}/` ? (
+                            <p className="message">ได้ส่งรูปภาพ</p>
+                          ) : (
+                            <p className="message"
+                              style={{
+                                display: "flex",
+                              }}>
+                              <span className="oneline-textoverflow" style={{ flex: 1 }}>{contact.latest_message_text}</span>
+                              <span style={{ width: "fit-content" }}> {new Date(contact.last_message_time).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit", })} น.</span>
+                            </p>
+                          )}
+                        </Flex>
+                        {/* <p className="message">{contact.message_text}</p> */}
+                        <p className="time">
+                          {contact.finished_at == null && contact.od_cancel_by == null && contact.current_step_name != null &&
+                            <>
+                              <span className="q-number">
+                                คิว {contact.od_q_number}
+                              </span>
+                              <span className="stat">
+                                รอ{contact?.current_step_name?.includes("ภาพ") && 'อนุมัติ'}{contact.current_step_name}
+                              </span>
+                            </>}
+                          {contact.finished_at != null &&
+                            <span className="finish">
+                              เสร็จสิ้นแล้ว
+                            </span>
+                          }
+                          {contact.od_cancel_by != null &&
+                            <span className="cancel">
+                              ยกเลิกแล้ว
+                            </span>
+                          }
 
-                              {contact.message_text?.split("images")[0] === `${host}/` ? (
-                                <p className="message">ได้ส่งรูปภาพ</p>
-                              ) : (
-                                  <p className="message"
-                                    style={{
-                                      display: "flex",
-                                    }}>
-                                    <span className="oneline-textoverflow" style={{ flex: 1}}>{contact.latest_message_text}</span>
-                                    <span style={{ width: "fit-content" }}> {new Date(contact.last_message_time).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit", })} น.</span>
-                                  </p>
-                              )}
-                            </p>
-                            {/* <p className="message">{contact.message_text}</p> */}
-                            <p className="time">
-                              {/* <span className="stat">{new Date(contact.last_message_time).toLocaleString("th-TH")}</span> */}
-                              {contact.od_id != 0 && <> <span className="stat">
-                                {contact?.current_step_name?.includes("แนบสลิป") || contact?.current_step_name?.includes("ภาพ") ?
-                                  contact.artist_id == userdata.id && 'รอ' //ถ้ามีคำว่าสลิปและเราเป็นนักวาด ให้ใส่คำว่ารอ แต่ถ้าไม่มีคำว่าสลิป และเราไม่ใช่นักวาด ให้ใส่คำว่ารอ
-                                  : contact.artist_id !== userdata.id && 'รอ'}{contact?.current_step_name?.includes("ภาพ") && 'อนุมัติ'}{contact.current_step_name}</span>
-                                {/* <span className="stat">{contact.od_id}</span> */}
-                                </>
-                              }
-                            </p>
-                          </>
-                        )}
+                        </p>
 
-                        {Toggled && (
-                          <>
-                            <p className="order filterd">xxxx</p>
-                            <p className="message filterd">bust-up full color..</p>
-                            <p className="time filterd">
-                              {" "}
-                              <span className="q">คิวที่1</span>
-                              <span className="stat">รอชำระเงิน</span>
-                            </p>
-                          </>
-                        )}
                       </div>
                     </div>
                     <div className="qq">

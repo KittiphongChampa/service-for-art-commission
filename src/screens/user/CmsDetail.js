@@ -36,9 +36,10 @@ import 'react-quill/dist/quill.snow.css';
 import { useAuth } from '../../context/AuthContext';
 
 import { host } from "../../utils/api";
+import { width } from '@mui/system';
 
 const title = 'รายละเอียด cms';
-const body = { backgroundColor: "#F1F1F9" }
+const body = { backgroundColor: "white" }
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -610,6 +611,7 @@ export default function CmsDetail() {
         open={isModalOpened}
         onCancel={closeModal}
         footer=""
+        width={1000}
       >
         {!isLoggedIn ?
           <>
@@ -643,17 +645,21 @@ export default function CmsDetail() {
             >
               <TextArea
                 placeholder="อธิบายรายละเอียดที่ต้องการ เช่น ผู้หญิงใส่เสื้อสีดาวผมยาวยืนอยู่ข้างกำแพงสีฟ้าเอียงมุมกล้องเล็กน้อย"
-                showCount
-                maxLength={200}
+                // showCount
+                // maxLength={200}
                 autoSize={{
                   minRows: 3,
                   maxRows: 5,
                 }}
               />
             </Form.Item>
-            <Button htmlType="submit" type="primary" shape="round" size="large">
-              ส่งคำขอจ้าง
-            </Button>
+            <Flex justify="center">
+              <Button htmlType="submit" type="primary" shape="round" size="large">
+                ส่งคำขอจ้าง
+              </Button>
+
+            </Flex>
+            
             {/* </Flex> */}
           </Form>
 
@@ -675,7 +681,7 @@ export default function CmsDetail() {
       <div className="background-blur" style={body}></div>
 
       <div class="body-lesspadding">
-        <div className="container">
+        <div className="container-xl">
           <div className="content-card">
             {
 
@@ -683,7 +689,7 @@ export default function CmsDetail() {
                 <>
                   {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
-                    <h1 className="h3 me-3">คอมมิชชัน Full Scale<span class="cms-status-detail">{cmsDetail.cms_status == 'open' ? 'เปิด' : 'ปิด'}</span></h1>
+                    <h1 className="h3 me-3">{cmsDetail.cms_name}<span class="cms-status-detail">{cmsDetail.cms_status == 'open' ? 'เปิด' : 'ปิด'}</span></h1>
                     {isLoggedIn &&
                       <Flex gap="small" justify="flex-end" flex={1}>
                         <Dropdown
@@ -707,7 +713,7 @@ export default function CmsDetail() {
 
                         <div>
                           <p>{artistDetail.artistName}</p>
-                          <p>4.0<ggIcon.Star className='fill-icon' /><span className="q">(3) | ว่าง 3 คิว</span></p>
+                          <p>0<ggIcon.Star className='fill-icon' /><span className="q">(0) | ว่าง 5 คิว</span></p>
                         </div>
 
                       </div>
@@ -938,7 +944,7 @@ export default function CmsDetail() {
                       ]}>
                       <TextArea
                         placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
-                        showCount maxLength={200}
+                        //showCount maxLength={200}
                         autoSize={{
                           minRows: 3,
                           maxRows: 5,
@@ -955,7 +961,7 @@ export default function CmsDetail() {
                       ]}>
                       <TextArea
                         placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
-                        showCount maxLength={200}
+                        //showCount maxLength={200}
                         autoSize={{
                           minRows: 3,
                           maxRows: 5,
@@ -972,7 +978,7 @@ export default function CmsDetail() {
                       ]}>
                       <TextArea
                         placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
-                        showCount maxLength={200}
+                        //showCount maxLength={200}
                         autoSize={{
                           minRows: 3,
                           maxRows: 5,
@@ -1039,7 +1045,8 @@ export default function CmsDetail() {
                                     },
                                   ]}
                                 >
-                                  <Input.TextArea showCount maxLength={200} autoSize={{ minRows: 3, maxRows: 5 }} />
+                                  <Input.TextArea //showCount maxLength={200} 
+                                    autoSize={{ minRows: 3, maxRows: 5 }} />
                                 </Form.Item>
                                 <Space>
                                   <Form.Item
@@ -1124,7 +1131,7 @@ export default function CmsDetail() {
           </div>
         </div>
       </div>
-      <Modal title="รายงาน" open={reportModalIsOpened} onCancel={handleReportModal} footer="">
+      <Modal width={1000} title="รายงาน" open={reportModalIsOpened} onCancel={handleReportModal} footer="">
         <Space gap="small" direction="vertical" style={{ width: "100%" }}>
 
           {!isNext && <>
@@ -1132,31 +1139,31 @@ export default function CmsDetail() {
             <Radio.Group onChange={onChange} value={value} >
               <Space direction="vertical">
                 <div><Radio value="สแปม"><p className="report-headding">สแปม</p></Radio>
-                  <p className="report-desc ms-4">ทำให้เข้าใจผิดหรือเป็นโพสท์ซ้ำ</p>
+                  <p className="report-desc ms-4">ทำให้เข้าใจผิด แนบลิงก์ที่เป็นอันตรายหรือเป็นโพสต์ซ้ำ</p>
                 </div>
                 <div><Radio value="ละเมิดทรัพย์สินทางปัญญา"><p className="report-headding">ละเมิดทรัพย์สินทางปัญญา</p></Radio>
                   <p className="report-desc ms-4">มีการละเมิดลิขสิทธิ์หรือเครื่องหมายการค้า</p>
                 </div>
-                <div><Radio value="ภาพลามกอนาจารหรือเนื้อหาเกี่ยวกับเรื่องเพศ"><p className="report-headding">ภาพลามกอนาจารหรือเนื้อหาเกี่ยวกับเรื่องเพศ</p></Radio>
-                  <p className="report-desc ms-4">เนื้อหาทางเพศที่โจ่งแจ้งซึ่งเกี่ยวข้องกับผู้ใหญ่หรือภาพเปลือย ไม่ใช่ภาพเปลือย หรือการใช้ในทางที่ผิดโดยเจตนาเกี่ยวกับผู้เยาว์</p>
+                <div><Radio value="การกระทำที่ไม่เหมาะสมและการคุกคาม"><p className="report-headding">การกระทำที่ไม่เหมาะสมและการคุกคาม</p></Radio>
+                  <p className="report-desc ms-4">มีเนื้อหาหรือภาพที่ไม่เหมาะสม การใช้ถ้อยคำหยาบคาย มีเนื้อหาทางเพศที่โจ่งแจ้งซึ่งเกี่ยวข้องกับผู้ใหญ่หรือภาพเปลือย การใช้ในทางที่ผิดโดยเจตนาเกี่ยวกับผู้เยาว์</p>
                 </div>
                 <div><Radio value="กิจกรรมที่แสดงความเกลียดชัง"><p className="report-headding">
                   กิจกรรมที่แสดงความเกลียดชัง</p></Radio>
-                  <p className="report-desc ms-4">อคติ การเหมารวม ลัทธิคนผิวขาว การใช้คำพูดส่อเสียด</p>
+                  <p className="report-desc ms-4">อคติ การเหมารวม ลัทธิคนผิวขาว การยุยงให้เกิดความรุนแรง</p>
                 </div>
 
-                <div>
+                {/* <div>
                   <Radio value={4}>
                     <p className="report-headding">อื่นๆ
                       {value === 4 ? <Input style={{ width: 200, marginLeft: 10 }} /> : null}</p>
                   </Radio>
-                </div>
+                </div> */}
 
 
               </Space>
             </Radio.Group>
             <Flex gap="small" justify="flex-end">
-              <Button shape="round" size="large" onClick={handleReportModal}>ยกเลิก</Button>
+              {/* <Button shape="round" size="large" onClick={handleReportModal}>ยกเลิก</Button> */}
               <Button shape="round" size="large" type="primary" onClick={handleNext} disabled={value == null}>ถัดไป</Button>
             </Flex>
 

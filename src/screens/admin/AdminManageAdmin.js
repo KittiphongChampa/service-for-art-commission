@@ -237,10 +237,10 @@ export default function AdminManageAdmin(props) {
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      <h1 className="">ผู้ดูแลระบบ</h1>
+      <h1 className="h3">ผู้ดูแลระบบ</h1>
 
       <div className="all-user-head">
-        <h2>รายชื่อแอดมิน ({admins.length})</h2>
+        <h2 className="h3">รายชื่อแอดมิน ({admins.length})</h2>
         <div>
           <Button
             onClick={handleClick}

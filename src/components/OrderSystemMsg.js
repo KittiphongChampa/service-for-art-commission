@@ -1,12 +1,17 @@
-import { Modal, Button, Input, Select, Space, Upload, Rate, Flex, Tooltip, InputNumber, Form } from 'antd';
+import { Modal, Button, Input, Select, Space, Image, Upload, Rate, Flex, Tooltip, InputNumber, Form } from 'antd';
 import { useState, useRef } from 'react';
-import { InfoCircleOutlined, LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+    InfoCircleOutlined, LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined, ZoomInOutlined,
+    ZoomOutOutlined,
+} from '@ant-design/icons';
 import * as Icon from 'react-feather';
 import ImgFullscreen from './openFullPic'
 import QRCode from "qrcode.react";
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 import axios from "axios";
 import { host } from "../utils/api";
+import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
+
 
 const getBase64 = (img, callback) => {
     const reader = new FileReader();
@@ -25,7 +30,7 @@ const beforeUpload = (file) => {
     return isJpgOrPng;
 };
 
-export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
+export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
     // console.log(orderDetail);
     // const flexSysDialog = { width: "50%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
     // const flexSysDialogWip = { width: "80%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
@@ -77,7 +82,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
     );
     const priceRef = useRef()
     async function uploadSlip(stepId) {
-        const res = await submitSlip(stepId,ModalToggle)
+        const res = await submitSlip(stepId, ModalToggle)
         // res == true && ModalToggle()
         console.log("res=", res)
     }
@@ -98,7 +103,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
         setSrc(imgsrc)
     }
 
-    
+
 
     const submitReview = (values) => {
         Swal.fire({
@@ -124,6 +129,24 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
         });
     };
 
+    function formatTime(rawTime) {
+        let currentDate;
+
+        if (!Number.isNaN(new Date(rawTime).getTime())) {
+            // currentDate = format(new Date(rawTime), 'dd/MM HH:mm น.');
+            if (isToday(new Date(rawTime))) {
+                currentDate = format(new Date(rawTime), 'HH:mm น.');
+            } else if (isYesterday(new Date(rawTime))) {
+                currentDate = format(new Date(rawTime), 'เมื่อวานนี้ HH:mm น.');
+            } else if (isThisYear(new Date(rawTime))) {
+                currentDate = format(new Date(rawTime), 'dd/MM HH:mm น.');
+            } else {
+                currentDate = format(new Date(rawTime), 'dd/MM/yyyy HH:mm น.');
+            }
+        }
+        return currentDate
+    }
+
 
     return (
         <>
@@ -131,15 +154,23 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {message.step_id == 0 && message.status == "e" &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
+                    <p>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     {message.message}
                     {/* {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดได้เปลี่ยนแปลงรายละเอียดออเดอร์แล้ว จากราคา XXX เป็น xxx และ XXX เป็น xxxx</p>} */}
                 </Flex>}
-            
+
 
             {
                 message.step_name == "ส่งคำขอจ้าง" &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
+                        <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })} น.</p>
                         {orderDetail.artist_id == myId ? <p>ลูกค้าส่งคำขอจ้างถึงคุณ</p> : <p>คุณส่งคำขอจ้างแล้ว</p>}
                         <Button size='large' type='link' onClick={handleBrief}>ดูบรีฟ</Button>
 
@@ -157,21 +188,34 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             }
 
 
-            {message.step_name == "รับคำขอจ้าง" && message.status !== "c" &&
+            {message.step_name.includes('รับคำขอจ้าง') && message.status !== "c" &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     {orderDetail.artist_id == myId ? <p>ยอมรับคำขอแล้ว รอส่งภาพร่างให้ลูกค้า</p> : <p>นักวาดยอมรับคำขอจ้างแล้ว</p>}
                 </Flex>}
 
             {/*! -----but ปฏิเสธ-------*/}
-            {message.step_name == "รับคำขอจ้าง" && message.status == "c" &&
+            {message.step_name.includes('รับคำขอจ้าง') && message.status == "c" &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     {orderDetail.artist_id == myId ? <p>ยกเลิกคำขอจ้างแล้ว</p> : <p>นักวาดยกเลิกคำขอจ้างแล้ว</p>}
                 </Flex>}
 
             {message.step_name == "ระบุราคา" && message.status == null && message.status == undefined && orderDetail.artist_id == myId &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
-                    {message.msgId}
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
+                    {/* {message.msgId} */}
                     <p className="h4"> ระบุราคาคอมมิชชัน</p>
+                    <p>ราคาขั้นต่ำ {orderDetail.pkg_min_price} บาท</p>
                     {message.checked == 0 ?
                         <>
                             <InputNumber suffix="บาท" className="inputnumber-css" ref={priceRef} />
@@ -185,16 +229,26 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {message.step_name == "ระบุราคา" && message.status !== null && message.status !== undefined &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     <p>{orderDetail.artist_id == myId ? 'คุณ' : 'นักวาด'}{message.message}</p>
                 </Flex>}
 
             {message?.step_name?.includes('แนบสลิป') && message.status == null && message.status == undefined &&
                 <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical>
-                    {message.msgId}
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
+                    {/* {message.msgId} */}
                     <p className="h4">{!message?.step_name?.includes('2') ? 'ชำระเงินครึ่งแรก' : "ชำระเงินครึ่งหลัง"}
-                        <Tooltip title="มีการจ่ายเงินสองรอบ จ่ายครั้งแรกหลังนักวาดส่งภาพร่าง จ่ายเงินครั้งที่สองหลังจากที่งานดำเนินไปได้ 50% แล้ว" color="#2db7f5">
-                            <Icon.Info />
-                        </Tooltip>
+                        {!message?.step_name?.includes('2') &&
+                            <Tooltip title="จ่ายเงินล่วงหน้า 50% ก่อนเริ่มงาน" color="#2db7f5">
+                                <Icon.Info />
+                            </Tooltip>}
+
                     </p>
                     <div>
                         {/* <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" /> */}
@@ -217,41 +271,100 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             }
 
             {/*ส่งสลิปลแว้ รอเช็คสลิป */}
-            {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status == null && message.status == undefined && orderDetail.artist_id == myId &&
+            {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status == null && message.status == undefined &&
                 <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical>
-                    {message.msgId}
-                    <p className="h4">{!message?.step_name?.includes('2') ? 'ตรวจสอบใบเสร็จชำระเงินครึ่งแรก' : "ตรวจสอบใบเสร็จชำระเงินครึ่งหลัง"}</p>
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
+                    {/* {message.msgId} */}
+                    {orderDetail.artist_id == myId &&
+                        <p className="h4">
+                            {!message?.step_name?.includes('2') ? 'ตรวจสอบใบเสร็จชำระเงินครึ่งแรก' : "ตรวจสอบใบเสร็จชำระเงินครึ่งหลัง"}
+                        </p>
+                    }
                     <div onClick={() => handleFullImg("https://s359.kapook.com/pagebuilder/ba154685-db18-4ac7-b318-a4a2b15b9d4c.jpg")}>
                         <img src="https://s359.kapook.com/pagebuilder/ba154685-db18-4ac7-b318-a4a2b15b9d4c.jpg" />
                     </div>
-                    <Flex wrap='wrap' gap='small' justify='center'>
-                        {message.checked == 0 ? <>
-                            <Button size="large" shape="round" onClick={() => approveSlip(message.step_id, message.step_name)} >ยอมรับสลิป</Button>
-                            <Button size="large" shape="round" onClick={() => rejectSlip(message.step_id, message.step_name)} danger >ไม่ยอมรับสลิป</Button>
-                            {/* <Button size="large" type="primary" shape="round" >ลบภาพร่าง</Button> */}
-                        </>
-                            : <p>ตรวจสอบใบเสร็จชำระเงินแล้ว</p>
-                        }
-                    </Flex>
+                    {orderDetail.artist_id == myId &&
+                        <Flex wrap='wrap' gap='small' justify='center'>
+                            {message.checked == 0 ? <>
+                                <Button size="large" shape="round" onClick={() => approveSlip(message.step_id, message.step_name)} >ยอมรับสลิป</Button>
+                                <Button size="large" shape="round" onClick={() => rejectSlip(message.step_id, message.step_name)} danger >ไม่ยอมรับสลิป</Button>
+                                {/* <Button size="large" type="primary" shape="round" >ลบภาพร่าง</Button> */}
+                            </>
+                                : <p>ตรวจสอบใบเสร็จชำระเงินแล้ว</p>
+                            }
+                        </Flex>
+                    }
+
                 </Flex>
             }
 
             {/*  = สลิปผ่าน */}
-            {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status !== null && message.status !== undefined &&
+            {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status == 'a' &&
                 <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical >
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     <p>{message.message}</p>
+                </Flex>
+            }
+
+            {/*  = สลิปไม่ผ่าน */}
+
+            {message?.step_name?.includes('ตรวจสอบใบเสร็จ') && message.status == 'c' &&
+                <Flex wrap='wrap' className="system-message qrcode sys-dialog" gap="small" justify="center" align="center" vertical >
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
+                    <p>ใบเสร็จชำระเงินไม่ถูกต้อง กรุณาอัปโหลดใบเสร็จการชำระเงินใหม่</p>
                 </Flex>
             }
 
             {message?.step_name?.includes("ภาพ") && message.status == null && message.status == undefined &&
                 <Flex wrap='wrap' className="system-message progress sys-dialog-wip" gap="small" justify="center" align="center" vertical>
-                    {message.msgId}
+                    {/* {message.msgId} */}
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     <p className="h4">{message.step_name}</p>
-                    <div className="progress-img-container">
+                    <div className="progress-img-container" >
                         {Array.isArray(message.img) && message.img.map((img) => {
-                            return <div onClick={() => handleFullImg(img)}><img src={img} /></div>
+                            return <div><Image src={img}
+                                preview={{
+                                    toolbarRender: (
+                                        _,
+                                        {
+                                            transform: { scale },
+                                            actions: { onZoomOut, onZoomIn },
+                                        },
+                                    ) => (
+                                        <Space size={12} className="toolbar-wrapper">
+                                            <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                                            <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                                        </Space>
+                                    ),
+                                }} /></div>
                         })}
-                        {!Array.isArray(message.img) && <div onClick={() => handleFullImg(message.img)}><img src={message.img} /></div>
+                        {!Array.isArray(message.img) && <div><Image src={message.img}
+                            preview={{
+                                toolbarRender: (
+                                    _,
+                                    {
+                                        transform: { scale },
+                                        actions: { onZoomOut, onZoomIn },
+                                    },
+                                ) => (
+                                    <Space size={12} className="toolbar-wrapper">
+                                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                                    </Space>
+                                ),
+                            }} /></div>
                         }
                     </div>
                     <Flex wrap='wrap' gap="small" justify="center">
@@ -260,7 +373,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                                 message.checked == 0 ? <>
                                     <Button size="large" shape="round" onClick={() => editProgress(message.step_id, message.step_name)} >แก้ไขภาพ {orderDetail.od_number_of_edit}/{orderDetail.pkg_edits}</Button>
                                     <Button size="large" shape="round" onClick={() => approveProgress(message.step_id, message.step_name)} >อนุมัติภาพ</Button>
-                                    
+
                                 </>
                                     : <p>ดำเนินการแล้ว</p>
                                 : message.checked == 0 ? <>
@@ -270,7 +383,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                                             <Button size="large" shape="round" onClick={() => delProgress(message.step_id, message.step_name, message.msgId)} style={{ width: "fit-content" }} danger icon={<DeleteOutlined />}></Button>
                                         </Flex>
                                     </Flex>
-                                    
+
                                 </>
                                     : <p>ดำเนินการแล้ว</p>
                         }
@@ -280,6 +393,10 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
 
             {message?.step_name?.includes("ภาพ") && message.status !== null && message.status !== undefined &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
+                    <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} น.</p>
                     <p>{message.message}</p>
                 </Flex>
             }
@@ -287,6 +404,10 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
             {message?.step_name == "รีวิว" &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
+                        <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })} น.</p>
                         {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
                         <p><u>ลิ้งโหลดงาน</u></p>
 
@@ -302,26 +423,53 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                 </>
             }
 
-            {message?.step_name == "แอดมินอนุมัติ" &&
+            {message?.step_name.includes("แอดมิน") && message?.status == null &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
-                        {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
-                        <p><u>อันนี้แอดมินต้องเป็นคนอนุมัติแต่ให้userมากดเองก่อนยังไม่มีหน้า</u></p>
-                        <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
+                        <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })} น.</p>
+                        รอระบบตรวจสอบความเหมือนของรูปภาพไฟนัล
+                    </Flex>
+                </>
+            }
+
+            {message?.step_name.includes("แอดมิน") && message?.status != null &&
+                <>
+                    <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
+                        {/* {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>} */}
+                        <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })} น.</p>
+                        <Icon.CheckCircle style={{ color: "#b7eb8f", width: "50px", height: "50px" }} />
+                        <p>ไม่มีรูปภาพที่เหมือนในระบบ</p>
+                        {/* <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button> */}
                         {orderDetail.artist_id !== myId ?
-                            message.checked !== 0 ?
+                            message.checked == 0 ?
                                 <>
+                                    <Button size="large" type="link" shape="round">
+                                        <Flex align='center' gap='small'>
+                                            ดาวน์โหลดรูปภาพไฟนัล<Icon.Download />
+
+                                        </Flex>
+
+                                    </Button>
                                     <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
                                 </>
-                                : <p>อนุมัติแล้ว</p>
+                                : null
                             : null
                         }
                     </Flex>
                 </>
             }
 
+
+
             <Modal title="แนบใบเสร็จชำระเงิน" open={IsModalOpen} footer="" onCancel={ModalToggle} style={{ maxWidth: "1000px" }}>
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="big-uploader">
+
                     <Upload
                         name="avatar"
                         listType="picture-card"
@@ -349,13 +497,13 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                 </Flex>
             </Modal>
 
-            <Modal title="รีวิว" open={IsReviewModalOpen} footer="" onCancel={ReviewModalHandle} style={{ maxWidth: "1000px" }}>
+            <Modal title="รีวิวคอมมิชชัน" open={IsReviewModalOpen} footer="" onCancel={ReviewModalHandle} style={{ maxWidth: "1000px" }}>
                 {/* <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="big-uploader"> */}
                 <Form
                     layout="vertical"
                     onFinish={submitReview}>
                     <Flex wrap='wrap' justify='center'>
-                        <Rate  onChange={setReviewValue} value={reviewValue} allowClear={false} />
+                        <Rate onChange={setReviewValue} value={reviewValue} allowClear={false} />
                     </Flex>
                     <Form.Item name='comment' label="ความคิดเห็น" style={{ textAlign: "center" }}>
                         <Input.TextArea placeholder="เขียนความคิดเห็น..."
@@ -367,7 +515,7 @@ export default function OrderSystemMsg({  curStepId, sendReview, cancelRequest, 
                     </Form.Item>
                     <Form.Item >
                         <Flex wrap='wrap' gap="small" justify='flex-end'>
-                            <Button htmlType="submit" size="large" shape="round">ยกเลิก</Button>
+                            {/* <Button htmlType="submit" size="large" shape="round">ยกเลิก</Button> */}
                             <Button size="large" type="primary" shape="round" htmlType='submit'>ส่งรีวิว</Button>
                         </Flex>
                     </Form.Item>

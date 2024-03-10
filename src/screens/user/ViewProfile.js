@@ -21,7 +21,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
 import * as alertData from "../../alertdata/alertData";
 import { useAuth } from '../../context/AuthContext';
-import { Modal, Button, Input, Select, Tabs } from 'antd';
+import { Modal, Button, Input, Rate, Tabs } from 'antd';
 import { host } from "../../utils/api";
 
 const title = "ViewProfile";
@@ -249,12 +249,12 @@ export default function ViewProfile() {
               style={{ backgroundColor: userdata.urs_cover_color }}
             ></div>
           </div>
-          <div className="container profile-page">
+          <div className="container-xl profile-page">
             <div className="user-profile-area">
               <div className="user-col-profile">
                 <ProfileImg
                   src={userdata.urs_profile_img}
-                  type="show"
+                  type="only-show"
                 // onPress={() => openModal("profile")}
                 />
                 {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
@@ -320,13 +320,12 @@ export default function ViewProfile() {
                 </div> */}
                 <div className="user-about-content">
                   <div className="user-about-review mb-4">
-                    <p className="fs-3">4.0</p> <p>จาก 5 รีวิว</p>
+                    <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
                   </div>
                   <div className="user-about-text">
                     <div>
                       <p>
-                        ผู้ติดตาม {myFollower.length}{" "}
-                        <button onClick={openFollower}>ดู</button>
+                        ผู้ติดตาม {myFollower.length}{" "}คน
                       </p>
                       <div>
                         {myFollowerData.map((data) => (
@@ -343,9 +342,8 @@ export default function ViewProfile() {
                           </a>
                         ))}
                       </div>
-                      <p>งานสำเร็จแล้ว 10 งาน</p>
-                      <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p>
-                      <p>ตอบกลับภายใน 1 ชั่วโมง</p>
+                      <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
+                      <p>เป็นสมาชิกเมื่อ {userdata.created_at}</p>
                     </div>
                     <div>
                       <p>คอมมิชชัน เปิด</p>

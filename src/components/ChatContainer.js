@@ -15,7 +15,7 @@ import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { Modal, Button, Checkbox, Input, Select, Space, Upload, Switch, Flex, Radio, InputNumber, Form } from 'antd';
 import OrderSystemMsg from "./OrderSystemMsg";
 import 'animate.css'
-// import { format } from 'date-fns';
+import { isSameDay, format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import QRCode from "qrcode.react";
 import io from "socket.io-client";
 import { useAuth } from '../context/AuthContext';
@@ -115,7 +115,8 @@ export default function ChatContainer({ currentChat, test }) {
   // }
 
   const getPayment = async () => {
-    if (chat_order_id !== null) {
+    // alert(chat_order_id)
+    if (chat_order_id != null && chat_order_id != 0) {
       return new Promise((resolve, reject) => {
         axios.get(`${host}/getPayment/order/${chat_order_id}`).then((response) => {
           const data = response.data;
@@ -148,9 +149,9 @@ export default function ChatContainer({ currentChat, test }) {
           reject(error); // Reject หากเกิดข้อผิดพลาดในการเรียก API
         });
       });
-      
+
     }
-    
+
   }
   // ทำงานเมื่อเปลี่ยน currentChat
   useEffect(() => {
@@ -203,7 +204,7 @@ export default function ChatContainer({ currentChat, test }) {
 
     getUser();
     getTou()
-    if (chat_order_id !== 0 || chat_order_id !== null) {
+    if (chat_order_id != null && chat_order_id != 0) {
       getPayment()
     }
   }, [currentChat]);
@@ -216,6 +217,7 @@ export default function ChatContainer({ currentChat, test }) {
       msg,
       od_id: chat_order_id,
       timestamp_chat,
+      created_at: currentDate
     });
     await axios.post(`${host}/messages/addmsg`, {
       from: userid,
@@ -225,7 +227,7 @@ export default function ChatContainer({ currentChat, test }) {
     });
     setMessages((prevMessages) => [
       ...prevMessages,
-      { fromSelf: true, message: msg, timestamp_chat: timestamp_chat },
+      { fromSelf: true, message: msg, timestamp_chat: timestamp_chat, created_at: currentDate },
     ]);
   }
 
@@ -388,16 +390,16 @@ export default function ChatContainer({ currentChat, test }) {
 
   //อัปเดตสถานะปัจจุบัน
   //ถ้ามี msgid ส่งมา = เลือกลบ
-  const updateMsg = (msgid) => {
+  const changeCheckTo1Ui = (msgid) => {
     // alert(msgid)
     msgid == null || msgid == undefined ?
       setMessages(
         messages.map((message) => (
           //ของเขาอัปแล้วแต่ของเรายังไม่อัปในกรณีที่เขาอนุมัติภาพแล้วและเรายังไม่อัปไอดีปัจจุบัน
           message.msgId === msgId.current ? { ...message, checked: 1 } : message
+          //ถ้ามันเออเร่ออีกแล้วหา msgid ไม่เจอก็ให้เช็คทุกมันเป็น 1 ไปซะ
         ))
       )
-
       //ลบภาพโปรเกสทิ้ง
       : setMessages((current) =>
         current.filter((msg) => msg.msgId != msgid)
@@ -417,45 +419,7 @@ export default function ChatContainer({ currentChat, test }) {
 
 
   //*--------------------------------------------------------------------
-
-  //*------------------------อัปเดตสถานะ---------------------------------------------
-
-
-  const updateSystemMsg = async ({ msgId, message, step_id, step_name, status, checked }) => {
-
-    socket.emit("send-msg", {
-      msgId: msgId,
-      to: currentChat.id,
-      from: userid,
-      msg: message,
-      timestamp_chat,
-      step_id: step_id,
-      step_name: step_name,
-      od_id: chat_order_id,
-      status: status,
-      checked: checked,
-      isSystemMsg: true,
-      created_at: currentDate
-    });
-
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        msgId: msgId,
-        to: currentChat.id,
-        from: userid,
-        message: message,
-        timestamp_chat,
-        step_id: step_id,
-        step_name: step_name,
-        od_id: chat_order_id,
-        status: status,
-        checked: checked,
-        isSystemMsg: true,
-        created_at: currentDate
-      },
-    ]);
-
+  const addSystemMsg = async ({ msgId, message, step_id, step_name, status, checked }) => {
     await axios.post(`${host}/messages/addmsg`, {
       from: userid,
       to: currentChat.id,
@@ -464,6 +428,46 @@ export default function ChatContainer({ currentChat, test }) {
       od_id: chat_order_id,
       status: status,
       checked: checked,
+    }).then((response) => {
+      console.log(response)
+      if (response.data.status == 'ok') {
+        socket.emit("send-msg", {
+          msgId: msgId,
+          to: currentChat.id,
+          from: userid,
+          msg: message,
+          timestamp_chat,
+          step_id: step_id,
+          step_name: step_name,
+          od_id: chat_order_id,
+          status: status,
+          checked: checked,
+          isSystemMsg: true,
+          created_at: currentDate
+        });
+
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            msgId: msgId,
+            to: currentChat.id,
+            from: userid,
+            message: message,
+            timestamp_chat,
+            step_id: step_id,
+            step_name: step_name,
+            od_id: chat_order_id,
+            status: status,
+            checked: checked,
+            isSystemMsg: true,
+            created_at: currentDate
+          },
+        ]);
+        return 'success'
+      } else {
+        return 'error'
+      }
+
     })
   }
 
@@ -517,6 +521,7 @@ export default function ChatContainer({ currentChat, test }) {
     msgId.current = res.data.msgId;
   }
 
+  //*------------------------อัปเดตสถานะ---------------------------------------------
 
 
   //รับคำขอจ้าง
@@ -529,9 +534,6 @@ export default function ChatContainer({ currentChat, test }) {
       cancelButtonText: "ยกเลิก",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // getPayment();
-        // แจ้งเตือนเมื่อยอมรับ
-        //112 คืออันที่ส่งคำขอจ้าง
         const acceptOrder = {
           sender_id: userid,
           sender_name: userdata.urs_name,
@@ -544,7 +546,7 @@ export default function ChatContainer({ currentChat, test }) {
         await axios.post(`${host}/noti/order/add`, acceptOrder);
 
         //1.1 ไปอัปเดต ui ให้เป็นเช็ค 1 ให้กับข้อความระบบที่ถูกจัดการแล้ว
-        updateMsg()
+        changeCheckTo1Ui()
         await axios.post(
           `${host}/messages/updatestep`,
           {
@@ -552,7 +554,7 @@ export default function ChatContainer({ currentChat, test }) {
             od_id: chat_order_id,
           }
         );
-        await updateSystemMsg({
+        await addSystemMsg({
           message: "รับคำขอจ้างแล้ว",
           step_id: currentStepId.current,
           step_name: currentStepName.current,
@@ -573,102 +575,6 @@ export default function ChatContainer({ currentChat, test }) {
       }
     });
   };
-
-  // const acceptRequest = (step_id, step_name) => {
-  //   Swal.fire({
-  //     title: `ยอมรับคำขอจ้างนี้หรือไม่`,
-  //     showCancelButton: true,
-  //     icon: "info",
-  //     confirmButtonText: "ยอมรับ",
-  //     cancelButtonText: "ยกเลิก",
-  //   }).then(async (result) => {
-  //     if (result.isConfirmed) {
-  //       // getPayment();
-  //       // แจ้งเตือนเมื่อยอมรับ
-  //       const acceptOrder = {
-  //         sender_id: userid,
-  //         sender_name: userdata.urs_name,
-  //         sender_img: userdata.urs_profile_img,
-  //         order_id: chat_order_id,
-  //         receiver_id: currentChat.id,
-  //         msg: 'รับคำขอจ้าง'
-  //       }
-  //       socket.emit('acceptOrder', acceptOrder);
-  //       await axios.post(`${host}/noti/order/add`, acceptOrder);
-
-  //       //1.1 ไปอัปเดต ui ให้เป็นเช็ค 1
-  //       updateMsg()
-  //       //1.2 อัปเดตฐานข้อมูลเป็นเช็ค1
-  //       const result = await axios.post(
-  //         //แค่อัปเดตให้เป็น 1 พอ
-  //         `${host}/messages/updatestep`,
-  //         {
-  //           step_id: step_id,
-  //           od_id: chat_order_id,
-  //         }
-  //       );
-
-  //       //2.1 อัปเดตui ของเขา
-  //       socket.emit("send-msg", {
-  //         to: currentChat.id,
-  //         from: userid,
-  //         msg: "รับคำขอจ้างแล้ว",
-  //         timestamp_chat,
-  //         step_id: currentStepId.current,
-  //         step_name: currentStepName.current,
-  //         od_id: chat_order_id,
-  //         status: "a",
-  //         checked: 1,
-  //         isSystemMsg: true,
-  //         current_time: currentDate
-  //       });
-
-  //       //2.2 ส่งuiเราว่ารับคำขอจ้างแล้ว
-  //       setMessages((prevMessages) => [
-  //         ...prevMessages,
-  //         {
-  //           to: currentChat.id,
-  //           from: userid,
-  //           message: "รับคำขอจ้างแล้ว",
-  //           timestamp_chat,
-  //           step_id: currentStepId.current,
-  //           step_name: currentStepName.current,
-  //           od_id: chat_order_id,
-  //           status: "a",
-  //           checked: 1,
-  //           isSystemMsg: true,
-  //           current_time: currentDate
-  //         },
-  //       ]);
-  //       //2.3 เพิ่มเข้าดาต้าเบส
-  //       await axios.post(`${host}/messages/addmsg`, {
-  //         from: userid,
-  //         to: currentChat.id,
-  //         message: "รับคำขอจ้างแล้ว",
-  //         step_id: currentStepId.current,
-  //         od_id: chat_order_id,
-  //         status: "a",
-  //         checked: 1,
-  //       })
-
-  //       //อัปเดตให้รับคำขอจ้างเสร็จ checked_at
-  //       const res = await axios.post(
-  //         `${host}/messages/updatestep`,
-  //         {
-  //           step_id: currentStepId.current,
-  //           od_id: chat_order_id,
-  //         }
-  //       );
-
-  //       //ไปอัปเดตตุ่มเขียว+ไปสเตปต่อไป
-  //       currentStepId.current = res.data.step_id;
-  //       currentStepName.current = res.data.step_name;
-  //       msgId.current = res.data.msgId;
-  //       Swal.fire("ยอมรับคำขอจ้างนี้แล้ว", "", "success");
-  //     }
-  //   });
-  // };
-
   //ไม่ยอมรับคำขอจ้าง
   const cancelRequest = (step_id, step_name) => {
     Swal.fire({
@@ -692,9 +598,7 @@ export default function ChatContainer({ currentChat, test }) {
         socket.emit('acceptOrder', acceptOrder);
         await axios.post(`${host}/noti/order/add`, acceptOrder);
 
-        //1.1 ไปอัปเดต ui ให้เป็นเช็ค 1
-        updateMsg()
-        //1.2 อัปเดตฐานข้อมูลเป็นเช็ค1
+        changeCheckTo1Ui()
         const result = await axios.post(
           //แค่อัปเดตให้เป็น 1 พอ
           `${host}/messages/updatestep`,
@@ -702,61 +606,24 @@ export default function ChatContainer({ currentChat, test }) {
             step_id: step_id,
             od_id: chat_order_id,
           }
-        );
-
-        //2.1 อัปเดตui ของเขา
-        socket.emit("send-msg", {
-          to: currentChat.id,
-          from: userid,
-          msg: "ปฏิเสธคำขอจ้างแล้ว",
-          timestamp_chat,
-          step_id: currentStepId.current,
-          step_name: currentStepName.current,
-          od_id: chat_order_id,
-          status: "c",
-          checked: 1,
-          isSystemMsg: true,
-          created_at: currentDate
-        });
-
-        //2.2 ส่งuiเราว่คำขอจ้างแล้ว
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            to: currentChat.id,
-            from: userid,
-            message: "ปฏิเสธคำขอจ้างแล้ว",
-            timestamp_chat,
-            step_id: currentStepId.current,
-            step_name: currentStepName.current,
-            od_id: chat_order_id,
-            status: "c",
-            checked: 1,
-            isSystemMsg: true,
-            created_at: currentDate
-          },
-        ]);
-        //2.3 เพิ่มเข้าดาต้าเบส
-        await axios.post(`${host}/messages/addmsg`, {
-          from: userid,
-          to: currentChat.id,
+        )
+        await addSystemMsg({
           message: "ปฏิเสธคำขอจ้างแล้ว",
           step_id: currentStepId.current,
-          od_id: chat_order_id,
-          status: "a",
+          step_name: currentStepName.current,
+          status: "c",
           checked: 1,
         })
-
-        //! อัปเดตให้ยกเลิก ยังไม่เขียนน
-        const res = await axios.post(
-          `${host}/messages/updatestep`,
+        await axios.post(
+          `${host}/cancelorder`,
           {
-            step_id: currentStepId.current,
             od_id: chat_order_id,
           }
-        );
-
-        Swal.fire("ปฏิเสธคำขอจ้างนี้แล้ว", "", "success");
+        ).then((response) => {
+          if (response.data.status == 'success') {
+            Swal.fire("ปฏิเสธคำขอจ้างนี้แล้ว", "", "success")
+          }
+        })
       }
     });
   };
@@ -772,8 +639,8 @@ export default function ChatContainer({ currentChat, test }) {
       cancelButtonText: "ยกเลิก",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        updateMsg()
-        await updateSystemMsg({
+        changeCheckTo1Ui()
+        await addSystemMsg({
           message: `อนุมัติ${step_name}แล้ว`,
           step_id: step_id,
           step_name: step_name,
@@ -842,28 +709,24 @@ export default function ChatContainer({ currentChat, test }) {
           })
 
           await getCurrentStep();
-          socket.emit("send-msg", {
-            msgId: msgId.current,
+
+          await sendQrCode()
+
+          socket.emit("update-timeline", {
             to: currentChat.id,
-            from: userid,
-            msg: `กรุณาแนบใบเสร็จชำระเงิน2`,
-            timestamp_chat,
-            step_id: currentStepId.current,
-            step_name: currentStepName.current,
             od_id: chat_order_id,
-            checked: 0,
-            isSystemMsg: true,
-            created_at: currentDate
+            nowCurId: currentStepId.current
           })
+          Swal.fire("อนุมัติภาพแล้ว", "", "success");
         } catch (error) {
         }
       }
-      Swal.fire("อนุมัติภาพแล้ว", "", "success");
+
     });
   }
-
   //แก้ไขโปรเกส
   const editProgress = (step_id, step_name) => {
+    //-------เพิ่มแสตนสำหรับราคาแก้ไข
     let title;
     if (orderDetail.pkg_edits <= orderDetail.od_number_of_edit) {
       title = 'การแก้ไขครั้งนี้มีค่าใช้จ่าย ต้องการแจ้งแก้ไขภาพนี้หรือไม่'
@@ -879,14 +742,14 @@ export default function ChatContainer({ currentChat, test }) {
     })
       .then(async (result) => {
         if (result.isConfirmed) {
-          await updateSystemMsg({
+          await addSystemMsg({
             message: `แจ้งแก้ไข${step_name}แล้ว`,
             step_id: step_id,
             step_name: step_name,
             status: "e",
             checked: 1,
           })
-          updateMsg()
+          changeCheckTo1Ui()
           Swal.fire("แจ้งแก้ไขภาพแล้ว", "", "success");
           const result = await axios.post(
             `${host}/messages/updatestep`,
@@ -914,7 +777,7 @@ export default function ChatContainer({ currentChat, test }) {
           setMessages((current) =>
             current.filter((msg) => msg.msgId != msgid)
           )
-          updateMsg(msgid)
+          changeCheckTo1Ui(msgid)
           Swal.fire("ลบภาพแล้ว", "", "success");
           const result = await axios.post(
             `${host}/messages/updatestep`,
@@ -946,7 +809,7 @@ export default function ChatContainer({ currentChat, test }) {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await updateSystemMsg({
+            await addSystemMsg({
               message: `กำหนดราคาคอมมิชชันนี้ ${price} บาท`,
               step_id: step_id,
               step_name: step_name,
@@ -954,7 +817,7 @@ export default function ChatContainer({ currentChat, test }) {
               checked: 1,
             })
             console.log(currentStepId.current)
-            updateMsg()
+            changeCheckTo1Ui()
 
             const result = await axios.post(
               `${host}/messages/updatestep`,
@@ -974,57 +837,60 @@ export default function ChatContainer({ currentChat, test }) {
             })
 
             //--ตั้งราคาสำเร็จและอัปเดตทุกอย่างแล้ว---
-            await axios.post(`${host}/messages/addmsg`, {
-              from: userid,
-              to: currentChat.id,
-              step_id: currentStepId.current,
-              message: "กรุณาแนบใบเสร็จชำระเงิน",
-              od_id: chat_order_id,
-              checked: 0,
-            })
-            await getPayment()
-            socket.emit("update-payment", {
-              // to: currentChat.id,
-              msgId: msgId.current,
-              to: currentChat.id,
-              from: userid,
-              msg: "กรุณาแนบใบเสร็จชำระเงิน",
-              timestamp_chat,
-              step_id: currentStepId.current,
-              step_name: currentStepName.current,
-              od_id: chat_order_id,
-              checked: 0,
-              isSystemMsg: true,
-              created_at: currentDate
-            })
-            await getCurrentStep()
 
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              {
-                msgId: msgId.current,
-                to: currentChat.id,
-                from: userid,
-                message: "กรุณาแนบใบเสร็จชำระเงิน",
-                timestamp_chat,
-                step_id: currentStepId.current,
-                step_name: currentStepName.current,
-                od_id: chat_order_id,
-                checked: 0,
-                isSystemMsg: true,
-                created_at: currentDate
-              },
-            ]);
+            await sendQrCode()
 
             Swal.fire("ตั้งราคาแล้ว", "", "success");
-
-            //ให้มันแนบสลิปต่อ
-
-
           } catch (error) {
           }
         }
       });
+  }
+
+  //ส่งคิวอาโค้ด
+  const sendQrCode = async (final) => {
+    await axios.post(`${host}/messages/addmsg`, {
+      from: userid,
+      to: currentChat.id,
+      step_id: currentStepId.current,
+      message: "กรุณาแนบใบเสร็จชำระเงิน",
+      od_id: chat_order_id,
+      checked: 0,
+    })
+    await getPayment()
+    socket.emit("update-payment", {
+      // to: currentChat.id,
+      msgId: msgId.current,
+      to: currentChat.id,
+      from: userid,
+      msg: "กรุณาแนบใบเสร็จชำระเงิน",
+      timestamp_chat,
+      step_id: currentStepId.current,
+      step_name: currentStepName.current,
+      od_id: chat_order_id,
+      checked: 0,
+      isSystemMsg: true,
+      created_at: currentDate
+    })
+    await getCurrentStep()
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        msgId: msgId.current,
+        to: currentChat.id,
+        from: userid,
+        message: "กรุณาแนบใบเสร็จชำระเงิน",
+        timestamp_chat,
+        step_id: currentStepId.current,
+        step_name: currentStepName.current,
+        od_id: chat_order_id,
+        checked: 0,
+        isSystemMsg: true,
+        created_at: currentDate
+      },
+    ]);
+
   }
 
   //แนบสลิปแล้ว
@@ -1039,7 +905,7 @@ export default function ChatContainer({ currentChat, test }) {
       if (result.isConfirmed) {
         // Swal.fire("อัปโหลดสลิปแล้ว", "", "success");
         await getCurrentStep()
-        updateMsg()
+        changeCheckTo1Ui()
         const result = await axios.post(
           `${host}/messages/updatestep`,
           {
@@ -1089,7 +955,7 @@ export default function ChatContainer({ currentChat, test }) {
     // })
     //   .then(async (result) => {
     //     if (result.isConfirmed) {
-    //       await updateMsg()
+    //       await changeCheckTo1Ui()
     //       const result = await axios.post(
     //         `${host}/messages/updatestep`,
     //         {
@@ -1153,8 +1019,8 @@ export default function ChatContainer({ currentChat, test }) {
     //   });
   }
 
-  //ยอมรับสลิป = ขั้นตอนชำระเงิน
-  function approveSlip(step_id, step_name, time) {
+  //ยอมรับสลิป
+  function approveSlip(step_id, step_name) {
     Swal.fire({
       title: `ยอมรับใบเสร็จชำระเงินนี้หรือไม่`,
       // showDenyButton: true,
@@ -1165,47 +1031,14 @@ export default function ChatContainer({ currentChat, test }) {
     })
       .then(async (result) => {
         if (result.isConfirmed) {
-          socket.emit("send-msg", {
-            to: currentChat.id,
-            from: userid,
-            msg: `ตรวจสอบใบเสร็จชำระเงินแล้ว ${!step_name?.includes('2') ? 'การชำระเงินครึ่งแรกสำเร็จ' : 'การชำระเงินครึ่งหลังสำเร็จ'}`,
-            timestamp_chat,
+          await addSystemMsg({
+            message: `ตรวจสอบใบเสร็จชำระเงินแล้ว ${!step_name?.includes('2') ? 'การชำระเงินครึ่งแรกสำเร็จ' : 'การชำระเงินครึ่งหลังสำเร็จ'}`,
             step_id: step_id,
             step_name: step_name,
-            od_id: chat_order_id,
-            status: "a",
-            checked: 1,
-            isSystemMsg: true,
-            created_at: currentDate
-          });
-          console.log(currentStepId.current)
-          await axios.post(`${host}/messages/addmsg`, {
-            from: userid,
-            to: currentChat.id,
-            step_id: step_id,
-            message: `ตรวจสอบใบเสร็จชำระเงินแล้ว ${!step_name?.includes('2') ? 'การชำระเงินครึ่งแรกสำเร็จ' : 'การชำระเงินครึ่งหลังสำเร็จ'}`,
-            od_id: chat_order_id,
             status: "a",
             checked: 1,
           })
-          updateMsg()
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              to: currentChat.id,
-              from: userid,
-              status: "a",
-              isSystemMsg: true,
-              created_at: currentDate,
-              step_name: step_name,
-              step_id: step_id,
-              message: `ตรวจสอบใบเสร็จชำระเงินแล้ว ${!step_name?.includes('2') ? 'การชำระเงินครึ่งแรกสำเร็จ' : 'การชำระเงินครึ่งหลัง'}`,
-              od_id: chat_order_id,
-              checked: 1,
-              timestamp_chat: timestamp_chat
-            },
-          ]);
-
+          changeCheckTo1Ui()
           const result = await axios.post(
             `${host}/messages/updatestep`,
             {
@@ -1223,14 +1056,31 @@ export default function ChatContainer({ currentChat, test }) {
             od_id: chat_order_id,
             nowCurId: currentStepId.current
           })
+          if (step_name?.includes('2')) {
+            await addSystemMsg({
+              message: "รอแอดมินอนุมัติ",
+              step_id: currentStepId.current,
+              step_name: currentStepName.current,
+              checked: 1,
+            })
+          } else {
+            //เพิ่มเดดไลน์
+            await axios.post(
+              `${host}/setdeadline`,
+              {
+                od_id: chat_order_id,
+                pkg_duration: orderDetail.pkg_duration
 
+              }
+            )
+          }
           Swal.fire("ยอมรับสลิปแล้ว", "", "success");
         }
       });
   }
 
-  //ไม่ยอมรับสลิป = ขั้นตอนชำระเงิน
-  function rejectSlip(step_id, step_name, time) {
+  //ไม่ยอมรับสลิป
+  function rejectSlip(step_id, step_name) {
     Swal.fire({
       title: `ปฏิเสธใบเสร็จชำระเงินนี้หรือไม่`,
       showCancelButton: true,
@@ -1240,45 +1090,41 @@ export default function ChatContainer({ currentChat, test }) {
     })
       .then(async (result) => {
         if (result.isConfirmed) {
-          socket.emit("send-msg", {
-            to: currentChat.id,
-            from: userid,
-            msg,
-            timestamp_chat,
-            step_id: step_id,
-            od_id: chat_order_id,
-            checked: 1,
-            created_at: currentDate
-          });
-          console.log(currentStepId.current)
-          await axios.post(`${host}/messages/addmsg`, {
-            from: userid,
-            to: currentChat.id,
-            step_id: step_id,
+          await addSystemMsg({
             message: "ยกเลิกใบเสร็จชำระเงินแล้ว",
-            od_id: chat_order_id,
-            status: "e",
+            step_id: step_id,
+            step_name: step_name,
+            status: "c",
             checked: 1,
           })
-          currentStepId.current = result.data.step_id;
-          currentStepName.current = result.data.step_name;
-          msgId.current = result.data.msgId;
-          updateMsg()
+          changeCheckTo1Ui()
 
-          console.log("เก้ทสแตทปจบ", currentStepId.current)
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { isSystemMsg: true, created_at: currentDate, step_name: stepName, step_id: step_id, message: "ยกเลิกใบเสร็จชำระเงินแล้ว", od_id: orderId.current, checked: 0, timestamp_chat: timestamp_chat },
-          ]);
+          const res = await axios.post(
+            `${host}/cancelslip`,
+            {
+              od_id: chat_order_id,
+            }
+          )
+          currentStepId.current = res.data.step_id;
+          currentStepName.current = res.data.step_name;
+          msgId.current = res.data.msgId;
+          //กลับมาสเตป -1
+          socket.emit("update-timeline", {
+            to: currentChat.id,
+            od_id: chat_order_id,
+            nowCurId: currentStepId.current
+          })
+          await sendQrCode()
           Swal.fire("ยกเลิกสลิปแล้ว", "", "success");
         }
       });
   }
 
+  //ส่งรีวิว
   const sendReview = async () => {
 
     //1.1 ไปอัปเดต ui ให้เป็นเช็ค 1
-    updateMsg()
+    changeCheckTo1Ui()
 
     //อัปเดตให้ checked_at
     await axios.post(
@@ -1464,8 +1310,6 @@ export default function ChatContainer({ currentChat, test }) {
                   isSystemMsg: true,
                   created_at: currentDate
                 });
-                // console.log(currentStepId.current)
-                //ใส่ไอดีแชทให้ตอนแสดงผลให้ตัวเอง
                 setMessages((prevMessages) => [
                   ...prevMessages,
                   {
@@ -1602,6 +1446,11 @@ export default function ChatContainer({ currentChat, test }) {
 
   }
 
+  let nowDate;
+  let firstRowofDay = true;
+  let showDate = true;
+  let timeFormat;
+
   return (
     <>
       {/* <div>
@@ -1661,20 +1510,20 @@ export default function ChatContainer({ currentChat, test }) {
                   <img src={previewUrl} alt={fileName} className="imagePreview" />
                 ) : (
                   <h4>Drop images here</h4>
-              )}
-            </form>
-            <Button variant="danger" onClick={handleCancel}>
-              ยกเลิก
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              form="sendImage"
-              onClick={handleCancel}
-            >
-              ส่งภาพ
-            </Button>
-              
+                )}
+              </form>
+              <Button variant="danger" onClick={handleCancel}>
+                ยกเลิก
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                form="sendImage"
+                onClick={handleCancel}
+              >
+                ส่งภาพ
+              </Button>
+
             </>}
           {page == "2" &&
             <>
@@ -1741,7 +1590,7 @@ export default function ChatContainer({ currentChat, test }) {
               <div>
                 <p>ประเภทการใช้งานปัจจุบัน : {allTou[0].old_tou_name}</p>
                 <p>ราคาปัจจุบัน : {orderDetail.od_price == null ? "ยังไม่กำหนดราคา" : orderDetail.od_price + ' บาท'} </p>
-                {/* <p>ราคาขั้นต่ำ : 200 บาท</p> */}
+                <p>ราคาขั้นต่ำ : {orderDetail.pkg_min_price} บาท</p>
               </div>
 
               <Form
@@ -1750,6 +1599,7 @@ export default function ChatContainer({ currentChat, test }) {
                 onFinish={submitChangeOrder}>
                 <Flex vertical>
                   <Checkbox checked={checkTou}
+                    disabled={orderDetail.finised_at != null}
                     onChange={(event) => setCheckTou(event.target.checked)}>
                     <p className="h6">เปลี่ยนประเภทการใช้งาน</p>
                   </Checkbox>
@@ -1763,7 +1613,7 @@ export default function ChatContainer({ currentChat, test }) {
                       </Radio.Group>
                     </Form.Item>
                   </>}
-                  <Checkbox checked={checkPrice} disabled={orderDetail.od_price == null}
+                  <Checkbox checked={checkPrice} disabled={orderDetail.od_price == null || orderDetail.finised_at != null}
                     onChange={(event) => setCheckPrice(event.target.checked)}>
                     <p className="h6">เปลี่ยนราคาคอมมิชชัน {orderDetail.od_price == null && "เปลี่ยนแปลงราคาปัจจุบันได้หลังจากกำหนดราคาแล้ว"}</p>
                   </Checkbox>
@@ -1771,10 +1621,15 @@ export default function ChatContainer({ currentChat, test }) {
                     label=""
                     name="new_price"
                     rules={[
+
                       {
                         required: true,
                         message: "กรุณาใส่ราคาคอมมิชชันใหม่",
                       },
+                      // {
+                      //   min: orderDetail.pkg_min_price,
+                      //   message: "กรุณาใส่ไม่น้อยกว่าราคาขั้นต่ำ",
+                      // },
                       { type: "number" },
                     ]}
                   >
@@ -1818,7 +1673,7 @@ export default function ChatContainer({ currentChat, test }) {
       </Modal>
       <div className="chat-header">
         <div className="chat-name">
-          <Link to="/chatbox" className="back-btn me-2" >
+          <Link to="/chatbox" className="back-btn me-2" onClick={()=>chat_order_id = null}>
             <Icon.ArrowLeft />
           </Link>
           <img src={currentChat.urs_profile_img}></img>
@@ -1834,7 +1689,7 @@ export default function ChatContainer({ currentChat, test }) {
         </div>
 
         {chat_order_id != 0 && <><div className="status-chat-header">
-          <p>คิวที่ {orderDetail?.od_q_number} msgid ปจบ.{msgidUi}</p>
+          <p>คิวที่ {orderDetail?.od_q_number}</p>
           <p>{currentStepName?.current?.includes("แนบสลิป") || currentStepName?.current?.includes("ภาพ") ?
             orderDetail?.artist_id == userid && 'รอ' //ถ้ามีคำว่าสลิปและเราเป็นนักวาด ให้ใส่คำว่ารอ แต่ถ้าไม่มีคำว่าสลิป และเราไม่ใช่นักวาด ให้ใส่คำว่ารอ
             : orderDetail?.artist_id !== userid && 'รอ'}{currentStepName?.current?.includes("ภาพ") && 'อนุมัติ'}{currentStepName?.current}</p>
@@ -1847,8 +1702,46 @@ export default function ChatContainer({ currentChat, test }) {
 
         <div className="chat">
           {messages.map((message, index) => {
+            let thisDate = new Date(message.created_at)
+            if (index == 0) {
+              //ตั้งวันที่ตั้งต้นของ row แรก
+              nowDate = message.created_at
+            }
+
+            if (isSameDay(thisDate, new Date(nowDate)) && firstRowofDay) {
+              // วันเดียวกันและเป็นแถวแรก
+              showDate = true
+              firstRowofDay = false
+            } else if (isSameDay(thisDate, new Date(nowDate))) {
+              //เป็นวันเดียวกันแต่ไม่ใช่ข้อความแรกก็ไม่ต้องทำไร
+              showDate = false
+              firstRowofDay = false
+            } else {
+              //กลายเป็นวันใหม่แล้วและเป็นแถวแรก
+              nowDate = message.created_at
+              showDate = true
+              firstRowofDay = false
+            }
+
+
+            if (isToday(thisDate)) {
+              timeFormat = format(thisDate, 'วันนี้');
+            } else if (isYesterday(thisDate)) {
+              timeFormat = format(thisDate, 'เมื่อวานนี้');
+            } else if (isThisYear(thisDate)) {
+              timeFormat = format(thisDate, 'วันที่ dd/MM');
+            } else {
+              timeFormat = format(thisDate, 'วันที่ dd/MM/yyyy');
+            }
+
+
             return (
               <>
+                {showDate &&
+                  <Flex justify="center">
+                    <p className='time-sent mt-3 mb-3'>{timeFormat}</p>
+                  </Flex>
+                }
                 {message.isSystemMsg ?
                   <>
                     <Flex ref={scrollRef} justify="center" key={message.msgId}>
@@ -1902,7 +1795,7 @@ export default function ChatContainer({ currentChat, test }) {
                                     message.timestamp_chat
                                   )}
 
-                                </p>
+                                  &nbsp;น.</p>
                               </div>
                             </div>
                           </div>
@@ -1964,13 +1857,15 @@ export default function ChatContainer({ currentChat, test }) {
             onChange={(e) => setMsg(e.target.value)}
             value={msg}
           />
-          <button type="submit">
-            <Icon.Send className="send-icon" />
-          </button>
+          <Button htmlType="submit" shape="round" icon={<Icon.Send />}
+            style={{ aspectRatio: "1/1", width: "48px", height: "48px", backgroundColor: "white", display: "flex", alignItems: "center", justifyContent: "center" }} />
+          {/* <Icon.Send className="send-icon" /> */}
+          {/* </Button> */}
         </div>
       </form>
 
-      <Modal width={1000} title="รายละเอียดการจ้าง" footer='' open={isBriefOpen} onCancel={handleBrief}>
+      <Modal
+        width={1000} title="รายละเอียดการจ้าง" footer='' open={isBriefOpen} onCancel={handleBrief}>
         <Flex vertical gap="small">
           <div>
             <p className="h6">ประเภทการใช้งาน</p>

@@ -282,7 +282,7 @@ export default function ArtworkDetail() {
                     )
                 }
                 <div className="body-lesspadding" style={{ backgroundColor: "#F1F5F9" }}>
-                    <div className="container">
+                    <div className="container-xl">
                         <div className="unnamedcard">
                             <div className="img-col" onClick={() => handleFullImg("/f-b.png")}>
                                 <img src={gallery.ex_img_path}/>
@@ -380,7 +380,7 @@ export default function ArtworkDetail() {
                 {/* {isOpened &&
                     <ReportModal handleModal={handleModal} />
                 } */}
-                <Modal title="รายงาน" open={reportModalIsOpened} onCancel={handleReportModal} footer="">
+                <Modal width={1000} title="รายงาน" open={reportModalIsOpened} onCancel={handleReportModal} footer="">
                     <Space gap="small" direction="vertical" style={{ width: "100%" }}>
 
                         {!isNext && <>
@@ -388,31 +388,31 @@ export default function ArtworkDetail() {
                             <Radio.Group onChange={onChange} value={value} >
                                 <Space direction="vertical">
                                     <div><Radio value="สแปม"><p className="report-headding">สแปม</p></Radio>
-                                        <p className="report-desc ms-4">ทำให้เข้าใจผิดหรือเป็นโพสท์ซ้ำ</p>
+                                        <p className="report-desc ms-4">ทำให้เข้าใจผิด แนบลิงก์ที่เป็นอันตรายหรือเป็นโพสต์ซ้ำ</p>
                                     </div>
                                     <div><Radio value="ละเมิดทรัพย์สินทางปัญญา"><p className="report-headding">ละเมิดทรัพย์สินทางปัญญา</p></Radio>
                                         <p className="report-desc ms-4">มีการละเมิดลิขสิทธิ์หรือเครื่องหมายการค้า</p>
                                     </div>
-                                    <div><Radio value="ภาพลามกอนาจารหรือเนื้อหาเกี่ยวกับเรื่องเพศ"><p className="report-headding">ภาพลามกอนาจารหรือเนื้อหาเกี่ยวกับเรื่องเพศ</p></Radio>
-                                        <p className="report-desc ms-4">เนื้อหาทางเพศที่โจ่งแจ้งซึ่งเกี่ยวข้องกับผู้ใหญ่หรือภาพเปลือย ไม่ใช่ภาพเปลือย หรือการใช้ในทางที่ผิดโดยเจตนาเกี่ยวกับผู้เยาว์</p>
+                                    <div><Radio value="การกระทำที่ไม่เหมาะสมและการคุกคาม"><p className="report-headding">การกระทำที่ไม่เหมาะสมและการคุกคาม</p></Radio>
+                                        <p className="report-desc ms-4">มีเนื้อหาหรือภาพที่ไม่เหมาะสม การใช้ถ้อยคำหยาบคาย มีเนื้อหาทางเพศที่โจ่งแจ้งซึ่งเกี่ยวข้องกับผู้ใหญ่หรือภาพเปลือย การใช้ในทางที่ผิดโดยเจตนาเกี่ยวกับผู้เยาว์</p>
                                     </div>
                                     <div><Radio value="กิจกรรมที่แสดงความเกลียดชัง"><p className="report-headding">
                                         กิจกรรมที่แสดงความเกลียดชัง</p></Radio>
-                                        <p className="report-desc ms-4">อคติ การเหมารวม ลัทธิคนผิวขาว การใช้คำพูดส่อเสียด</p>
+                                        <p className="report-desc ms-4">อคติ การเหมารวม ลัทธิคนผิวขาว การยุยงให้เกิดความรุนแรง</p>
                                     </div>
 
-                                    <div>
+                                    {/* <div>
                                         <Radio value={4}>
                                             <p className="report-headding">อื่นๆ
                                                 {value === 4 ? <Input style={{ width: 200, marginLeft: 10 }} /> : null}</p>
                                         </Radio>
-                                    </div>
+                                    </div> */}
 
 
                                 </Space>
                             </Radio.Group>
                             <Flex gap="small" justify="flex-end">
-                                <Button shape="round" size="large" onClick={handleReportModal}>ยกเลิก</Button>
+                                {/* <Button shape="round" size="large" onClick={handleReportModal}>ยกเลิก</Button> */}
                                 <Button shape="round" size="large" type="primary" onClick={handleNext} disabled={value == null}>ถัดไป</Button>
                             </Flex>
 

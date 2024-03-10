@@ -9,7 +9,7 @@ export default function ArtistBox(props) {
                 <div className="img-wrapper"><img src={img} /></div>
                 <div>
                     <p>{name}</p>
-                    <Rate disabled defaultValue={2} className="one-star" />4.5 (12 รีวิว)
+                    <Rate disabled defaultValue={2} className="one-star" />{props.rw_star} ({props.rw_number} รีวิว)
                 </div>
             </div>
         </>

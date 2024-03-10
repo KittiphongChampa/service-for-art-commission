@@ -20,11 +20,11 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {Button} from 'antd'
+import { Button, Space, Form, Input, Modal, Flex, Col, Row } from "antd";
 
 // import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
+// import Form from "react-bootstrap/Form";
+// import Modal from "react-bootstrap/Modal";
 import { Helmet } from "react-helmet";
 
 import * as alertData from "../../alertdata/alertData";
@@ -113,12 +113,12 @@ export default function SettingProfile() {
         }
       }).catch((error) => {
         if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
-            alert("Token has expired. Please log in again.");
-            localStorage.removeItem("token");
-            navigate("/login");
-          } else {
-            console.error("Error:", error);
-          }
+          alert("Token has expired. Please log in again.");
+          localStorage.removeItem("token");
+          navigate("/login");
+        } else {
+          console.error("Error:", error);
+        }
       });
   };
   const profileupdate = async (event) => {
@@ -160,8 +160,6 @@ export default function SettingProfile() {
       .then((response) => {
         const data = response.data;
         if (data.status === "ok") {
-          // alert("Update Success");
-          // window.location = "/setting-profile";
           Swal.fire({ ...alertData.success }).then(() => {
             window.location.reload(false);
           });
@@ -190,21 +188,14 @@ export default function SettingProfile() {
     input.click();
   };
 
-  // const [isShow, setIsShow] = useState(false);
-
-  // const handleHidden = () => {
-  //     setIsShow(prevState => !prevState);
-  // };
-
-  // const handleHide = () => {
-  //   setIsShow(prevState => !prevState);
-  //     // setHide("none");
-  // };
-
-  const [showPsswordModal, setShowPsswordModal] = useState(null);
+  const [showPsswordModal, setShowPsswordModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(null);
   const [showCoverModal, setShowCoverModal] = useState(null);
 
+  function handleModalPass() {
+    setShowPsswordModal(!showPsswordModal)
+
+  }
   const openPassModal = () => {
     const PasswordModal = (
       <ChangePasswordModal setShowPsswordModal={setShowPsswordModal} />
@@ -266,12 +257,41 @@ export default function SettingProfile() {
     });
   };
 
+  const submitChangePassForm = (values) => {
+    const formData = new FormData();
+    formData.append("oldPassword", values.nowPassword);
+    formData.append("newPassword", values.newPassword);
+    Swal.fire({ ...alertData.changePassConfirm }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .put(`${host}/profile/password/change`, formData, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          })
+          .then((response) => {
+            const data = response.data;
+            if (data.status === "ok") {
+              Swal.fire({ ...alertData.changePassIsConfirmed }).then(() => {
+                window.location.reload(false);
+              })
+            } else {
+              //   toast.error(data.message, toastOptions);
+              Swal.fire({ ...alertData.changePassIsError }).then(() => {
+                // window.location.reload(false);
+              })
+            }
+          });
+      }
+    })
+  };
+
   return (
     <div className="body-con">
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      {showPsswordModal}
+      {/* {showPsswordModal} */}
       {showProfileModal}
       {showCoverModal}
 
@@ -279,8 +299,8 @@ export default function SettingProfile() {
       <NavbarUser />
 
       {/* <div className="setting-container"> */}
-      <div className="body-lesspadding" style={{ backgroundColor: "rgb(241, 241, 249)" }}>
-        <div className="container">
+      <div className="body-lesspadding" style={{ backgroundColor: "white" }}>
+        <div className="container-xl">
           <div className="content-card">
             <h1 className="h3">การตั้งค่า</h1>
             {/* <SettingAside onActive="profile" /> */}
@@ -363,6 +383,26 @@ export default function SettingProfile() {
                       </Button>}
                     </div>
                   </form>
+                  {/* <Form
+                    onFinish={profileupdate}
+                    layout="vertical"
+                    name="updateProfile"
+                    initialValues={
+                      {
+                        username: name,
+                      }
+                    }
+                  >
+                    <Form.Item
+                      label="ชื่อผู้ใช้"
+                      name="username">
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      label="คำอธิบายตัวเอง">
+                      <Input />
+                    </Form.Item>
+                  </Form> */}
                 </div>
               </div>
 
@@ -382,7 +422,7 @@ export default function SettingProfile() {
                     <label>รหัสผ่าน</label>
                     <Button
                       // className="change-pass gradient-border-btn"
-                      onClick={openPassModal}
+                      onClick={handleModalPass}
                       shape="round"
                     >
                       <p>เปลี่ยนรหัสผ่าน</p>
@@ -436,19 +476,21 @@ export default function SettingProfile() {
                       </p>
 
                     </div>
-                    <div className="" id="sendDataBtn" style={{ display: "flex", justifyContent: "center" }}>
+                    <Flex gap="small" justify="center">
                       {!editPromptpayBtn && <>
-                        <Button className="gradiant-btn" type="submit" >
+
+                        <Button htmlType='submit' className="gradiant-btn" shape='round' size="large">
                           บันทึกข้อมูล
                         </Button>
-                        <Button className="cancle-btn" type="button" onClick={editPromptpay}>
+                        <Button className="cancle-btn" shape='round' size="large" onClick={editPromptpay}>
                           ยกเลิก
-                        </Button> </>
+                        </Button>
+                      </>
                       }
                       {editPromptpayBtn && <Button shape="round" size="large" className="edit-profile-btn" onClick={editPromptpay}>
                         แก้ไขข้อมูลบัญชีธนาคาร
                       </Button>}
-                    </div>
+                    </Flex>
                   </form>
                 </div>
               </div>
@@ -465,10 +507,80 @@ export default function SettingProfile() {
               {/* </div> */}
             </div>
           </div>
+          <Modal title="เปลี่ยนรหัสผ่านใหม่" open={showPsswordModal} onCancel={handleModalPass} width={1000} footer=''>
+            <Form
+              onFinish={submitChangePassForm}
+              layout="vertical">
+              <Form.Item
+                label="รหัสผ่านปัจจุบัน"
+                name='nowPassword'
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรหัสผ่าน",
+                  },
+                  {
+                    min: 8,
+                    message: "กรุณากรอกรหัสผ่านอย่างน้อย 8 ตัว",
+                  },
+                  { type: "password" },
+                ]}>
+                <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+              </Form.Item>
+              <Form.Item
+                label="รหัสผ่าน"
+                name="newPassword"
+                id="newPassword"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรหัสผ่าน",
+                  },
+                  {
+                    min: 8,
+                    message: "กรุณากรอกรหัสผ่านอย่างน้อย 8 ตัว",
+                  },
+                  { type: "password" },
+                ]}
+              >
+                <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+              </Form.Item>
+
+              {/* Field */}
+              <Form.Item
+                label="ยืนยันรหัสผ่าน"
+                name="verifyPassword"
+                dependencies={['newPassword']}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรหัสผ่าน",
+                  },
+                  { type: "password" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('newPassword') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('รหัสผ่านไม่ตรงกัน'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password style={{ borderRadius: "1rem", padding: "0.5rem 1rem" }} />
+              </Form.Item>
+              <Flex gap='small' justify="center">
+                <Button type="primary" htmlType="submit" shape='round' size="large">บันทึกข้อมูล</Button>
+                <Button shape='round' size="large" onClick={handleModalPass}>ยกเลิก</Button>
+              </Flex>
+            </Form>
+
+          </Modal>
 
 
         </div>
       </div>
+
     </div>
   );
 }

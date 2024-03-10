@@ -1,7 +1,7 @@
 export const verifyEmainSuccess = {
   title: 'ส่ง OTP สำเร็จ โปรดตรวจสอบรหัสยืนยันบนอีเมลของคุณ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
@@ -15,7 +15,7 @@ export const verifyEmainFailed = {
 export const registerSuccess = {
   title: 'สมัครสมาชิกสำเร็จ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
@@ -44,7 +44,7 @@ export const changePassConfirm = {
 export const changePassIsConfirmed = {
     title: 'เปลี่ยนรหัสผ่านใหม่แล้ว',
     icon: 'success',
-    iconColor: '#7E9AFA',
+    //iconColor: '#7E9AFA',
     confirmButtonText: 'ตกลง',
 }
 
@@ -58,7 +58,7 @@ export const changePassIsError = {
 export const deleteCoinConfirm = {
     title: 'คุณต้องการลบแพ็กเกจนี้หรือไม่',
     icon: 'question',
-    iconColor: '#7E9AFA',
+    //iconColor: '#7E9AFA',
     showCancelButton: true,
     confirmButtonText: 'ตกลง',
     cancleButtonText: "ยกเลิก"
@@ -67,7 +67,7 @@ export const deleteCoinConfirm = {
 export const deleteCoinIsConfirmed = {
     title: 'ลบแพ็กเกจแล้ว',
     icon: 'success',
-    iconColor: '#7E9AFA',
+    //iconColor: '#7E9AFA',
     confirmButtonText: 'ตกลง',
 }
 
@@ -102,7 +102,7 @@ export const BuycoinSuccess = {
 export const changeProfileImgIsConfirmed = {
     title: 'เปลี่ยนภาพโปรไฟล์แล้ว',
     icon: 'success',
-    iconColor: '#7E9AFA',
+    //iconColor: '#7E9AFA',
     confirmButtonText: 'ตกลง',
 }
 
@@ -117,7 +117,7 @@ export const changeProfileImgConfirm = {
 export const changeCoverColorIsConfirmed = {
   title: 'เปลี่ยนสีสีพื้นหลังสำเร็จแล้ว',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
@@ -132,14 +132,14 @@ export const changeCoverIsError = {
 export const sendOtpSuccess = {
   title: 'รหัสถูกต้อง',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const deleteAccountConfirm = {
   title: 'คุณต้องการลบบัญชีหรือไม่',
   icon: 'question',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   showCancelButton: true,
   confirmButtonText: 'ตกลง',
   cancleButtonText: "ยกเลิก",
@@ -148,28 +148,28 @@ export const deleteAccountConfirm = {
 export const deleteAccountIsConfirmed = {
   title: 'ลบบัญชีผู้ใช้แล้ว',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const success = {
   title: 'บันทึกสำเร็จ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const pending = {
   title: 'ระบบกำลังทำการตรวจสอบรูปภาพ',
   icon: 'question',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const deleteUserSuccess = {
   title: 'ลบบัญชีผู้ใช้งานสำเร็จ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
@@ -183,21 +183,21 @@ export const deleteUserFailed = {
 export const addadminSuccess = {
   title: 'เพิ่มแอดมินสำเร็จ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const deladminSuccess = {
   title: 'ลบแอดมินสำเร็จ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 
 export const uploadpass = {
   title: 'อัปโหลดสำเร็จ',
   icon: 'success',
-  iconColor: '#7E9AFA',
+  //iconColor: '#7E9AFA',
   confirmButtonText: 'ตกลง',
 }
 

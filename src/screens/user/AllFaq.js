@@ -74,11 +74,11 @@ export default function AllFaq() {
                     height: "50vh", backgroundImage: "url('./images/seamoon.jpg')", backgroundPosition: "top",
                     backgroundSize: "cover"
                 }}>
-                    <div className="container" style={{paddingTop:"30vh",paddingInline:"15%"}}>
+                    <div className="container-xl" style={{paddingTop:"30vh",paddingInline:"15%"}}>
                         <Input type="search" onChange={handleSearch} placeholder="ค้นหาคำถามที่พบบ่อย.." allowClear size="large" />
                     </div>
                 </div>
-                <div className="container">
+                <div className="container-xl">
                     <h1>คำถามที่พบบ่อย</h1>
                     <Collapse items={items} bordered={false}
                         style={{
