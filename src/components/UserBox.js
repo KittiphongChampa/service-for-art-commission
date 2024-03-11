@@ -103,6 +103,8 @@ function UserBox(props) {
 
 function AdminBox(props) {
 
+    console.log(props);
+
     function deleteAdmin(id) {
 
         Swal.fire({
@@ -141,7 +143,9 @@ function AdminBox(props) {
             <p className="username">{props.username}</p>
             <p>{props.userid}</p>
             <p>{props.email}</p>
-            <button onClick={()=>deleteAdmin(props.userid)}>ลบบัญชีแอดมิน</button>
+            {props.admindata.admin_type === 0 ? (
+                <button onClick={()=>deleteAdmin(props.userid)}>ลบบัญชีแอดมิน</button>
+            ) :(<></>)}
         </div>
     )
 }

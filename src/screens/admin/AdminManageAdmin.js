@@ -68,6 +68,8 @@ export default function AdminManageAdmin(props) {
     input.click();
   };
 
+  const { admindata } = useAuth();
+
   useEffect(() => {
     if (jwt_token && type === "admin") {
       getAdminData();
@@ -242,6 +244,7 @@ export default function AdminManageAdmin(props) {
       <div className="all-user-head">
         <h2 className="h3">รายชื่อแอดมิน ({admins.length})</h2>
         <div>
+        {admindata.admin_type === 0 ? (
           <Button
             onClick={handleClick}
             type="primary"
@@ -251,6 +254,7 @@ export default function AdminManageAdmin(props) {
           >
             เพิ่มแอดมิน
           </Button>
+        ) : (<></>)}
           <Input
             type="search"
             onChange={handleSearch}
@@ -266,6 +270,7 @@ export default function AdminManageAdmin(props) {
               username={item.admin_name}
               userid={item.admin_id}
               email={item.admin_email}
+              admindata={admindata}
             />
           </div>
         ))}

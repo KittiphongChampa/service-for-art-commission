@@ -1144,15 +1144,16 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   }
 
   //*---------------------------------------------------------------------
-
   const handleSendImage = async (image) => {
+    
     const formData = new FormData();
     formData.append("from", userid);
     formData.append("to", currentChat.id);
+    formData.append("od_id", chat_order_id);
     formData.append("image", image);
     console.log(formData);
     await axios
-      .post(`${host}/messages/addmsg`, formData, {})
+      .post(`${host}/messages/addmsg`, formData, )
       .then((response) => {
         const data = response.data;
         let msg = data.image_chat;
