@@ -1451,6 +1451,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
 
   }
+  // console.log(messages);
 
   let nowDate;
   let firstRowofDay = true;
@@ -1711,10 +1712,10 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
         <div className="chat">
           {messages.map((message, index) => {
-            let thisDate = new Date(message.created_at)
+            let thisDate = new Date(message.last_message_time)
             if (index == 0) {
               //ตั้งวันที่ตั้งต้นของ row แรก
-              nowDate = message.created_at
+              nowDate = message.last_message_time
             }
 
             if (isSameDay(thisDate, new Date(nowDate)) && firstRowofDay) {
@@ -1727,7 +1728,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
               firstRowofDay = false
             } else {
               //กลายเป็นวันใหม่แล้วและเป็นแถวแรก
-              nowDate = message.created_at
+              nowDate = message.last_message_time
               showDate = true
               firstRowofDay = false
             }
@@ -1850,6 +1851,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           })}
           <div ref={chatbottom}></div>
         </div>
+
       </Scrollbars>
 
       <form className="input-container" onSubmit={(event) => sendChat(event)}>
