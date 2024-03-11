@@ -44,6 +44,8 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
     changeChat(contact);
     window.history.pushState({}, '', `/chatbox?id=${contact.id}&od_id=${contact.od_id}`)
   };
+
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
   return (
     <>
       {userdata.urs_name && userdata.urs_profile_img && (
@@ -66,7 +68,8 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
                       <div>
                         <p className="order h6">{contact.urs_name}</p>
                         <Flex>
-                          {contact.message_text?.split("images")[0] === `${host}/` ? (
+                          {/* {contact.message_text?.split("images")[0] === `${host}/` ? ( */}
+                          {contact.message_text?.split('.').pop() && allowedExtensions.includes(contact.message_text?.split('.').pop().toLowerCase()) ? (
                             <p className="message">ได้ส่งรูปภาพ</p>
                           ) : (
                               <p className="message"
@@ -111,7 +114,8 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
                     <p className="order h6">{contact_order.urs_name}</p>
                     <Flex>
 
-                      {contact_order.message_text?.split("images")[0] === `${host}/` ? (
+                      {/* {contact_order.message_text?.split("images")[0] === `${host}/` ? ( */}
+                      {contact_order.message_text?.split('.').pop() && allowedExtensions.includes(contact_order.message_text?.split('.').pop().toLowerCase()) ? (
                         <p className="message">ได้ส่งรูปภาพ</p>
                       ) : (
                           <p className="message"
