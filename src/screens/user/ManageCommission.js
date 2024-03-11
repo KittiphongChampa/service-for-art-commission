@@ -206,8 +206,8 @@ export default function ManageCommission() {
           formData.append("arr_imageID", arr_imageID)
           formData.append("arr_image_name", arr_image_name)
           formData.append("userID", userID);
-          // axios.post(`${phost}/upload-json`, formData, {
-          axios.post(`http://127.0.0.1:5000/upload-json`, formData, {
+          axios.post(`${phost}/upload-json`, formData, {
+          // axios.post(`http://127.0.0.1:5000/upload-json`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
