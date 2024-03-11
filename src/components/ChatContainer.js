@@ -418,8 +418,8 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
       nowCurId: currentStepId.current,
       deleted: msgid
     });
-    // console.log(messages);
   };
+
 
 
 
@@ -1457,6 +1457,9 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   let showDate = true;
   let timeFormat;
 
+
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
   return (
     <>
       {/* <div>
@@ -1777,9 +1780,8 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                           <div className="user-message" ref={scrollRef} key={uuidv4()}>
                             <div className="my-message">
                               <div>
-                                {message.message?.split("images_chat")[0] ===
-                                  `${host}/` ? (
-                                  // <img src={message.message} width={100} />
+                                
+                                {message.message?.split('.').pop() && allowedExtensions.includes(message.message?.split('.').pop().toLowerCase()) ? (
                                   <div className="att-image" style={{ cursor: "pointer" }} onClick={() => handleFullImg(message.message)}><img src={message.message} /></div>
                                 ) : (
                                   <p className="message">{message.message}</p>
@@ -1812,8 +1814,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                             <div className="their-message">
                               <div>
                                 {/* <div>{message.message}</div> */}
-                                {message.message?.split("images_chat")[0] ===
-                                  `${host}/` ? (
+                                {message.message?.split('.').pop() && allowedExtensions.includes(message.message?.split('.').pop().toLowerCase()) ? (
                                   <div className="att-image" style={{ cursor: "pointer" }} onClick={() => handleFullImg(message.message)}><img src={message.message} /></div>
                                 ) : (
                                   <p className="message">{message.message}</p>
