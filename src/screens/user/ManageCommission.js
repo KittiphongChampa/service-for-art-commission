@@ -263,7 +263,7 @@ export default function ManageCommission() {
 
     api.info({
       message: "กำลังตรวจสอบรูปภาพ",
-      description: "กำลังตรวจสอบรูปภาพรอก่อนพี่ชายย ยังอัปคอมมิชชันไม่ได้เด้อ",
+      description: "กำลังตรวจสอบรูปภาพ",
       btn,
       duration: 0,
       placement: "bottomRight",

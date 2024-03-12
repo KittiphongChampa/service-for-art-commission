@@ -73,7 +73,7 @@ export default function SettingProfile() {
   const [editPromptpayBtn, setEditPromptpayBtn] = useState(true);
 
   const [file, setFile] = useState("");
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(userdata.urs_profile_img);
   const handleFileChange = (event) => {
     const image = event.target.files[0];
     setFile(image);
@@ -203,25 +203,23 @@ export default function SettingProfile() {
     setShowPsswordModal(PasswordModal);
   };
 
-  const openProfileModal = () => {
-    const ProfileModal = (
-      <ChangeProfileImgModal
-        profile={userdata.urs_profile_img}
-        setShowProfileModal={setShowProfileModal}
-      />
-    );
-    setShowProfileModal(ProfileModal);
-  };
+  // const openProfileModal = () => {
+  //   const ProfileModal = (
+  //     <ChangeProfileImgModal
+  //       profile={userdata.urs_profile_img}
+  //       setShowProfileModal={setShowProfileModal}
+  //     />
+  //   );
+  //   setShowProfileModal(ProfileModal);
+  // };
 
-  const openCoverModal = () => {
-    const CoverModal = (
-      <ChangeCoverModal
-        profile={userdata.urs_profile_img}
-        setShowCoverModal={setShowCoverModal}
-      />
-    );
-    setShowCoverModal(CoverModal);
-  };
+  function openCoverModal() {
+    setShowCoverModal(!showCoverModal);
+  }
+
+  function openProfileModal() {
+    setShowProfileModal(!showProfileModal);
+  }
 
   const openColorInput = () => {
     const btnElementClass =
@@ -285,6 +283,60 @@ export default function SettingProfile() {
       }
     })
   };
+  const [selectedColor, setSelectedColor] = useState(userdata.urs_cover_color);
+
+  const submitChangeCoverForm = (event, data) => {
+    // const colorPicker = document.getElementById("color-input");
+    // const colorValue = colorPicker.value;
+    event.preventDefault()
+    const formData = new FormData();
+    formData.append("cover_color", selectedColor);
+    Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
+      if (result.isConfirmed) {
+        axios.patch(`${host}/cover_color/update`, formData, {
+          headers: {
+            Authorization: "Bearer " + token,
+          }
+        }).then((response) => {
+          if (response.data.status === "ok") {
+            Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
+              window.location.reload(false);
+            })
+          } else {
+            Swal.fire({ ...alertData.changeCoverIsError })
+          }
+        })
+      }
+    })
+  }
+
+  const profileupdate_img = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append("file", file);
+    await axios
+      .put(`${host}/profile_img/update`, formData, {
+        headers: {
+          "Content-type": "multipart/form-data",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.status === "ok") {
+          Swal.fire({ ...alertData.changeProfileImgIsConfirmed }).then(() => {
+            window.location.reload(false);
+          });
+          //   alert("Update Success");
+          //   window.location = "/userprofile";
+        } else {
+          //   toast.error(data.message, toastOptions);
+          Swal.fire({ ...alertData.IsError }).then(() => {
+            window.location.reload(false);
+          });
+        }
+      });
+  };
 
   return (
     <div className="body-con">
@@ -292,8 +344,8 @@ export default function SettingProfile() {
         <title>{title}</title>
       </Helmet>
       {/* {showPsswordModal} */}
-      {showProfileModal}
-      {showCoverModal}
+      {/* {showProfileModal}
+      {showCoverModal} */}
 
       {/* <Navbar /> */}
       <NavbarUser />
@@ -340,7 +392,7 @@ export default function SettingProfile() {
                         id="username"
                         maxlength="50"
                         disabled={editProfileBtn}
-                        style={{ border: !editProfileBtn && '1px solid black' }}
+                        style={{ border: !editProfileBtn && '1px solid #d9d9d9' }}
                         {...register("username", { maxLength: 50 })}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -349,7 +401,7 @@ export default function SettingProfile() {
                         className="text-align-right"
                         style={{ display: editProfileBtn ? 'none' : 'block' }}
                       >
-                        {name.length}/50
+                        {/* {name.length}/50 */}
                       </p>
 
                       <label >คำอธิบายตัวเอง</label>
@@ -358,7 +410,7 @@ export default function SettingProfile() {
                         id="bio"
                         maxlength="350"
                         disabled={editProfileBtn}
-                        style={{ border: !editProfileBtn && '1px solid black' }}
+                        style={{ border: !editProfileBtn && '1px solid #d9d9d9' }}
                         {...register("bio", { maxLength: 350 })}
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
@@ -371,7 +423,7 @@ export default function SettingProfile() {
                       </p>
                     </div>
 
-                    <div className="" id="sendDataBtn" style={{ display: "flex", justifyContent: "center" }}>
+                    <Flex className="mt-3" id="sendDataBtn" justify="center" gap="small">
                       {!editProfileBtn && <><Button shape="round" size="large" className="gradiant-btn" htmlType="submit">
                         บันทึกข้อมูล
                       </Button>
@@ -381,7 +433,7 @@ export default function SettingProfile() {
                       {editProfileBtn && <Button shape="round" size="large" className="edit-profile-btn" onClick={editProfile}>
                         แก้ไขโปรไฟล์
                       </Button>}
-                    </div>
+                    </Flex>
                   </form>
                   {/* <Form
                     onFinish={profileupdate}
@@ -444,7 +496,7 @@ export default function SettingProfile() {
                         id="bankAccName"
                         maxlength="50"
                         disabled={editPromptpayBtn}
-                        style={{ border: !editPromptpayBtn && '1px solid black' }}
+                        style={{ border: !editPromptpayBtn && '1px solid #d9d9d9' }}
                         {...register("bankAccName", { maxLength: 50 })}
                         value={bankAccName}
                         onChange={(e) => setBankAccName(e.target.value)}
@@ -453,7 +505,7 @@ export default function SettingProfile() {
                         className="text-align-right"
                         style={{ display: editPromptpayBtn ? 'none' : 'block' }}
                       >
-                        {bankAccName.length}/200
+                        {/* {bankAccName.length}/200 */}
                       </p>
 
 
@@ -463,7 +515,7 @@ export default function SettingProfile() {
                         id="ppNumber"
                         maxlength="350"
                         disabled={editPromptpayBtn}
-                        style={{ border: !editPromptpayBtn && '1px solid black' }}
+                        style={{ border: !editPromptpayBtn && '1px solid #d9d9d9' }}
                         {...register("ppNumber", { maxLength: 50 })}
                         value={ppNumber}
                         onChange={(e) => setPpNumber(e.target.value)}
@@ -472,7 +524,7 @@ export default function SettingProfile() {
                         className="text-align-right"
                         style={{ display: editPromptpayBtn ? 'none' : 'block' }}
                       >
-                        {ppNumber.length}/50
+                        {/* {ppNumber.length}/50 */}
                       </p>
 
                     </div>
@@ -575,6 +627,52 @@ export default function SettingProfile() {
               </Flex>
             </Form>
 
+          </Modal>
+
+          <Modal title="เปลี่ยนสีปก" open={showCoverModal} onCancel={openCoverModal} footer="">
+            {/* <div className="form-area"> */}
+            <form onSubmit={submitChangeCoverForm}>
+              {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนสีปก</h2> */}
+              <div className="setting-img-box">
+                <div className="setting-cover">
+                  <input onChange={(e) => { setSelectedColor(e.target.value) }} defaultValue={userdata.urs_cover_color} type="color" id="color-input" style={{ cursor: "pointer" }} />
+                </div>
+                <ProfileImg src={userdata.urs_profile_img} type="only-show" />
+
+              </div>
+              <Flex justify="center" gap="small">
+                <Button type="primary" shape="round" size="large" htmlType="submit">บันทึก</Button>
+                <Button shape="round" size="large" onClick={openCoverModal}>ยกเลิก</Button>
+              </Flex>
+            </form>
+
+            {/* </div> */}
+          </Modal>
+
+          <Modal title="เปลี่ยนภาพโปรไฟล์" open={showProfileModal} onCancel={openProfileModal} footer="">
+            {/* <div className="form-modal">
+                    <div className="form-area"> */}
+            <form onSubmit={profileupdate_img}>
+              {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนภาพโปรไฟล์</h2> */}
+              <ProfileImg type="only-show" src={previewUrl} basedProfile={userdata.urs_profile_img} />
+              {/* <ProfileImg src={previewUrl} onPress={addProfileImg}/> */}
+              <div class="input-group mb-1 mt-5">
+                <input {...register("profileImg", { required: true })} accept="image/png, image/jpeg" onChange={handleFileChange}
+                  type="file" class="form-control" id="inputGroupFile02" />
+                {/* <label class="input-group-text" for="inputGroupFile02">Upload</label> */}
+
+              </div>
+              <div className="text-align-right">
+                {errors.profileImg && errors.profileImg.type === "required" && (<p class="validate-input"> กรุณาเลือกไฟล์ภาพ</p>)}
+                {errors.profileImg && errors.profileImg.type === "accept" && (<p class="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>)}
+              </div>
+              <Flex gap="small" justify="center">
+                <Button type="primary" shape="round" size="large" htmlType="submit">บันทึก</Button>
+                <Button shape="round" size="large" onClick={openProfileModal}>ยกเลิก</Button>
+              </Flex>
+            </form>
+            {/* </div>
+                </div> */}
           </Modal>
 
 

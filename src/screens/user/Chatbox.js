@@ -222,12 +222,12 @@ export default function ChatBox() {
             <h1 >แชท</h1>
           </div>
           <div className="menu-chat-grid">
-            <div className="abc">
+            {/* <div className="abc">
               <Flex>
                 <Search placeholder="ค้นหา..." allowClear size="large" />
                 <Button type="text" icon={<FilterOutlined style={{ color: "white" }} />}></Button>
               </Flex>
-            </div>
+            </div> */}
             <div className="menu-chat">
               <button className={selectedChatType == "private" && "selected"} onClick={(event) => menuChat(event, "private")}>
                 ส่วนตัว
@@ -248,10 +248,7 @@ export default function ChatBox() {
                 selectedChatType={selectedChatType}
               />
             </div>
-
           </div>
-
-          
         </div>
 
         {/* -----ดิฟ2  กดแล้วให้เปลี่ยนตรงนี้------*/}

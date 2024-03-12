@@ -575,10 +575,10 @@ export default function ChatContainer({ currentChat, test }) {
       }
     });
   };
-  //ไม่ยอมรับคำขอจ้าง
+  //ยกเลิกคำขอจ้างจากปุ่มตอนส่งคำขอจ้าง
   const cancelRequest = (step_id, step_name) => {
     Swal.fire({
-      title: `ปฏิเสธคำขอจ้างนี้หรือไม่`,
+      title: `ยกเลิกคำขอจ้างนี้หรือไม่`,
       showCancelButton: true,
       icon: "question",
       confirmButtonText: "ตกลง",
@@ -599,7 +599,7 @@ export default function ChatContainer({ currentChat, test }) {
         await axios.post(`${host}/noti/order/add`, acceptOrder);
 
         changeCheckTo1Ui()
-        const result = await axios.post(
+        await axios.post(
           //แค่อัปเดตให้เป็น 1 พอ
           `${host}/messages/updatestep`,
           {
@@ -608,7 +608,7 @@ export default function ChatContainer({ currentChat, test }) {
           }
         )
         await addSystemMsg({
-          message: "ปฏิเสธคำขอจ้างแล้ว",
+          message: "ยกเลิกคำขอจ้างแล้ว",
           step_id: currentStepId.current,
           step_name: currentStepName.current,
           status: "c",
@@ -621,14 +621,70 @@ export default function ChatContainer({ currentChat, test }) {
           }
         ).then((response) => {
           if (response.data.status == 'success') {
-            Swal.fire("ปฏิเสธคำขอจ้างนี้แล้ว", "", "success")
+            Swal.fire("ยกเลิกคำขอจ้างนี้แล้ว", "", "success")
+          }
+        })
+      }
+    });
+  };
+  //ยกเลิกคำขอจ้างจากปุ่มข้างๆ
+  
+  const cancelReq2 = () => {
+    Swal.fire({
+      title: currentStepId.current,
+      showCancelButton: true,
+      icon: "question",
+      confirmButtonText: "ตกลง",
+      cancelButtonText: "ยกเลิก",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // getPayment();
+        // แจ้งเตือนเมื่อยอมรับ
+        const acceptOrder = {
+          sender_id: userid,
+          sender_name: userdata.urs_name,
+          sender_img: userdata.urs_profile_img,
+          order_id: chat_order_id,
+          receiver_id: currentChat.id,
+          msg: 'รับคำขอจ้าง'
+        }
+        socket.emit('acceptOrder', acceptOrder);
+        await axios.post(`${host}/noti/order/add`, acceptOrder);
+
+        changeCheckTo1Ui()
+        await addSystemMsg({
+          message: "ยกเลิกคำขอจ้างแล้ว",
+          step_name: 'ตอบรับคำขอจ้าง',
+          step_id: 0,
+          status: "c",
+          checked: 1,
+        })
+
+        if (currentStepName.current.includes('รับคำขอจ้าง')) {
+          axios.post(
+            //แค่อัปเดตให้เป็น 1 พอ
+            `${host}/messages/updatestep`,
+            {
+              step_id: currentStepId.current-1,
+              od_id: chat_order_id,
+            }
+          )
+        }
+        await axios.post(
+          `${host}/cancelorder`,
+          {
+            od_id: chat_order_id,
+            // no_step_id : true
+          }
+        ).then((response) => {
+          if (response.data.status == 'success') {
+            Swal.fire("ยกเลิกคำขอจ้างนี้แล้ว", "", "success")
           }
         })
       }
     });
   };
 
-  //อนุมัติโปรเกส
   const approveProgress = (step_id, step_name) => {
     let nextStep;
     Swal.fire({
@@ -1379,7 +1435,7 @@ export default function ChatContainer({ currentChat, test }) {
               (checkTou && allTou[0].old_tou !== touValue ? ` เปลี่ยนประเภทการใช้งานจาก ${allTou[0].old_tou_name} ⇒ ${newTouName}` : ''),
             timestamp_chat,
             step_id: 0,
-            step_name: currentStepName.current,
+            // step_name: currentStepName.current,
             od_id: chat_order_id,
             status: "e",
             checked: null,
@@ -1395,7 +1451,7 @@ export default function ChatContainer({ currentChat, test }) {
             (checkTou && allTou[0].old_tou !== touValue ? ` เปลี่ยนประเภทการใช้งานจาก ${allTou[0].old_tou_name} ⇒ ${newTouName}` : ''),
           timestamp_chat,
           step_id: 0,
-          step_name: currentStepName.current,
+          // step_name: currentStepName.current,
           od_id: chat_order_id,
           status: "e",
           checked: null,
@@ -1457,7 +1513,7 @@ export default function ChatContainer({ currentChat, test }) {
           <QRCode value={qrCode} />
         </div> */}
       <ImgFullscreen src={src} opened={fullImgOpened} handleFullImg={handleFullImg} acceptRequest={acceptRequest} />
-      {showOderDetailModal ? <ChatOrderDetail myId={userid} isBriefOpen={isBriefOpen} handleBrief={handleBrief} currentStep={curStepId} messages={messages} currentStepName={currentStepName.current} allSteps={allSteps} orderDetail={orderDetail} handleOdModal={handleOdModal} showOderDetailModal={showOderDetailModal} /> : null}
+      {showOderDetailModal ? <ChatOrderDetail cancelReq2={cancelReq2} myId={userid} isBriefOpen={isBriefOpen} handleBrief={handleBrief} currentStep={curStepId} messages={messages} currentStepName={currentStepName.current} allSteps={allSteps} orderDetail={orderDetail} handleOdModal={handleOdModal} showOderDetailModal={showOderDetailModal} /> : null}
 
       <Modal width={1000} title="" open={isModalOpen} footer="" onCancel={handleCancel}>
         {/* <ChatAddModal /> */}
@@ -1673,7 +1729,7 @@ export default function ChatContainer({ currentChat, test }) {
       </Modal>
       <div className="chat-header">
         <div className="chat-name">
-          <Link to="/chatbox" className="back-btn me-2" onClick={()=>chat_order_id = null}>
+          <Link to="/chatbox" className="back-btn me-2" onClick={() => chat_order_id = null}>
             <Icon.ArrowLeft />
           </Link>
           <img src={currentChat.urs_profile_img}></img>
@@ -1689,10 +1745,13 @@ export default function ChatContainer({ currentChat, test }) {
         </div>
 
         {chat_order_id != 0 && <><div className="status-chat-header">
-          <p>คิวที่ {orderDetail?.od_q_number}</p>
-          <p>{currentStepName?.current?.includes("แนบสลิป") || currentStepName?.current?.includes("ภาพ") ?
-            orderDetail?.artist_id == userid && 'รอ' //ถ้ามีคำว่าสลิปและเราเป็นนักวาด ให้ใส่คำว่ารอ แต่ถ้าไม่มีคำว่าสลิป และเราไม่ใช่นักวาด ให้ใส่คำว่ารอ
-            : orderDetail?.artist_id !== userid && 'รอ'}{currentStepName?.current?.includes("ภาพ") && 'อนุมัติ'}{currentStepName?.current}</p>
+          {
+            !orderDetail?.od_cancel_by && !orderDetail?.finished_at &&
+            <>
+              <p>คิวที่ {orderDetail?.od_q_number}</p>
+              <p>รอ{currentStepName?.current}</p>
+            </>
+          }
         </div>
           <button className="menu-icon-chat" onClick={handleOdModal}><Icon.Info className='' /></button></>}
 

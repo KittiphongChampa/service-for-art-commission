@@ -458,8 +458,8 @@ const NavbarAdmin = (props) => {
         <div class="nav-box" >
             <nav class="nav-container">
                 <div class="inline-nav">
-                    <a href="/search"><Icon.Search className='nav-icon' /></a>
                     <a href="/admin"><Icon.Home className='nav-icon' /></a>
+                    <a href="/"><Icon.Search className='nav-icon' /></a>
                 </div>
                 <div class="inline-nav">
 
@@ -511,7 +511,7 @@ const NavbarAdmin = (props) => {
                             <img src={admindata.admin_profile} style={{ width: "45px", height: "45px", borderRadius: "50px" }} />
                         </button>
                         <div className={`dropdown-area ${open ? 'open' : 'close'}`} >
-                            <a href="#" className="in-dropdown"><Icon.User className='nav-icon mx-2' />ตั้งค่าโปรไฟล์</a>
+                            <a href="/admin/setting-profile" className="in-dropdown"><Icon.User className='nav-icon mx-2' />ตั้งค่าโปรไฟล์</a>
                             {admindata.admin_type === 0 ? (
                                 <>
                                     <a href="/admin/adminmanage/alladmin" className="in-dropdown"><AdminPanelSettingsOutlinedIcon className='nav-icon mx-2' />จัดการแอดมิน</a>

@@ -1256,19 +1256,22 @@ div.form-order .orderSubmitBtn {
   /* offset-x | offset-y | blur-radius | color */
 }
 
-div#cms-artist-profile {
+div#cms-artist-profile,
+.cms-artist-profile {
   display: flex;
   align-items: center;
   min-width: -moz-fit-content;
   min-width: fit-content;
 }
-div#cms-artist-profile img {
+div#cms-artist-profile img,
+.cms-artist-profile img {
   border-radius: 100px;
-  width: 64px;
-  height: 64px;
+  width: 50px;
+  height: 50px;
   margin-right: 10px;
 }
-div#cms-artist-profile p {
+div#cms-artist-profile p,
+.cms-artist-profile p {
   height: -moz-fit-content;
   height: fit-content;
   width: -moz-fit-content;
@@ -1276,11 +1279,13 @@ div#cms-artist-profile p {
   font-weight: 400;
   color: #525764;
 }
-div#cms-artist-profile p > span {
+div#cms-artist-profile p > span,
+.cms-artist-profile p > span {
   font-weight: 200;
   color: gray;
 }
-div#cms-artist-profile .q {
+div#cms-artist-profile .q,
+.cms-artist-profile .q {
   font-weight: 400;
 }
 
@@ -2075,10 +2080,16 @@ p.time-sent {
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   gap: 0.6rem;
 }
+.profile-gallery-container .profile-gallery {
+  aspect-ratio: 1/1;
+}
 .profile-gallery-container .profile-gallery img {
   margin-bottom: 10px;
   border-radius: 5px;
   width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .filter {
@@ -2472,11 +2483,11 @@ table.overview-order-table th.number, table.overview-order-table th.q {
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   grid-template-rows: min-content;
   gap: 0.6rem;
-  min-height: 50rem;
 }
 .content-items div.artwork {
   overflow: hidden;
   border-radius: 0.5rem;
+  aspect-ratio: 1/1;
 }
 .content-items div.artwork img {
   -o-object-fit: cover;
@@ -2798,4 +2809,57 @@ div.text-wraper p {
   border: 1px solid rgba(199, 203, 221, 0.3647058824);
   margin-right: 10;
   width: 250px;
+}
+
+.sim-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  height: 100%;
+  overflow: hidden;
+}
+.sim-container .problem-pic-container {
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  display: flex;
+}
+.sim-container .problem-pic-container div.pic {
+  flex: 1 0 1;
+  min-height: 0;
+  margin-left: -24px;
+  margin-right: -24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+.sim-container .problem-pic-container div.pic img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.sim-container .sim-pic-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-rows: min-content;
+  gap: 0.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: auto;
+}
+.sim-container .sim-pic-container .pic-box .pic-detail {
+  text-align: center;
+}
+.sim-container .sim-pic-container .pic-box .pic-wrapper {
+  aspect-ratio: 1/1;
+  margin-left: -24px;
+  margin-right: -24px;
+}
+.sim-container .sim-pic-container .pic-box .pic-wrapper img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
 }/*# sourceMappingURL=main.css.map */

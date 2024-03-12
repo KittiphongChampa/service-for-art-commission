@@ -13,9 +13,9 @@ import { Helmet } from "react-helmet";
 // import DefaultInput from "../components/DefaultInput";
 import { NavbarUser, NavbarAdmin, NavbarGuest } from "../components/Navbar";
 import CmsItem from "../components/CmsItem";
-import { Pagination, Input, Select, Form, Tabs } from 'antd';
+import { Pagination, Input, Select, Empty, Tabs, Flex } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Keyboard, Scrollbar, Navigation} from 'swiper/modules';
+import { Keyboard, Scrollbar, Navigation } from 'swiper/modules';
 import ArtistBox from '../components/ArtistBox'
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -124,7 +124,7 @@ export default function Index() {
   //   const oldSelected = document?.getElementsByClassName("selected")
   //   oldSelected[0]?.classList.remove("selected")
   //   if (submenu == null) {
-  //     const menuSelected = document?.getElementById("foryou")
+  //     const menuSelected = document?.getElementById("explore")
   //     menuSelected?.classList.add("selected")
   //   } else {
   //     if (document.getElementById(submenu)) {
@@ -137,24 +137,32 @@ export default function Index() {
   //   }
   // }, [submenu])
 
+  useEffect(() => {
+    setActivateKey(submenu)
+  }, [submenu])
+
+
+  const [activateKey, setActivateKey] = useState('explore')
+
+
   const menus = [
     {
-      key: '1',
-      label: <Link to="/" id="foryou" >สำรวจ</Link>,
-      children: <Foryou type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
+      key: 'explore',
+      label: <Link to="/" id="explore" >สำรวจ</Link>,
+      children: <Explore type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
     },
     {
-      key: '2',
+      key: 'commissions',
       label: <Link to="/commissions" id="commissions">คอมมิชชัน</Link>,
       children: <Commissions IFollowingIDs={IFollowingIDs} />,
     },
     {
-      key: '3',
+      key: 'gallery',
       label: <Link to="/gallery" id="gallery">งานวาด</Link>,
       children: <Gallery IFollowingIDs={IFollowingIDs} />,
     },
     {
-      key: '4',
+      key: 'artists',
       label: <Link to="/artists" id="artists" >นักวาด</Link>,
       children: <Artists IFollowingIDs={IFollowingIDs} />,
     },
@@ -214,15 +222,15 @@ export default function Index() {
             </div>
 
           </div>
-          
+
         </div>
         <div className="container-xl">
-          
+
 
           <div className=" content-container user-profile-contentCard" >
             {submenu !== 'search' ? <>
               <div>
-                <Tabs defaultActiveKey="1" items={menus} />
+                <Tabs activeKey={activateKey} defaultActiveKey="explore" onChange={setActivateKey} items={menus} />
               </div>
               {submenu == null
                 ? null : submenu == "search" && <Search />}
@@ -325,7 +333,7 @@ function Commissions({ IFollowingIDs }) {
       const data = response.data;
       setCommission(data.commissions)
       setFilteredCms(data.commissions.slice(startIndex, endIndex))
-      
+
       setMessage('');
     });
   }
@@ -402,7 +410,7 @@ function Commissions({ IFollowingIDs }) {
               // onChange={handleChange}
               options={[
                 { value: 'เปิด', label: 'เปิด' },
-                { value: 'ปิด', label: 'ปิด' },
+                // { value: 'ปิด', label: 'ปิด' },
                 { value: 'ทั้งหมด', label: 'ทั้งหมด' },
                 // { value: 'disabled', label: 'Disabled', disabled: true },
               ]}
@@ -446,9 +454,13 @@ function Commissions({ IFollowingIDs }) {
             ))}
           </div>
         ) : (
-          <div className="artistbox-items">
-            <h2>{Message}</h2>
-          </div>
+          <Flex justify="center">
+            <Empty description={
+              <span>
+                ยังไม่มีข้อมูล
+              </span>
+            } />
+          </Flex>
         )}
         <Pagination
           total={commission == undefined ? 0 : commission.length}
@@ -465,7 +477,7 @@ function Commissions({ IFollowingIDs }) {
 
 }
 
-function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gallerylatest, galleryIfollow }) {
+function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gallerylatest, galleryIfollow }) {
   return (
     <>
       {isLoggedIn === true && type === "user" ? (
@@ -474,7 +486,7 @@ function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galle
             <div className="content-box">
               <div className="content-top">
                 <p className="h3">นักวาดที่คุณกำลังติดตาม</p>
-                <Link to="/homepage/artists"><p>ดูทั้งหมด&gt;</p></Link>
+                <Link to="/artists"><p>ดูทั้งหมด&gt;</p></Link>
               </div>
 
               <Swiper
@@ -502,7 +514,7 @@ function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galle
             <div className="content-box">
               <div className="content-top">
                 <p className="h3">คอมมิชชันของนักวาดที่ติดตาม</p>
-                <Link to="/homepage/commissions"><p>ดูทั้งหมด&gt;</p></Link>
+                <Link to="/commissions"><p>ดูทั้งหมด&gt;</p></Link>
               </div>
               <Swiper
                 slidesPerView="auto"
@@ -534,7 +546,7 @@ function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galle
             <div class="content-box">
               <div class="content-top">
                 <p className="h3">ผลงานนักวาดที่กำลังติดตาม</p>
-                <Link to="/homepage/gallery"><p>ดูทั้งหมด&gt;</p></Link>
+                <Link to="/gallery"><p>ดูทั้งหมด&gt;</p></Link>
               </div>
               <Swiper
                 slidesPerView="auto"
@@ -570,7 +582,7 @@ function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galle
       <div class="content-box">
         <div class="content-top">
           <p className="h3">คอมมิชชันล่าสุด</p>
-          <Link to="/homepage/commissions"><p>ดูทั้งหมด&gt;</p></Link>
+          <Link to="/commissions"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
       </div>
       <Swiper
@@ -598,7 +610,7 @@ function Foryou({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, galle
       <div class="content-box">
         <div class="content-top">
           <p className="h3">ผลงานล่าสุด</p>
-          <Link to="/homepage/gallery"><p>ดูทั้งหมด&gt;</p></Link>
+          <Link to="/gallery"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
         <Swiper
           slidesPerView="auto"
@@ -744,9 +756,13 @@ function Gallery({ IFollowingIDs }) {
           ))}
         </div>
       ) : (
-        <div className="artwork">
-          <h2>{Message}</h2>
-        </div>
+        <Flex justify="center">
+          <Empty description={
+            <span>
+              ยังไม่มีข้อมูล
+            </span>
+          } />
+        </Flex>
       )}
 
 
@@ -836,9 +852,13 @@ function Artists({ IFollowingIDs }) {
           ))}
         </div>
       ) : (
-        <div className="artistbox-items">
-          <h2>{Message}</h2>
-        </div>
+        <Flex justify="center">
+          <Empty description={
+            <span>
+              ยังไม่มีข้อมูล
+            </span>
+          } />
+        </Flex>
       )}
     </>
   )
@@ -868,8 +888,8 @@ function SearchResults({ search, user_SearchResult, cms_SearchResult, art_Search
   const menus = [
     {
       key: '1',
-      label: <Link to="/" id="foryou" >ทั้งหมด</Link>,
-      // children: <Foryou type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
+      label: <Link to="/" id="explore" >ทั้งหมด</Link>,
+      // children: <explore type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
     },
     {
       key: '2',
@@ -908,7 +928,7 @@ function SearchResults({ search, user_SearchResult, cms_SearchResult, art_Search
 
         <div className="content-top">
           <p className="h3">นักวาด</p>
-          <Link to="/homepage/artists"><p>ดูทั้งหมด&gt;</p></Link>
+          <Link to="/artists"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
 
         <Swiper
@@ -937,7 +957,7 @@ function SearchResults({ search, user_SearchResult, cms_SearchResult, art_Search
       <div className="content-box">
         <div className="content-top">
           <p className="h3">คอมมิชชัน</p>
-          <Link to="/homepage/commissions"><p>ดูทั้งหมด&gt;</p></Link>
+          <Link to="/commissions"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
       </div>
       <Swiper
@@ -970,7 +990,7 @@ function SearchResults({ search, user_SearchResult, cms_SearchResult, art_Search
       <div class="content-box">
         <div class="content-top">
           <p className="h3">ผลงาน</p>
-          <Link to="/homepage/gallery"><p>ดูทั้งหมด&gt;</p></Link>
+          <Link to="/gallery"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
         <div class="content-items">
         </div>

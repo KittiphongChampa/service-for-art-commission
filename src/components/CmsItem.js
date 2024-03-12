@@ -6,15 +6,15 @@ import { Rate } from 'antd';
 
 export default function CmsItem(props) {
     return (
-        <div class="cms-card">
+        <div className="cms-card">
             {/* <Icon.Check className="cms-status" style={{ backgroundColor: `#b7eb8f`,color:'green !important' }}/> */}
             {/* <i data-feather="check" class="nav-icon cms-status"></i> */}
             <div class="cms-card-grid">
                 <div class="cms-card-img col"
                     style={{ backgroundImage: `url("${props.src}")` }}
                 >
-<div className="status-wrapper">
-                        <p>เปิด</p> 
+                    <div className="status-wrapper">
+                        <p>เปิด</p>
                         {/* ถ้าปิดเป็น classname close */}
                     </div>
 

@@ -166,10 +166,10 @@ export default function OrderOverview() {
     }
 
     function filterRangeDate(date, dateString) {
-        const qq = allData.filter(item => isAfter(new Date(item.ordered_at), dateString[0]) && isBefore(new Date(item.ordered_at), dateString[1]))
+        const qq = allData.filter(item => isAfter(new Date(item.ordered_at), new Date(dateString[0])) && isBefore(new Date(item.ordered_at), new Date(dateString[1])))
         //dateString = อาเรย์วันที่
         sortAllData(qq)
-        // console.log(qq);
+        console.log(dateString[0], dateString[1]);
     }
 
     const [showDetail, setShowDetail] = useState('')
@@ -321,15 +321,9 @@ export default function OrderOverview() {
                 <table className="overview-order-table">
                     <tr className="table-head">
                         <th className="number">คิว</th>
-                        {/* <th className="q">คิวที่</th> */}
                         <th>ไอดีออเดอร์</th>
                         <th>คอมมิชชัน:แพ็กเกจ</th>
-                        {/* <th>ระยะเวลา(วัน)</th> */}
-                        {/* <th>เวลาที่เหลือ<Icon.Info /></th> */}
                         <th>ราคาคมช.</th>
-                        {/* <th>แก้ไข(ครั้ง)</th> */}
-                        {/* <th>ราคาแก้ไข(บาท)</th> */}
-                        {/* <th>รวม(บาท)</th> */}
                         <th>ผู้จ้าง</th>
                         <th>ความคืบหน้า</th>
                     </tr>
@@ -338,24 +332,25 @@ export default function OrderOverview() {
                         // <ShowData filteredArray={searchQuery} />
                         <>
                             {searchQuery.map((req, index) => {
-                                var currentDate = req.ordered_at;
-                                var deadline;
+                                let currentDate = new Date(req.ordered_at)
+                                let deadline = new Date(req.od_deadline)
 
-                                if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                                    currentDate = format(new Date(req.ordered_at), 'dd/MM HH:mm น.');
-                                    let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
-                                    deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                                    if (isToday(new Date(req.ordered_at))) {
-                                        currentDate = format(new Date(req.ordered_at), 'วันนี้ HH:mm น.');
-                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
-                                        deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
-
-                                    } else if (isYesterday(new Date(req.ordered_at))) {
-                                        currentDate = format(new Date(req.ordered_at), 'เมื่อวานนี้ HH:mm น.');
-                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
-                                        deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                                if (!Number.isNaN(currentDate.getTime())) {
+                                    currentDate = format(currentDate, 'dd/MM HH:mm น.');
+                                    if (isToday(currentDate)) {
+                                        currentDate = format(currentDate, 'วันนี้ HH:mm น.');
+                                    } else if (isYesterday(currentDate)) {
+                                        currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
                                     }
-                                    //ต้องเป็นวันที่รับคำขอจ้าง
+                                }
+
+                                if (!Number.isNaN(deadline.getTime())) {
+                                    deadline = format(deadline, 'dd/MM HH:mm น.');
+                                    if (isToday(deadline)) {
+                                        deadline = format(deadline, 'วันนี้ HH:mm น.');
+                                    } else if (isYesterday(deadline)) {
+                                        deadline = format(deadline, 'เมื่อวานนี้ HH:mm น.');
+                                    }
                                 }
 
                                 return (
@@ -366,7 +361,7 @@ export default function OrderOverview() {
                                             <td>{req.cms_name} : {req.pkg_name}</td>
                                             <td>{req.od_price}</td>
                                             <td>{req.customer_name}</td>
-                                            <td>{req.step_name == undefined ? "-" : req.step_name}</td>
+                                            <td>รอ{req.step_name == undefined ? "-" : req.step_name}</td>
                                         </tr>
                                         {showDetail === index + 1 + startIndex && <tr className="tr-detail">
                                             <td colSpan="12">
@@ -388,24 +383,25 @@ export default function OrderOverview() {
 
                         <>
                             {filterCmsReq && filterCmsReq.map((req, index) => {
-                                var currentDate = req.ordered_at;
-                                var deadline;
+                                let currentDate = new Date(req.ordered_at)
+                                let deadline = new Date(req.od_deadline)
 
-                                if (!Number.isNaN(new Date(req.ordered_at).getTime())) {
-                                    currentDate = format(new Date(req.ordered_at), 'dd/MM HH:mm น.');
-                                    let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
-                                    deadline = format(raw_deadline, 'dd/MM HH:mm น.');
-                                    if (isToday(new Date(req.ordered_at))) {
-                                        currentDate = format(new Date(req.ordered_at), 'วันนี้ HH:mm น.');
-                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
-                                        deadline = format(raw_deadline, 'วันนี้ HH:mm น.');
-
-                                    } else if (isYesterday(new Date(req.ordered_at))) {
-                                        currentDate = format(new Date(req.ordered_at), 'เมื่อวานนี้ HH:mm น.');
-                                        let raw_deadline = addDays(new Date(req.ordered_at), req.pkg_duration)
-                                        deadline = format(raw_deadline, 'เมื่อวานนี้ HH:mm น.');
+                                if (!Number.isNaN(currentDate.getTime())) {
+                                    currentDate = format(currentDate, 'dd/MM HH:mm น.');
+                                    if (isToday(currentDate)) {
+                                        currentDate = format(currentDate, 'วันนี้ HH:mm น.');
+                                    } else if (isYesterday(currentDate)) {
+                                        currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
                                     }
-                                    //ต้องเป็นวันที่รับคำขอจ้าง
+                                }
+
+                                if (!Number.isNaN(deadline.getTime())) {
+                                    deadline = format(deadline, 'dd/MM HH:mm น.');
+                                    if (isToday(deadline)) {
+                                        deadline = format(deadline, 'วันนี้ HH:mm น.');
+                                    } else if (isYesterday(deadline)) {
+                                        deadline = format(deadline, 'เมื่อวานนี้ HH:mm น.');
+                                    }
                                 }
 
                                 return (
