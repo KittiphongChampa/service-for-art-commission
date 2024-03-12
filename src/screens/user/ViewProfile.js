@@ -284,21 +284,29 @@ export default function ViewProfile() {
         <div class="body-nopadding" style={body}>
           <div className="cover-grid">
             <div
-              className="cover-color"
-              style={{ backgroundColor: userInfo.urs_cover_color }}
-            ></div>
+              className="cover"
+            >
+              <div
+                className="cover-color"
+                style={{ backgroundColor: userInfo.urs_cover_color }}
+              >
+              </div>
+            </div>
           </div>
           <div className="container-xl profile-page">
             <div className="user-profile-area">
               <div className="user-col-profile">
+
                 <ProfileImg
                   src={userInfo.urs_profile_img}
                   type="only-show"
                 // onPress={() => openModal("profile")}
                 />
+
                 {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
                 <p className="username-profile fs-5">{userInfo.urs_name}</p>
-                <p className="follower-profile">follower</p>
+                {/* <p className="follower-profile">follower</p> */}
+               
                 {type != "admin" ? (
                   <div className="group-btn-area">
                     {follow === "no_follow" ? (
@@ -326,37 +334,36 @@ export default function ViewProfile() {
                   </div>
                 ) : (
                   <>
-                     <div className="group-btn-area">
+                      <div className="group-btn-area">
                         <Button shape="round" danger onClick={() => setpopup(true)}>ระงับบัญชีผู้ใช้</Button>
                       </div>
-                    <Modal show={popup} onHide={Close}>
-                      <Modal.Header>
-                        <Modal.Title>เหตุผลการแบน</Modal.Title>
-                      </Modal.Header>
+                      <Modal show={popup} onHide={Close}>
+                        <Modal.Header>
+                          <Modal.Title>เหตุผลการแบน</Modal.Title>
+                        </Modal.Header>
 
-                      <Modal.Body>
-                        <Form>
-                          <Form.Control
-                            as="textarea"
-                            rows={3}
-                            placeholder="เหตุผลการแบน..."
-                            value={banReason}
-                            onChange={(e) => setBanReason(e.target.value)}
-                          />
-                        </Form>
-                      </Modal.Body>
+                        <Modal.Body>
+                          <Form>
+                            <Form.Control
+                              as="textarea"
+                              rows={3}
+                              placeholder="เหตุผลการแบน..."
+                              value={banReason}
+                              onChange={(e) => setBanReason(e.target.value)}
+                            />
+                          </Form>
+                        </Modal.Body>
 
-                      <Modal.Footer>
-                        <Button variant="secondary" onClick={Close}>
-                          ปิด
-                        </Button>
-                      ) : (
-                        <Button shape="round" onClick={eventUnfollow}>
-                          เลิกติดตาม
-                        </Button>
-                      </Modal.Footer>
-                    </Modal>
-                  </>
+                        <Modal.Footer>
+                          <Button variant="secondary" onClick={Close}>
+                            ปิด
+                          </Button>
+                          <Button variant="danger" onClick={deleteUser}>
+                            แบนไอดี
+                          </Button>
+                        </Modal.Footer>
+                      </Modal>
+                    </>
                 )}
                 <p className="bio-profile">{userInfo.urs_bio}</p>
               </div>
@@ -374,6 +381,7 @@ export default function ViewProfile() {
                       <p>
                         ผู้ติดตาม {myFollower.length}{" "}คน
                       </p>
+
                       <div>
                         {myFollowerData.map((data) => (
                           <a
@@ -390,35 +398,13 @@ export default function ViewProfile() {
                         ))}
                       </div>
                       <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
-                      <p>เป็นสมาชิกเมื่อ {userInfo.created_at}</p>
+                      <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                      
                     </div>
-                    <div className="user-about-text">
-                      <div>
-                        <p>
-                          ผู้ติดตาม {myFollower.length}{" "}คน
-                        </p>
-                        <div>
-                          {myFollowerData.map((data) => (
-                            <a
-                              key={data.id}
-                              href={`/profile/${data.id}`}
-                              style={{ display: "flex" }}
-                            >
-                              <img
-                                src={data.urs_profile_img}
-                                style={{ width: "30px" }}
-                              />
-                              <p>{data.urs_name}</p>
-                            </a>
-                          ))}
-                        </div>
-                        <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
-                        <p>เป็นสมาชิกเมื่อ {currentDate}</p>
-                      </div>
-                      <div>
-                        <p>คอมมิชชัน เปิด</p>
-                        <p>คิวว่าง 1 คิว</p>
-                      </div>
+                    <div>
+                      <p>คอมมิชชัน เปิด</p>
+                      <p>คิวว่าง 1 คิว
+                    </p>
                     </div>
                   </div>
                 </div>
@@ -448,6 +434,7 @@ export default function ViewProfile() {
   );
 }
 
+// เกี่ยวกับตรงนี้
 function AllCms(props) {
   const type = localStorage.getItem("type");
   const { myCommission, userID } = props;
