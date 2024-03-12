@@ -125,7 +125,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
             } else if (isThisYear(new Date(rawTime))) {
                 currentDate = format(new Date(rawTime), 'dd/MM HH:mm น.');
             } else {
-                currentDate = format(new Date(rawTime), 'dd/MM/yyyy HH:mm น.');
+                currentDate = format(new Date(rawTime), 'dd/MM/YYYY HH:mm น.');
             }
         }
         return currentDate
@@ -171,7 +171,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
         <>
             <ImgFullscreen src={src} opened={fullImgOpened} handleFullImg={handleFullImg} acceptRequest={acceptRequest} />
 
-            {message.step_id == 0 && message.status == "e" &&
+            {message.step_id == 0 && message.status == "e" && message?.message.includes('เปลี่ยน') &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     <p>{new Date(message.created_at).toLocaleString("th-TH", {
                         hour: "2-digit",
@@ -183,7 +183,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
 
 
             {
-                message.step_name == "ส่งคำขอจ้าง" &&
+                message?.step_name?.includes('ส่งคำขอจ้าง') &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
                         <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
@@ -207,7 +207,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
             }
 
 
-            {message.step_name.includes('รับคำขอจ้าง') && message.status !== "c" &&
+            {message?.step_name?.includes('รับคำขอจ้าง') && message.status !== "c" &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
                         hour: "2-digit",
@@ -217,7 +217,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                 </Flex>}
 
             {/*! -----but ปฏิเสธ-------*/}
-            {message.step_name.includes('รับคำขอจ้าง') && message.status == "c" &&
+            {message?.message?.includes('ยกเลิกคำขอจ้าง') && message.status == "c" &&
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="sys-dialog">
                     <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
                         hour: "2-digit",
@@ -442,7 +442,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                 </>
             }
 
-            {message?.step_name.includes("แอดมิน") && message?.status == null &&
+            {message?.step_name?.includes("แอดมิน") && message?.status == null &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
                         <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
@@ -454,7 +454,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                 </>
             }
 
-            {message?.step_name.includes("แอดมิน") && message?.status != null &&
+            {message?.step_name?.includes("แอดมิน") && message?.status != null &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
                         {/* {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>} */}

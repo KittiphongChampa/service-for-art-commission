@@ -23,10 +23,11 @@ import * as alertData from "../../alertdata/alertData";
 import { useAuth } from '../../context/AuthContext';
 import { Modal, Button, Input, Rate, Tabs, Flex } from 'antd';
 import { host } from "../../utils/api";
+import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
 
 const title = "ViewProfile";
 const bgImg = "";
-const body = { backgroundColor: "#F1F5F9" };
+const body = { backgroundColor: "white" };
 
 const toastOptions = {
   position: "bottom-right",
@@ -259,27 +260,29 @@ export default function ViewProfile() {
   function closeModal() {
     setIsModalOpened(false);
   }
+  let currentDate;
+
+  if (!Number.isNaN(new Date(userdata.created_at).getTime())) {
+    currentDate = format(new Date(userdata.created_at), 'dd/MM/yyyy');
+  }
+
+
 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
-      {showCoverModal}
-      {showProfileModal}
+      <div className="body-con">
+        <Helmet>
+          <title>{title}</title>
+        </Helmet>
 
-      {isLoggedIn ? (
-        type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
-      ) : (
-        <NavbarHomepage />
-      )}
+        {isLoggedIn ? (
+          type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+        ) : (
+          <NavbarHomepage />
+        )}
 
-      <div class="body-nopadding" style={body}>
-        <div className="cover-grid">
-          <div
-            className="cover"
-          // onClick={openModal}
-          >
+        <div class="body-nopadding" style={body}>
+          <div className="cover-grid">
             <div
               className="cover-color"
               style={{ backgroundColor: userInfo.urs_cover_color }}
@@ -323,7 +326,9 @@ export default function ViewProfile() {
                   </div>
                 ) : (
                   <>
-                    <button onClick={() => setpopup(true)}>ระงับบัญชีผู้ใช้</button>
+                     <div className="group-btn-area">
+                        <Button shape="round" danger onClick={() => setpopup(true)}>ระงับบัญชีผู้ใช้</Button>
+                      </div>
                     <Modal show={popup} onHide={Close}>
                       <Modal.Header>
                         <Modal.Title>เหตุผลการแบน</Modal.Title>
@@ -345,8 +350,9 @@ export default function ViewProfile() {
                         <Button variant="secondary" onClick={Close}>
                           ปิด
                         </Button>
-                        <Button variant="danger" onClick={deleteUser}>
-                          แบนไอดี
+                      ) : (
+                        <Button shape="round" onClick={eventUnfollow}>
+                          เลิกติดตาม
                         </Button>
                       </Modal.Footer>
                     </Modal>
@@ -386,9 +392,33 @@ export default function ViewProfile() {
                       <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
                       <p>เป็นสมาชิกเมื่อ {userInfo.created_at}</p>
                     </div>
-                    <div>
-                      <p>คอมมิชชัน เปิด</p>
-                      <p>คิวว่าง 1 คิว</p>
+                    <div className="user-about-text">
+                      <div>
+                        <p>
+                          ผู้ติดตาม {myFollower.length}{" "}คน
+                        </p>
+                        <div>
+                          {myFollowerData.map((data) => (
+                            <a
+                              key={data.id}
+                              href={`/profile/${data.id}`}
+                              style={{ display: "flex" }}
+                            >
+                              <img
+                                src={data.urs_profile_img}
+                                style={{ width: "30px" }}
+                              />
+                              <p>{data.urs_name}</p>
+                            </a>
+                          ))}
+                        </div>
+                        <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
+                        <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                      </div>
+                      <div>
+                        <p>คอมมิชชัน เปิด</p>
+                        <p>คิวว่าง 1 คิว</p>
+                      </div>
                     </div>
                   </div>
                 </div>

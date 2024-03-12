@@ -32,7 +32,7 @@
     align-items: center !important;
 }
 
-.ant-image-preview-close{
+.ant-image-preview-close {
     background-color: white;
     color: $darkMineral;
 }
@@ -646,15 +646,16 @@ div.form-order {
 
 }
 
-div#cms-artist-profile {
+div#cms-artist-profile,
+.cms-artist-profile {
     display: flex;
     align-items: center;
     min-width: fit-content;
 
     img {
         border-radius: 100px;
-        width: 64px;
-        height: 64px;
+        width: 50px;
+        height: 50px;
         margin-right: 10px;
     }
 
@@ -1046,6 +1047,7 @@ p.time-sent {
                         font-weight: 500;
                         font-size: 14px;
                     }
+
                     span.finish {
                         background-color: #42fa14;
                         color: white;
@@ -1388,7 +1390,7 @@ p.time-sent {
                             word-break: break-word;
                         }
 
-                        
+
 
                         div.att-image {
                             img {
@@ -1481,7 +1483,8 @@ p.time-sent {
     padding: 1rem;
     box-shadow: rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px;
     background-color: white;
-    img{
+
+    img {
         pointer-events: none;
         cursor: pointer;
     }
@@ -1711,10 +1714,13 @@ p.time-sent {
     gap: 0.6rem;
 
     .profile-gallery {
+        aspect-ratio: 1/1;
         img {
             margin-bottom: 10px;
             border-radius: 5px;
             width: 100%;
+            height: 100%;
+            object-fit: cover;
 
             // aspect-ratio: 1/1;
             // flex: 1 1 auto;
@@ -2228,14 +2234,15 @@ table.overview-order-table {
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-    grid-template-rows:min-content;
+    grid-template-rows: min-content;
     gap: 0.6rem;
-    min-height: 50rem;
+    // min-height: 50rem;
 
 
     div.artwork {
         overflow: hidden;
         border-radius: 0.5rem;
+        aspect-ratio: 1/1;
 
         img {
             object-fit: cover;
@@ -2657,7 +2664,7 @@ div.text-wraper {
 
 //------------------------
 
-.dashboard-item{
+.dashboard-item {
     padding: 1rem;
     border-radius: 1rem;
     background-color: white;
@@ -2665,4 +2672,72 @@ div.text-wraper {
     border: 1px solid #c7cbdd5d;
     margin-right: 10;
     width: 250px;
+}
+
+//---ตรวจสอบภาพเหมือน
+
+.sim-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    height: 100%;
+    overflow: hidden;
+
+    .problem-pic-container {
+        height: 100%;
+        min-height: 0;
+        flex-direction: column;
+        display: flex;
+
+        // background-color: black;
+        div.pic {
+            flex: 1 0 1;
+            min-height: 0;
+            // height: 80%;
+            // height: 90%;
+            margin-left: -24px;
+            margin-right: -24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+
+    }
+
+    .sim-pic-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+        grid-template-rows: min-content;
+        gap: 0.5rem;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: auto;
+
+        // background-color: pink;
+        .pic-box {
+            .pic-detail {
+                text-align: center;
+            }
+
+            .pic-wrapper {
+                aspect-ratio: 1/1;
+                margin-left: -24px;
+                margin-right: -24px;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+    }
+
 }

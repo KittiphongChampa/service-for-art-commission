@@ -20,7 +20,7 @@ import 'animate.css'
 import { waitFor } from "@testing-library/react";
 import { Container } from 'react-bootstrap/Container';
 
-export default function ChatOrderDetail({ myId, isBriefOpen, handleBrief, currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
+export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleBrief, currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
 
     function isTodayUTC7(date) {
         const dateUTC7 = addHours(date, 7); // เพิ่ม 7 ชั่วโมงเพื่อเปลี่ยนเป็นเวลาในโซนเวลา UTC+7
@@ -235,6 +235,8 @@ export default function ChatOrderDetail({ myId, isBriefOpen, handleBrief, curren
                     <Flex gap="small" className="od-edit-brief">
                         <Button shape="round" onClick={handleBrief}>ดูบรีฟ</Button>
                         <Button shape="round" onClick={handleHistoryModal}>ดูประวัติการดำเนินการ</Button>
+                        {!orderDetail.od_cancel_by && !orderDetail.finished_at && <Button shape="round" danger onClick={cancelReq2} >ยกเลิกออเดอร์</Button>}
+                        
                         {/* <Icon.Info className="ms-2" /> */}
                     </Flex>
                     <div className="od-quota-grid">

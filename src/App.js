@@ -32,6 +32,7 @@ import AdminManage from "./screens/admin/AdminManage";
 import AdminManageCms from "./screens/admin/AdminManageCms";
 import AdminManageFAQ from "./screens/admin/AdminManageFAQ";
 import AdminManageCmsProblem from './screens/admin/AdminManageCmsProblem';
+import SettingProfileAdmin from './screens/admin/SettingProfileAdmin';
 
 
 const App = () => {
@@ -75,7 +76,8 @@ const App = () => {
             <Route path="/admin/allfaq" element={<AdminManageFAQ />} />
 
             <Route path="/admin/adminmanage/:menu" element={<AdminManage />} />
-            <Route path="/admin/adminmanage/:menu/:reportid" element={<AdminManage />} />
+          <Route path="/admin/adminmanage/:menu/:reportid" element={<AdminManage />} />
+          <Route path="/admin/setting-profile" element={<SettingProfileAdmin />} />
 
           </Routes>
         </Router>
