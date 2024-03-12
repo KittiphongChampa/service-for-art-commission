@@ -54,6 +54,7 @@ const getBase64 = (file) =>
 export default function CmsDetail() {
   const token = localStorage.getItem("token");
   const type = localStorage.getItem("type");
+  const location = useLocation();
   const navigate = useNavigate();
   const cmsID = useParams();
   const [artistDetail, setArtistDetail] = useState([]);
@@ -64,12 +65,8 @@ export default function CmsDetail() {
   const [topics, setTopics] = useState([]);
   const [isOwner, setIsOwner] = useState(false);
 
-  const [queueTotal, setQueueTotal] = useState([]); //ข้อมูลของคิวที่ถูกจองและคิวทั้งหมด
-  const [queueData, setQueueData] = useState([]); //ข้อมูล
 
   const { userdata, isLoggedIn, socket } = useAuth();
-
-
 
   const time = cmsDetail.created_at;
   const date = new Date(time);
@@ -78,16 +75,8 @@ export default function CmsDetail() {
   useEffect(() => {
     getDetailCommission();
     topic();
-    getQueueData()
+    fetchData();
   }, []);
-
-  const getQueueData = async () => {
-    await axios.get(`${host}/get/queue/${cmsID}`).then((response) => {
-      const data = response.data;
-      setQueueTotal(data.QueueInfo[0])
-      setQueueData(data.QueueData)
-    })
-  }
 
   const topic = () => {
     axios.get(`${host}/getTopic`).then((response) => {
@@ -96,6 +85,14 @@ export default function CmsDetail() {
     });
   }
 
+  const [allqueueData, setAllQueueData] = useState([]);
+
+  const fetchData = () => {
+    axios.get(`${host}/getQueueData/${cmsID.id}`).then((response) => {
+      const data = response.data;
+      setAllQueueData(data.results)
+    })
+  }
 
 
   const getDetailCommission = async () => {
@@ -136,10 +133,6 @@ export default function CmsDetail() {
     return minPrice;
   }
   const minPrice = findMinPrice();
-
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const adminParam = queryParams.get("admin");
 
 
   const [touValue, setTouValue] = useState(1);
@@ -593,7 +586,7 @@ export default function CmsDetail() {
     {
       key: '3',
       label: "คิว",
-      children: <Queue cmsID={cmsID.id} cms_amount_q={cmsDetail.cms_amount_q}  queueTotal={queueTotal} queueData={queueData}/>,
+      children: <Queue cmsID={cmsID.id} cms_amount_q={cmsDetail.cms_amount_q} allqueueData={allqueueData}  />,
     },
   ];
 
@@ -724,24 +717,17 @@ export default function CmsDetail() {
 
                         <div>
                           <p>{artistDetail.artistName}</p>
-                          <p>{artistDetail.all_review}<ggIcon.Star className='fill-icon' /><span className="q">({artistDetail.total_reviews}) | ว่าง {cmsDetail.cms_amount_q - (queueTotal?.used_slots || 0)} คิว</span></p>
+                          <p>{artistDetail.all_review}<ggIcon.Star className='fill-icon' /><span className="q">({artistDetail.total_reviews}) | ว่าง {cmsDetail.cms_amount_q - (allqueueData.length || 0)} คิว</span></p>
                         </div>
 
                       </div>
                     </Link>
                     <p id="cms-price">โพสต์เมื่อ {thaiDate}</p>
-                    {/* <p id="cms-price" className="h4">
-                  เริ่มต้น {minPrice} บาท
-                </p> */}
+         
                   </div>
-                  {/* <p style={{ textAlign: "right", fontSize: "0.7rem" }}>
-                {thaiDate}
-              </p> */}
+           
                   <ImgSlide imgDetail={imgDetail} />
 
-                  {/* <p className="text-align-center mt-3 mb-3">
-                    {cmsDetail.cms_desc}
-                  </p> */}
                   <div
                     dangerouslySetInnerHTML={{ __html: cmsDetail.cms_desc }}
                     className="view ql-editor displaydesc mt-4 mb-4"
@@ -751,22 +737,14 @@ export default function CmsDetail() {
                       <ul>
                         <p>ถนัด</p>
                         <p style={{ fontWeight: "300" }}>{cmsDetail.cms_good_at}</p>
-                        {/* {goodAtItems.map((item, index) => (
-                      <li key={index}>
-                        <span>{item}</span>
-                      </li>
-                    ))} */}
+                     
                       </ul>
                     </div>
                     <div className="bad-at">
                       <ul>
                         <p>ไม่ถนัด</p>
                         <p style={{ fontWeight: "300" }}>{cmsDetail.cms_bad_at}</p>
-                        {/* {badAtItems.map((item, index) => (
-                      <li key={index}>
-                        <span>{item}</span>
-                      </li>
-                    ))} */}
+                
                       </ul>
                     </div>
 
@@ -776,64 +754,14 @@ export default function CmsDetail() {
                         <p style={{ fontWeight: "300" }}>
                           {cmsDetail.cms_no_talking}
                         </p>
-                        {/* {no_talkingAtItems.map((item, index) => (
-                      <li key={index}>
-                        <span>{item}</span>
-                      </li>
-                    ))} */}
+       
                       </ul>
                     </div>
                   </div>
-                  {/* <div className="group-submenu">
-                    <button
-                      className="sub-menu selected"
-                      onClick={
-                        !activeMenu.package
-                          ? (event) => handleMenu(event, "package")
-                          : null
-                      }
-                    >
-                      แพ็กเกจ
-                    </button>
-
-                    <button
-                      className="sub-menu"
-                      onClick={
-                        !activeMenu.review
-                          ? (event) => handleMenu(event, "review")
-                          : null
-                      }
-                    >
-                      รีวิว
-                    </button>
-                    <button
-                      className="sub-menu"
-                      onClick={
-                        !activeMenu.queue
-                          ? (event) => handleMenu(event, "queue")
-                          : null
-                      }
-                    >
-                      คิว
-                    </button>
-                  </div> */}
+      
                   <div className="mt-3 mb-3">
                     <Tabs defaultActiveKey="1" items={menus} />
                   </div>
-
-                  {/* <Queue /> */}
-
-                  {/* {activeMenu.package && (
-                    <Package
-                      pkgDetail={pkgDetail}
-                      setPkgID={handlePkgId}
-                      setPkgName={handlePkgName}
-                      // setDeadline={handleDeadline}
-                      onClick={openModal}
-                    />
-                  )}
-                  {activeMenu.review && <Review />}
-                  {activeMenu.queue && <Queue cmsID={cmsID.id} />} */}
                 </>
                 :
                 <>
@@ -1380,13 +1308,11 @@ function Review() {
 function Queue(props) {
   const cmsID = props.cmsID;
   const cms_amount_q = props.cms_amount_q;
-  const queueTotal = props.queueTotal;
-  const queueData = props.queueData;
-
+  const allqueueData = props.allqueueData; //"ไม่มีค่า"
+ 
   return (
     <>
-      <h2>คิว ({queueTotal?.used_slots || 0}/{cms_amount_q})</h2>
-      {/* <Alert message="ในตารางคิวนี้รวมคิวของคอมมิชชันอื่นของคุณBoobi ด้วย" closable type="info" showIcon className="mt-3 mb-5 " /> */}
+      <h2>คิว ({allqueueData.length}/{cms_amount_q})</h2>
       <table className="queue-table">
         <tr>
           <th className="q">คิว</th>
@@ -1395,13 +1321,13 @@ function Queue(props) {
           <th>วันที่จ้าง</th>
           <th>ความคืบหน้า</th>
         </tr>
-        {queueData.length == 0 ? (<div>
+        {allqueueData.length == 0 ? (<div>
           <h4>ยังไม่มีออเดอร์</h4>
         </div>)
           :
-          (queueData.map((data, index) => (
+          (allqueueData.map((data, index) => (
             <tr key={data.od_id}>
-              <td>{index + 1}</td>
+              <td>{data.od_q_number}</td>
               <td>{data.cms_name} : {data.pkg_name}</td>
               <td>{data.urs_name}</td>
               <td>{data.ordered_at}</td>

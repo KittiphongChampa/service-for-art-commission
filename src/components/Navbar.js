@@ -63,7 +63,7 @@ const NavbarUser = (props) => {
     };
 
     const displayNotification = (data) => {
-        console.log(data);
+        // console.log(data);
         let action;
         let read;
         let linked;

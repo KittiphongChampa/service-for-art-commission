@@ -899,7 +899,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   }
 
   //แนบสลิปแล้ว
-  function submitSlip(step_id, ModalToggle) {
+  function submitSlip(formData, ModalToggle) {
     Swal.fire({
       title: `อัปโหลดใบเสร็จชำระเงินนี้หรือไม่`,
       showCancelButton: true,
@@ -911,13 +911,15 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
         // Swal.fire("อัปโหลดสลิปแล้ว", "", "success");
         await getCurrentStep()
         changeCheckTo1Ui()
+
         const result = await axios.post(
           `${host}/messages/updatestep`,
           {
-            step_id: step_id,
+            step_id: currentStepId.current,
             od_id: chat_order_id,
           }
         );
+
         currentStepId.current = result.data.step_id;
         currentStepName.current = result.data.step_name;
         msgId.current = result.data.msgId;
@@ -945,7 +947,16 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           nowCurId: currentStepId.current
         })
         ModalToggle()
-        Swal.fire("อัปโหลดสลิปแล้ว", "", "success")
+
+        await axios.post(`${host}/upload-slip`, formData,{}).then(async(response) => {
+          const data = response.data;
+            if (data.status === 'ok') {
+              // console.log('อัปโหลดภาพสำเร็จ');
+              Swal.fire("อัปโหลดสลิปแล้ว", "", "success")
+            } else {
+              console.log('อัปโหลดภาพไม่สำเร็จ');
+            }
+        })
       }
     });
 
@@ -1151,7 +1162,6 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
     formData.append("to", currentChat.id);
     formData.append("od_id", chat_order_id);
     formData.append("image", image);
-    console.log(formData);
     await axios
       .post(`${host}/messages/addmsg`, formData, )
       .then((response) => {
@@ -1736,13 +1746,15 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
             if (isToday(thisDate)) {
               timeFormat = format(thisDate, 'วันนี้');
-            } else if (isYesterday(thisDate)) {
+            } 
+            else if (isYesterday(thisDate)) {
               timeFormat = format(thisDate, 'เมื่อวานนี้');
             } else if (isThisYear(thisDate)) {
               timeFormat = format(thisDate, 'วันที่ dd/MM');
-            } else {
-              timeFormat = format(thisDate, 'วันที่ dd/MM/yyyy');
-            }
+            } 
+            // else {
+            //   timeFormat = format(thisDate, 'วันที่ dd/MM/yyyy');
+            // }
 
 
             return (

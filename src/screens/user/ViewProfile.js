@@ -21,7 +21,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
 import * as alertData from "../../alertdata/alertData";
 import { useAuth } from '../../context/AuthContext';
-import { Modal, Button, Input, Rate, Tabs } from 'antd';
+import { Modal, Button, Input, Rate, Tabs, Flex } from 'antd';
 import { host } from "../../utils/api";
 
 const title = "ViewProfile";
@@ -36,18 +36,16 @@ const toastOptions = {
   theme: "dark",
 };
 
-
-
-
 export default function ViewProfile() {
   const jwt_token = localStorage.getItem("token");
   const type = localStorage.getItem("type");
-  const { isLoggedIn } = useAuth();
+  const { userdata, isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   const { id } = useParams();
-  const [userdata, setUserdata] = useState([]); //จะเป็นข้อมูลของคนอื่น
+  const [userInfo, setUserInfo] = useState([]); //จะเป็นข้อมูลของคนอื่น
   const [follow, setFollow] = useState([]);
+  console.log(follow);
   const [myFollower, setFollowIds] = useState([]);
   const [myFollowerData, setMyFollowerData] = useState([]);
 
@@ -59,18 +57,21 @@ export default function ViewProfile() {
   const [profileMenuSelected, setprofileMenuSelected] = useState("cms");
 
   useEffect(() => {
-    getUserProfile();
     getUserCms();
+    if (jwt_token) {
+      getUserProfile();
+    } else {
+      getUserProfile_notlogin();
+    }
   }, [])
 
   // useEffect(() => {
   //   // setLoading(true);
   //   getUserProfile();
   // }, [myFollower]);
-
-  const getUserProfile = async () => {
+  const getUserProfile_notlogin = async () => {
     await axios
-      .get(`${host}/profile/${id}`, {
+      .get(`${host}/profile_notlogin/${id}`, {
         headers: {
           Authorization: "Bearer " + jwt_token,
         },
@@ -78,7 +79,28 @@ export default function ViewProfile() {
       .then((response) => {
         const data = response.data;
         if (data.status === "ok") {
-          setUserdata(data.users[0]);
+          setUserInfo(data.users[0]);
+          setFollow(data.message);
+          setFollowIds(data.followerIds);
+        } else if (data.status === "error") {
+          toast.error(data.message, toastOptions);
+        } else {
+          toast.error("ไม่พบผู้ใช้งาน", toastOptions);
+        }
+      })
+  }
+
+  const getUserProfile = async () => {
+    await axios
+      .get(`${host}/profile/${id}?myId=${userdata.id}`, {
+        headers: {
+          Authorization: "Bearer " + jwt_token,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.status === "ok") {
+          setUserInfo(data.users[0]);
           setFollow(data.message);
           setFollowIds(data.followerIds);
         } else if (data.status === "error") {
@@ -111,27 +133,31 @@ export default function ViewProfile() {
   }
 
   const eventfollow = async () => {
-    try {
-      await axios
-        .post(
-          `${host}/follow`,
-          { id },
-          {
-            headers: {
-              Authorization: "Bearer " + jwt_token,
-            },
-          }
-        )
-        .then((response) => {
-          const data = response.data;
-          if (data.status === "ok") {
-            window.location.reload(false);
-          } else {
-            toast.error("เกิดข้อผิดพลาด", toastOptions);
-          }
-        });
-    } catch (error) {
-      // จัดการข้อผิดพลาดที่เกิดขึ้น
+    if (isLoggedIn) {
+      try {
+        await axios
+          .post(
+            `${host}/follow`,
+            { id },
+            {
+              headers: {
+                Authorization: "Bearer " + jwt_token,
+              },
+            }
+          )
+          .then((response) => {
+            const data = response.data;
+            if (data.status === "ok") {
+              window.location.reload(false);
+            } else {
+              toast.error("เกิดข้อผิดพลาด", toastOptions);
+            }
+          });
+      } catch (error) {
+        // จัดการข้อผิดพลาดที่เกิดขึ้น
+      }
+    } else {
+      openModal();
     }
   };
 
@@ -182,7 +208,7 @@ export default function ViewProfile() {
   };
   const deleteUser = async () => {
     setpopup(false);
-    const userId = userdata.id;
+    const userId = userInfo.id;
     const formData = new FormData();
     formData.append("banReason", banReason);
     await axios
@@ -210,7 +236,7 @@ export default function ViewProfile() {
     {
       key: '1',
       label: "คอมมิชชัน",
-      children: <AllCms myCommission={myCommission} userID={userdata.id} />,
+      children: <AllCms myCommission={myCommission} userID={userInfo.id} />,
     },
     {
       key: '2',
@@ -223,6 +249,16 @@ export default function ViewProfile() {
       children: <AllReviews />,
     }
   ];
+
+  const [isModalOpened, setIsModalOpened] = useState(false);
+
+  function openModal() {
+    setIsModalOpened(true);
+  }
+
+  function closeModal() {
+    setIsModalOpened(false);
+  }
 
   return (
     <>
@@ -246,19 +282,19 @@ export default function ViewProfile() {
           >
             <div
               className="cover-color"
-              style={{ backgroundColor: userdata.urs_cover_color }}
+              style={{ backgroundColor: userInfo.urs_cover_color }}
             ></div>
           </div>
           <div className="container-xl profile-page">
             <div className="user-profile-area">
               <div className="user-col-profile">
                 <ProfileImg
-                  src={userdata.urs_profile_img}
+                  src={userInfo.urs_profile_img}
                   type="only-show"
                 // onPress={() => openModal("profile")}
                 />
                 {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
-                <p className="username-profile fs-5">{userdata.urs_name}</p>
+                <p className="username-profile fs-5">{userInfo.urs_name}</p>
                 <p className="follower-profile">follower</p>
                 {type != "admin" ? (
                   <div className="group-btn-area">
@@ -272,13 +308,18 @@ export default function ViewProfile() {
                       </Button>
                     )}
 
-                    <a href={`/chatbox?id=${userdata.id}&od_id=0`}>
-                      {/* <Link to={{ pathname: "/chatbox", state: { data: id } }}> */}
-                      <Button shape="round" >
+                    {isLoggedIn ? (
+                      <a href={`/chatbox?id=${userInfo.id}&od_id=0`}>
+                        <Button shape="round">
+                          แชท
+                        </Button>
+                      </a>
+                    ) : (
+                      <Button shape="round" onClick={openModal}>
                         แชท
                       </Button>
-                      {/* </Link> */}
-                    </a>
+                    )}
+
                   </div>
                 ) : (
                   <>
@@ -311,7 +352,7 @@ export default function ViewProfile() {
                     </Modal>
                   </>
                 )}
-                <p className="bio-profile">{userdata.urs_bio}</p>
+                <p className="bio-profile">{userInfo.urs_bio}</p>
               </div>
               <div className="user-col-about">
                 {/* <div className="user-about-menu">
@@ -320,7 +361,7 @@ export default function ViewProfile() {
                 </div> */}
                 <div className="user-about-content">
                   <div className="user-about-review mb-4">
-                    <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
+                    <div className="user-about-review mb-4"><p className="fs-3">{userInfo.urs_all_review ? userInfo.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userInfo.rw_number ? userInfo.rw_number : 0} รีวิว</p></div>
                   </div>
                   <div className="user-about-text">
                     <div>
@@ -342,8 +383,8 @@ export default function ViewProfile() {
                           </a>
                         ))}
                       </div>
-                      <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
-                      <p>เป็นสมาชิกเมื่อ {userdata.created_at}</p>
+                      <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
+                      <p>เป็นสมาชิกเมื่อ {userInfo.created_at}</p>
                     </div>
                     <div>
                       <p>คอมมิชชัน เปิด</p>
@@ -357,33 +398,22 @@ export default function ViewProfile() {
               <div>
                 <Tabs defaultActiveKey="1" items={menus} />
               </div>
-              {/* <button
-                className="sub-menu selected"
-                onClick={(event) => menuProfile(event, "cms")}
-              >
-                คอมมิชชัน
-              </button>
-              <button
-                className="sub-menu"
-                onClick={(event) => menuProfile(event, "gallery")}
-              >
-                งานวาด
-              </button>
-              <button
-                className="sub-menu"
-                onClick={(event) => menuProfile(event, "review")}
-              >
-                รีวิว
-              </button>
-              {profileMenuSelected === "cms" ? (
-                <AllCms myCommission={myCommission} userID={userdata.id} />
-              ) : null}
-              {profileMenuSelected === "gallery" ? <AllArtworks /> : null}
-              {profileMenuSelected === "review" ? <AllReviews /> : null} */}
             </div>
           </div>
         </div>
       </div>
+      <Modal
+        title="คุณยังไม่ได้เข้าสู่ระบบ"
+        open={isModalOpened}
+        onCancel={closeModal}
+        footer=""
+        width={1000}
+      >
+        <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+        <Flex justify="flex-end">
+          <Link to="/login"><Button shape="round" size="large">ตกลง</Button></Link>
+        </Flex>
+      </Modal>
     </>
   );
 }

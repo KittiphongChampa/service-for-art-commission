@@ -18,17 +18,6 @@ const getBase64 = (img, callback) => {
     reader.addEventListener('load', () => callback(reader.result));
     reader.readAsDataURL(img);
 };
-const beforeUpload = (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-        alert('You can only upload JPG/PNG file!');
-    }
-    // const isLt2M = file.size / 1024 / 1024 < 2;
-    // if (!isLt2M) {
-    //     alert('Image must smaller than 2MB!');
-    // }
-    return isJpgOrPng;
-};
 
 export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
     // console.log(orderDetail);
@@ -37,6 +26,8 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
 
     const [IsModalOpen, setIsModalOpen] = useState(false)
     const stepIdRef = useRef()
+
+    const [form] = Form.useForm();
 
 
 
@@ -53,21 +44,14 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
     }
 
     const [IsReviewModalOpen, setIsReviewModalOpen] = useState(false)
+
     function ReviewModalHandle() {
         setIsReviewModalOpen(!IsReviewModalOpen)
         // alert(stepIdRef.current)
     }
 
     const [loading, setLoading] = useState(false);
-    const [imageUrl, setImageUrl] = useState();
-    const handleChange = (info) => {
 
-        getBase64(info.file.originFileObj, (url) => {
-            setLoading(false);
-            setImageUrl(url);
-        });
-        return false;
-    };
     const uploadButton = (
         <div>
             {/* {loading ? <LoadingOutlined /> : <PlusOutlined />} */}
@@ -81,11 +65,13 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
         </div>
     );
     const priceRef = useRef()
-    async function uploadSlip(stepId) {
-        const res = await submitSlip(stepId, ModalToggle)
-        // res == true && ModalToggle()
-        console.log("res=", res)
-    }
+
+    // async function uploadSlip(stepId) {
+    //     const res = await submitSlip(stepId, ModalToggle)
+    //     // res == true && ModalToggle()
+    //     console.log("res=", res)
+    // }
+
     const [reviewValue, setReviewValue] = useState(5);
     const [commentValue, setCommentValue] = useState();
     const ref = useRef()
@@ -102,8 +88,6 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
         setFullImgOpened(prevState => !prevState)
         setSrc(imgsrc)
     }
-
-
 
     const submitReview = (values) => {
         Swal.fire({
@@ -146,6 +130,41 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
         }
         return currentDate
     }
+
+    // const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+
+
+    // เกี่ยวกับการอัปโหลดรูปภาพ
+    const [imageUrl, setImageUrl] = useState();
+    const [fileList, setFileList] = useState([]);
+    const beforeUpload = (file) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+          alert('You can only upload JPG/PNG file!');
+        }
+        setFileList([...fileList, file]);
+        return isJpgOrPng; 
+    };
+
+    const handleChange = (info) => {
+        setFileList(info.fileList);
+        getBase64(info.file.originFileObj, (url) => {
+            setImageUrl(url);
+        });
+    };
+
+    const onSubmitImage = async (values) => {
+        // setLoading(true);
+        const formData = new FormData();
+        formData.append("slip_Image", fileList[0].originFileObj);
+        formData.append("od_id", orderDetail.od_id);
+        await submitSlip(formData, ModalToggle);
+    }
+
+    // -------------------------------------------------------------------
+
+
 
 
     return (
@@ -283,8 +302,8 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                             {!message?.step_name?.includes('2') ? 'ตรวจสอบใบเสร็จชำระเงินครึ่งแรก' : "ตรวจสอบใบเสร็จชำระเงินครึ่งหลัง"}
                         </p>
                     }
-                    <div onClick={() => handleFullImg("https://s359.kapook.com/pagebuilder/ba154685-db18-4ac7-b318-a4a2b15b9d4c.jpg")}>
-                        <img src="https://s359.kapook.com/pagebuilder/ba154685-db18-4ac7-b318-a4a2b15b9d4c.jpg" />
+                    <div onClick={() => handleFullImg(message.img)}>
+                        <img src={message.img} />
                     </div>
                     {orderDetail.artist_id == myId &&
                         <Flex wrap='wrap' gap='small' justify='center'>
@@ -470,30 +489,40 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
             <Modal title="แนบใบเสร็จชำระเงิน" open={IsModalOpen} footer="" onCancel={ModalToggle} style={{ maxWidth: "1000px" }}>
                 <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="big-uploader">
 
-                    <Upload
-                        name="avatar"
-                        listType="picture-card"
-                        className="avatar-uploader"
-                        showUploadList={false}
-                        // action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-                        beforeUpload={beforeUpload}
-                        onChange={handleChange}
+                    {/* เกี่ยวกับการอัพโหลดรูปภาพ */}
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        name="slip-upload"
+                        onFinish={onSubmitImage}
                     >
-                        {imageUrl ? (
-                            <img
+                        {/* เกียวกับการพรีวิว */}
+                        <Upload
+                            name="avatar"
+                            listType="picture-card"
+                            className="avatar-uploader"
+                            showUploadList={false}
+                            beforeUpload={beforeUpload}
+                            onChange={handleChange}
+                            fileList={fileList}
+                            >
+                            {imageUrl ? (
+                                <img
                                 src={imageUrl}
                                 alt="avatar"
                                 style={{
                                     width: '100%',
                                     objectFit: "cover"
                                 }}
-                            />
-                        ) : (
-                            uploadButton
-                        )}
-                    </Upload>
-                    {/* <Button icon={<UploadOutlined />} >อัปโหลดสลิป</Button> */}
-                    <Button icon={<UploadOutlined />} disabled={imageUrl === null} onClick={() => uploadSlip(stepIdRef.current)}>อัปโหลดสลิป</Button>
+                                />
+                            ) : (
+                                uploadButton
+                            )}
+                        </Upload>
+                        {/* <Button icon={<UploadOutlined />} >อัปโหลดสลิป</Button> */}
+                        <Button htmlType="submit" icon={<UploadOutlined />} disabled={imageUrl === null} >อัปโหลดสลิป</Button>
+                    </Form>
+
                 </Flex>
             </Modal>
 
