@@ -37,6 +37,7 @@ export default function Profile() {
     const { isLoggedIn, socket } = useAuth();
     const token = localStorage.getItem("token");
     const [userdata, setUserdata] = useState([]);
+    console.log(userdata.urs_type);
 
     const [showCoverModal, setShowCoverModal] = useState(false)
     const [showProfileModal, setShowProfileModal] = useState(false)
@@ -146,7 +147,7 @@ export default function Profile() {
     const [profileMenuSelected, setprofileMenuSelected] = useState('cms')
 
 
-    const menus = [
+    const menusArtist = [
         {
             key: '1',
             label: "คอมมิชชัน",
@@ -174,6 +175,14 @@ export default function Profile() {
         }
     ];
 
+    const menus = [
+        {
+            key: '4',
+            label: "ผู้ติดตาม",
+            children: <Followers myFollowerData={myFollowerData} />,
+        }
+    ];
+
     function changeMenu() {
     }
 
@@ -184,19 +193,7 @@ export default function Profile() {
         setShowProfileModal(!showProfileModal);
     }
 
-    // const { register, handleSubmit, formState: { errors }, reset } = useForm();
-
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         const colorInput = document.getElementById("color-input")
-    //         colorInput.click();
-    //     }, 300);
-
-    // }, [])
-
     const submitChangeCoverForm = (event, data) => {
-        // const colorPicker = document.getElementById("color-input");
-        // const colorValue = colorPicker.value;
         event.preventDefault()
         const formData = new FormData();
         formData.append("cover_color", selectedColor);
@@ -259,8 +256,12 @@ export default function Profile() {
     };
 
     const [selectedColor, setSelectedColor] = useState(userdata.urs_cover_color);
-    // let a = new Date(userdata.created_at)
-    // let currentDate = format(a, 'dd/MM');
+
+    let currentDate;
+
+    if (!Number.isNaN(new Date(userdata.created_at).getTime())) {
+        currentDate = format(new Date(userdata.created_at), 'dd/MM/yyyy');
+    }
 
     return (
         <div className="body-con">
@@ -301,17 +302,19 @@ export default function Profile() {
                                 <div className="user-about-content">
                                     <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
                                     <div className="user-about-text">
-                                        <Flex gap="small" vertical>
+                                        {userdata.urs_type == 1 ? 
+                                            <Flex gap="small" vertical>
                                             <p>ผู้ติดตาม {myFollowerData.length} คน</p>
                                             <p>กำลังติดตาม {IFollowerData.length} คน </p>
                                             <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
-                                            <p>เป็นสมาชิกเมื่อ {userdata.created_at}</p>
-                                            {/* <p>อัตราการทำงานสำเร็จ 
-                                                {userdata.success / userdata.cancel} %
-                                            </p> */}
-                                            {/* <p>ใช้งานล่าสุดเมื่อ 12 ชั่วโมงที่แล้ว</p> */}
-                                            {/* <p>ตอบกลับภายใน 1 ชั่วโมง</p> */}
+                                            <p>เป็นสมาชิกเมื่อ {currentDate}</p>
                                         </Flex>
+                                            :
+                                            <Flex gap="small" vertical>
+                                            <p>กำลังติดตาม {IFollowerData.length} คน </p>
+                                            <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                                        </Flex>}
+                                        
                                         <Flex gap="small" vertical>
                                             <p>คอมมิชชัน เปิด</p>
                                             <p>คิวว่าง 5 คิว</p>
@@ -325,7 +328,20 @@ export default function Profile() {
                         <div className="user-profile-contentCard">
                             {/* <button className="sub-menu selected" onClick={(event) => menuProfile(event, 'all')}>ทั้งหมด</button> */}
                             <div>
-                                <Tabs defaultActiveKey="1" items={menus} />
+                            {userdata.urs_type == 1 ? 
+                                    <>
+                                        <Tabs defaultActiveKey="1" items={menusArtist} />
+                                
+                                </>
+                                :
+                                    <>
+                                        <Tabs defaultActiveKey="4" items={menus} />
+                                
+                                </>
+                            
+                        }
+                            
+                                
                             </div>
                         </div>
                     </div>

@@ -629,7 +629,7 @@ export default function CmsDetail() {
             <Form.Item label="ประเภทการใช้งาน">
               <Radio.Group onChange={onChangeTou} value={touValue}>
                 {touDetail.map((item) => (
-                  <Radio key={item.tou_id} value={item.tou_name}>
+                  <Radio key={item.tou_id} value={item.tou_id}>
                     {item.tou_name}
                   </Radio>
                 ))}
@@ -1315,7 +1315,7 @@ function Queue(props) {
       <h2>คิว ({allqueueData.length}/{cms_amount_q})</h2>
       <table className="queue-table">
         <tr>
-          <th className="q">คิว</th>
+          <th className="q">ลำดับ</th>
           <th>คอมมิชชัน:แพคเกจ</th>
           <th>ชื่อผู้จ้าง</th>
           <th>วันที่จ้าง</th>
@@ -1327,7 +1327,7 @@ function Queue(props) {
           :
           (allqueueData.map((data, index) => (
             <tr key={data.od_id}>
-              <td>{data.od_q_number}</td>
+              <td>{index + 1}</td>
               <td>{data.cms_name} : {data.pkg_name}</td>
               <td>{data.urs_name}</td>
               <td>{data.ordered_at}</td>

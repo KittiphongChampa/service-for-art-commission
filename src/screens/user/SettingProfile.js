@@ -483,7 +483,8 @@ export default function SettingProfile() {
                 </div>
               </div>
 
-              <div className="settingCard">
+              {userdata.urs_type == 1 && 
+                <div className="settingCard">
                 <div>
                   <h2 className="h3">บัญชีพร้อมเพย์</h2>
                 </div>
@@ -546,6 +547,8 @@ export default function SettingProfile() {
                   </form>
                 </div>
               </div>
+            }
+              
 
               {/* <div style={{ border: "none", padding: "0",width: "100%",height: "fit-content"}}> */}
               <Button

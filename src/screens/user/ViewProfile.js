@@ -46,7 +46,6 @@ export default function ViewProfile() {
   const { id } = useParams();
   const [userInfo, setUserInfo] = useState([]); //จะเป็นข้อมูลของคนอื่น
   const [follow, setFollow] = useState([]);
-  console.log(follow);
   const [myFollower, setFollowIds] = useState([]);
   const [myFollowerData, setMyFollowerData] = useState([]);
 
@@ -59,6 +58,7 @@ export default function ViewProfile() {
 
   useEffect(() => {
     getUserCms();
+    // getUserArtwork();
     if (jwt_token) {
       getUserProfile();
     } else {
@@ -66,10 +66,6 @@ export default function ViewProfile() {
     }
   }, [])
 
-  // useEffect(() => {
-  //   // setLoading(true);
-  //   getUserProfile();
-  // }, [myFollower]);
   const getUserProfile_notlogin = async () => {
     await axios
       .get(`${host}/profile_notlogin/${id}`, {
@@ -262,8 +258,8 @@ export default function ViewProfile() {
   }
   let currentDate;
 
-  if (!Number.isNaN(new Date(userdata.created_at).getTime())) {
-    currentDate = format(new Date(userdata.created_at), 'dd/MM/yyyy');
+  if (!Number.isNaN(new Date(userInfo.created_at).getTime())) {
+    currentDate = format(new Date(userInfo.created_at), 'dd/MM/yyyy');
   }
 
 
@@ -289,10 +285,8 @@ export default function ViewProfile() {
               <div
                 className="cover-color"
                 style={{ backgroundColor: userInfo.urs_cover_color }}
-              >
-              </div>
+              ></div>
             </div>
-          </div>
           <div className="container-xl profile-page">
             <div className="user-profile-area">
               <div className="user-col-profile">
@@ -381,7 +375,6 @@ export default function ViewProfile() {
                       <p>
                         ผู้ติดตาม {myFollower.length}{" "}คน
                       </p>
-
                       <div>
                         {myFollowerData.map((data) => (
                           <a
@@ -399,12 +392,10 @@ export default function ViewProfile() {
                       </div>
                       <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
                       <p>เป็นสมาชิกเมื่อ {currentDate}</p>
-                      
                     </div>
                     <div>
                       <p>คอมมิชชัน เปิด</p>
-                      <p>คิวว่าง 1 คิว
-                    </p>
+                      <p>คิวว่าง 1 คิว</p>
                     </div>
                   </div>
                 </div>
@@ -417,6 +408,7 @@ export default function ViewProfile() {
             </div>
           </div>
         </div>
+      </div>
       </div>
       <Modal
         title="คุณยังไม่ได้เข้าสู่ระบบ"

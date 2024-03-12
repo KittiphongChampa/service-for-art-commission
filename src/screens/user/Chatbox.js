@@ -139,7 +139,6 @@ export default function ChatBox() {
 
   // Callback function ที่จะส่งไปยัง child
   const updateMessages = (messages) => {
-    console.log(messages);
     setMessages(messages);
   };
 

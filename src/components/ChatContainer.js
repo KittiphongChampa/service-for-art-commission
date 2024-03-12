@@ -20,7 +20,7 @@ import QRCode from "qrcode.react";
 
 import { useAuth } from '../context/AuthContext';
 
-import { host } from "../utils/api";
+import { host, phost } from "../utils/api";
 import id from "faker/lib/locales/id_ID";
 
 const generatePayload = require("promptpay-qr");
@@ -84,40 +84,6 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   const [accName, setAccName] = useState();
   const payPrice = useRef();
   const firstPayPaid = useRef();
-
-  // const getPayment = async () => {
-  //   axios.get(`${host}/getPayment/order/${chat_order_id}`).then((response) => {
-  //     const data = response.data;
-  //     var pay;
-  //     if (data.status === 'ok') {
-
-  //       const payData = data.PaymentData[0];
-
-  //       //ราคาทั้งหมดบวกกับค่าแก้ไข
-  //       // setAmount(payData.allprice)
-  //       setPhoneNumber(payData.urs_promptpay_number)
-  //       setAccName(payData.urs_account_name)
-  //       firstPayPaid.current = payData.od_first_pay //เชคว่าจ่ายยัง
-  //       if (firstPayPaid.current == null) {
-  //         //ถ้ายังไม่จ่ายครั้งแรก
-  //         payPrice.current = payData.allprice / 2
-  //         pay = payData.allprice / 2
-  //         setQrCode(generatePayload(payData.urs_promptpay_number, { pay }));
-  //         console.log(pay)
-
-  //       } else {
-  //         //ถ้าจ่ายครั้งแรกแล้ว ให้เอาราคาทั้งหมดไปรวมกันเลย
-  //         payPrice.current = payData.allprice
-  //         pay = payData.allprice
-  //         setQrCode(generatePayload(payData.urs_promptpay_number, { pay }));
-  //         console.log(pay)
-
-  //       }
-  //     } else {
-  //       console.log('error');
-  //     }
-  //   })
-  // }
 
   const getPayment = async () => {
     // alert(chat_order_id)
@@ -401,7 +367,8 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
       setMessages(
         messages.map((message) => (
           //ของเขาอัปแล้วแต่ของเรายังไม่อัปในกรณีที่เขาอนุมัติภาพแล้วและเรายังไม่อัปไอดีปัจจุบัน
-          message.msgId === msgId.current ? { ...message, checked: 1 } : message
+          // message.msgId === msgId.current ? { ...message, checked: 1 } : message
+          message.step_id ? { ...message, checked: 1 } : message
           //ถ้ามันเออเร่ออีกแล้วหา msgid ไม่เจอก็ให้เช็คทุกมันเป็น 1 ไปซะ
         ))
       )
@@ -476,9 +443,10 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
     })
   }
 
-  const updateSystemActionMsg = async ({ msgId, message, step_id, step_name, status, checked }) => {
+  const updateSystemActionMsg = async ({ img , msgId, message, step_id, step_name, status, checked }) => {
 
     socket.emit("send-msg", {
+      img: img,
       msgId: msgId,
       to: currentChat.id,
       from: userid,
@@ -496,6 +464,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
     setMessages((prevMessages) => [
       ...prevMessages,
       {
+        img: img,
         msgId: msgId,
         to: currentChat.id,
         from: userid,
@@ -739,7 +708,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             checked: 0,
           });
           // ทำการ await ก่อนที่จะทำ getCurrentStep()
-          await getCurrentStep();
+          await getCurrentStep()
           socket.emit("send-msg", {
             msgId: msgId.current,
             to: currentChat.id,
@@ -812,7 +781,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           })
           changeCheckTo1Ui()
           Swal.fire("แจ้งแก้ไขภาพแล้ว", "", "success");
-          const result = await axios.post(
+          await axios.post(
             `${host}/messages/updatestep`,
             {
               step_id: step_id,
@@ -820,6 +789,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
               od_edit: true
             }
           )
+          window.location.reload();
         }
       })
   }
@@ -898,11 +868,11 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             })
 
             //--ตั้งราคาสำเร็จและอัปเดตทุกอย่างแล้ว---
-
             await sendQrCode()
 
             Swal.fire("ตั้งราคาแล้ว", "", "success");
           } catch (error) {
+            Swal.fire("ไม่สามารถตั้งราคาได้ กรุณาลองใหม่อีกครั้ง", "", "error");
           }
         }
       });
@@ -987,31 +957,32 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           message: "แนบใบเสร็จชำระเงินแล้ว",
           od_id: chat_order_id,
           checked: 0,
-        })
-        await getCurrentStep()
-        updateSystemActionMsg({
-          msgId: msgId.current,
-          message: `แนบใบเสร็จชำระเงินแล้ว รอการตรวจสอบ`,
-          step_id: currentStepId.current,
-          step_name: currentStepName.current,
-          status: null,
-          checked: 0,
-        })
-        socket.emit("update-timeline", {
-          to: currentChat.id,
-          od_id: chat_order_id,
-          nowCurId: currentStepId.current
-        })
-        ModalToggle()
+        }).then( async() => {
 
-        await axios.post(`${host}/upload-slip`, formData,{}).then(async(response) => {
-          const data = response.data;
-            if (data.status === 'ok') {
-              // console.log('อัปโหลดภาพสำเร็จ');
-              Swal.fire("อัปโหลดสลิปแล้ว", "", "success")
-            } else {
-              console.log('อัปโหลดภาพไม่สำเร็จ');
-            }
+          await axios.post(`${host}/upload-slip`, formData,{}).then(async(response) => {
+            const data = response.data;
+              if (data.status === 'ok') {
+                console.log(data.slip_name);
+                updateSystemActionMsg({
+                  img: data.slip_name,
+                  msgId: msgId.current,
+                  message: `แนบใบเสร็จชำระเงินแล้ว รอการตรวจสอบ`,
+                  step_id: currentStepId.current,
+                  step_name: currentStepName.current,
+                  status: null,
+                  checked: 0,
+                })
+                socket.emit("update-timeline", {
+                  to: currentChat.id,
+                  od_id: chat_order_id,
+                  nowCurId: currentStepId.current
+                })
+                ModalToggle()
+                Swal.fire("อัปโหลดสลิปแล้ว", "", "success")
+              } else {
+                console.log('อัปโหลดภาพไม่สำเร็จ');
+              }
+          })
         })
       }
     });
@@ -1351,7 +1322,6 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           od_id: chat_order_id,
           checked: 0,
         }).then(async () => {
-          console.log('ทำงาน');
           await getCurrentStep()
           const formData = new FormData();
           fileList.forEach((file) => {
@@ -1407,6 +1377,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
               } else {
                 // alert('ไม่ทำงาน')
+                console.log('error');
               }
             })
         })
@@ -1420,6 +1391,69 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
 
   }
+
+
+  //ส่งภาพไฟนัล
+  const finalSubmit = async () => {
+    Swal.fire({
+      title: "ส่ง" + currentStepName?.current + "หรือไม่",
+      showCancelButton: true,
+      icon: "question",
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
+    }).then(async (result) => {
+      await addSystemMsg({
+              message: "รอแอดมินอนุมัติ",
+              step_id: currentStepId.current,
+              step_name: currentStepName.current,
+              checked: 1,
+      })
+      
+      const formData = new FormData();
+      formData.append("final_Image", fileList[0].originFileObj);
+      formData.append("userID", userid);
+      formData.append("od_id", userid);
+      axios
+      .post(`${host}/final-images/add`, formData, {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.status == "ok") {
+          formData.append("final_img_name", data.final_img_name)
+          formData.append("finalId", data.finalId)
+          axios.post(`${phost}/upload-json-finals`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then((response) => {
+            if (response.data.status === "ok") {
+              //อันนี้คือไม่มีภาพเหมือน
+              
+            } else if (response.data.status === "similar") {
+              Swal.fire({
+                title: "ระบบตรวจพบรูปภาพที่ซ้ำ รอแอดมินตรวจสอบ",
+                icon: "warning"
+              }).then(() => {
+                
+              });
+            } else {
+              Swal.fire({
+                title: "เกิดข้อผิดพลาดในการอัปโหลดไฟล",
+                icon: "error"
+              }).then(() => {
+                window.location.reload(false);
+              });
+            }
+          })
+        }
+      })
+    })
+
+  };
 
 
   // -------------------------------------------------changeOrder-----------------------------------------------
@@ -1627,7 +1661,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                 form={form}
                 layout="vertical"
                 name="login"
-                onFinish={onFinish}
+                onFinish={currentStepName.current == 'ภาพไฟนัล'? finalSubmit : onFinish}
                 autoComplete="off"
                 initialValues={{
                   final: 3,
@@ -1749,7 +1783,11 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
       </Modal>
       <div className="chat-header">
         <div className="chat-name">
-          <Link to="/chatbox" className="back-btn me-2" onClick={() => chat_order_id = null}>
+          <Link to="/chatbox" className="back-btn me-2" onClick={() => {
+            document.querySelector(".aside-chatbox").style.display = 'block';
+            document.querySelector(".chat-room").style.display = 'none';
+            document.querySelector(".aside-chatbox").classList.add("container-xl");
+          }}>
             <Icon.ArrowLeft />
           </Link>
           <img src={currentChat.urs_profile_img}></img>

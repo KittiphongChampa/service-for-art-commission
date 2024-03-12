@@ -75,7 +75,7 @@ export default function ManageCommission() {
   const { userdata, isLoggedIn, socket } = useAuth();
   const jwt_token = localStorage.getItem("token");
   let userID = userdata.id;
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [topics, setTopics] = useState([]);
 
   //---------------------------------------------------------------------
@@ -159,6 +159,7 @@ export default function ManageCommission() {
 
   const onFinish = (values) => {
 
+    setIsLoading(true)
     const formData = new FormData();
     fileList.forEach((file) => {
       formData.append("image_file", file.originFileObj);
@@ -239,6 +240,7 @@ export default function ManageCommission() {
                 window.location.reload(false);
               });
             }
+            setIsLoading(false)
           })
         } else if (data.status == "error") {
           console.log("error");
@@ -267,8 +269,8 @@ export default function ManageCommission() {
       btn,
       duration: 0,
       placement: "bottomRight",
-      // icon: <LoadingOutlined style={{ color: '#108ee9' }} />
-      icon: <Progress type="circle" percent={50} size={20} />,
+      icon: <LoadingOutlined style={{ color: '#108ee9' }} />
+
     });
   };
 
@@ -883,7 +885,7 @@ export default function ManageCommission() {
                   ></Select>
                 </Form.Item>
                 <Flex justify="flex-end">
-                  <Button size="large" type="primary" htmlType="submit" shape="round">บันทึก</Button>
+                  <Button size="large" type="primary" htmlType="submit" shape="round" loading={isLoading}>บันทึก</Button>
                 </Flex>
               </Form>
               <br />
