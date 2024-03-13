@@ -63,7 +63,7 @@ export default function Welcome() {
           </div>
 
 
-          <div className="section-wrapper container-xl" >
+         <div className="section-wrapper container-xl" >
             {/* ช่องคอมมิชชันคือไร */}
             <div className="cms-section">
               <div className="icon">
@@ -73,12 +73,12 @@ export default function Welcome() {
               <p>art commission คือ การจ้างนักวาดให้สร้างผลงานศิลปะตามคำร้องของผู้จ้าง ไม่ใช่การซื้อผลงานที่นักวาดสร้างขึ้นก่อนแล้ว โดยเรื่องราคาจะขึ้นอยู่กับรายละเอียดของงานและจุดประสงค์การใช้ โดยประเภทของสิทธิ์ต่างๆมีดังนี้</p>
               <p>Personal use : ใช้ส่วนตัว ไม่สามารถใช้เชิงพาณิชย์ได้,License : สามารถนำไปทำบางอย่างได้ เช่น ใช้ในเชิงพาณิชย์ ทั้งนี้ทั้งนั้นขึ้นอยู่กับข้อตกลงว่าสามารถทำอะไรได้บ้าง,Exclusive right : สามารถนำผลงานไปทำอะไรก็ได้ อาทิ การนำไปดัดแปลง ขายต่อ เป็นต้น ลิขสิทธิ์อยู่ที่ผู้ซื้อ แต่นักวาดยังมีเครดิตในผลงานอยู่</p>
               <div className='cms-img'>
-                <img />
-              </div>
+                <img src='./images/รูปหน้าhome.png' alt='รูป art commission คืออะไร' style={{objectFit:'contain',width:"100%",height:"100%"}} />
+              </div> 
             </div>
 
             {/* ช่องระบบ */}
-            <div className="sys-section">
+            {/* <div className="sys-section">
               <div className="sys-img">
                 <img src="seamoon.jpg" />
               </div>
@@ -103,10 +103,10 @@ export default function Welcome() {
 
                 <Button shape='round' size='large'>สมัครเป็นนักวาด</Button>
               </div>
-            </div>
+            </div> */}
           </div>
 
-          <footer className="w-100 py-4 flex-shrink-0" style={{ backgroundColor: "#525764" }}>
+          {/* <footer className="w-100 py-4 flex-shrink-0" style={{ backgroundColor: "#525764" }}>
             <div className="container-xl py-4">
               <div className="row gy-4 gx-5">
                 <div className="col-lg-4 col-md-6">
@@ -144,7 +144,7 @@ export default function Welcome() {
                 </div>
               </div>
             </div>
-          </footer>
+          </footer> */}
 
 
         </div>

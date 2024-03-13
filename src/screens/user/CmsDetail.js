@@ -1211,7 +1211,7 @@ function Package(props) {
             </div>
             <div>
               <p>ระยะเวลาทำงาน {pkg.pkg_duration} วัน</p>
-              <p>ประเภทงานที่อนุญาต ทุกประเภท</p>
+              {/* <p>ประเภทงานที่อนุญาต ทุกประเภท</p> */}
               <p>จำนวนครั้งแก้ไขงาน {pkg.pkg_edits} ครั้ง</p>
             </div>
           </div>
@@ -1228,7 +1228,7 @@ function Package(props) {
           </div>
           <div>
             <p>ระยะเวลาทำงาน {pkgDetail.pkg_duration} วัน</p>
-            <p>ประเภทงานที่อนุญาต ทุกประเภท</p>
+            {/* <p>ประเภทงานที่อนุญาต ทุกประเภท</p> */}
             <p>จำนวนครั้งแก้ไขงาน {pkgDetail.pkg_edits} ครั้ง</p>
           </div>
         </div>
@@ -1312,7 +1312,7 @@ function Queue(props) {
  
   return (
     <>
-      <h2>คิว ({allqueueData.length}/{cms_amount_q})</h2>
+      <h2 className='h3'>คิว ({allqueueData.length}/{cms_amount_q})</h2>
       <table className="queue-table">
         <tr>
           <th className="q">ลำดับ</th>

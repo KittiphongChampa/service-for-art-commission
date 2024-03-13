@@ -1100,12 +1100,25 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             nowCurId: currentStepId.current
           })
           if (step_name?.includes('2')) {
-            await addSystemMsg({
-              message: "รอแอดมินอนุมัติ",
+            await axios.post(`${host}/messages/addmsg`, {
+              from: userid,
+              to: currentChat.id,
+              message: "รีวิว",
+              step_id: currentStepId.current,
+              od_id: chat_order_id,
+              checked: 0,
+            })
+            
+            await updateSystemActionMsg({
+              message: "รีวิว",
               step_id: currentStepId.current,
               step_name: currentStepName.current,
-              checked: 1,
+              checked: 0,
             })
+            await axios.post(`${host}/finishorder`, {
+              od_id : chat_order_id
+            })
+            
           } else {
             //เพิ่มเดดไลน์
             await axios.post(
@@ -1165,6 +1178,8 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
   //ส่งรีวิว
   const sendReview = async () => {
+    // ReviewModalHandle()
+    // Swal.fire("รีวิวสำเร็จแล้ว", "", "success");
 
     //1.1 ไปอัปเดต ui ให้เป็นเช็ค 1
     changeCheckTo1Ui()
@@ -1176,9 +1191,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
         step_id: currentStepId.current,
         od_id: chat_order_id
       }
-    );
-
-    Swal.fire("รีวิวสำเร็จแล้ว", "", "success");
+    )
   }
 
   //*---------------------------------------------------------------------
@@ -1388,72 +1401,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
     })
 
     //เอาสเตตัสปจบ.มา+เอาไอดีของแชทที่ดึงออกมาด้วย
-
-
   }
-
-
-  //ส่งภาพไฟนัล
-  const finalSubmit = async () => {
-    Swal.fire({
-      title: "ส่ง" + currentStepName?.current + "หรือไม่",
-      showCancelButton: true,
-      icon: "question",
-      confirmButtonText: "ยืนยัน",
-      cancelButtonText: "ยกเลิก",
-    }).then(async (result) => {
-      await addSystemMsg({
-              message: "รอแอดมินอนุมัติ",
-              step_id: currentStepId.current,
-              step_name: currentStepName.current,
-              checked: 1,
-      })
-      
-      const formData = new FormData();
-      formData.append("final_Image", fileList[0].originFileObj);
-      formData.append("userID", userid);
-      formData.append("od_id", userid);
-      axios
-      .post(`${host}/final-images/add`, formData, {
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.status == "ok") {
-          formData.append("final_img_name", data.final_img_name)
-          formData.append("finalId", data.finalId)
-          axios.post(`${phost}/upload-json-finals`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }).then((response) => {
-            if (response.data.status === "ok") {
-              //อันนี้คือไม่มีภาพเหมือน
-              
-            } else if (response.data.status === "similar") {
-              Swal.fire({
-                title: "ระบบตรวจพบรูปภาพที่ซ้ำ รอแอดมินตรวจสอบ",
-                icon: "warning"
-              }).then(() => {
-                
-              });
-            } else {
-              Swal.fire({
-                title: "เกิดข้อผิดพลาดในการอัปโหลดไฟล",
-                icon: "error"
-              }).then(() => {
-                window.location.reload(false);
-              });
-            }
-          })
-        }
-      })
-    })
-
-  };
 
 
   // -------------------------------------------------changeOrder-----------------------------------------------
@@ -1661,7 +1609,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                 form={form}
                 layout="vertical"
                 name="login"
-                onFinish={currentStepName.current == 'ภาพไฟนัล'? finalSubmit : onFinish}
+                onFinish={onFinish}
                 autoComplete="off"
                 initialValues={{
                   final: 3,
@@ -1709,7 +1657,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                 onFinish={submitChangeOrder}>
                 <Flex vertical>
                   <Checkbox checked={checkTou}
-                    disabled={orderDetail.finised_at != null}
+                    disabled={orderDetail.finised_at != null || orderDetail.od_cancel_by != null}
                     onChange={(event) => setCheckTou(event.target.checked)}>
                     <p className="h6">เปลี่ยนประเภทการใช้งาน</p>
                   </Checkbox>
@@ -1723,7 +1671,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                       </Radio.Group>
                     </Form.Item>
                   </>}
-                  <Checkbox checked={checkPrice} disabled={orderDetail.od_price == null || orderDetail.finised_at != null}
+                  <Checkbox checked={checkPrice} disabled={orderDetail.od_price == null || orderDetail.finised_at != null || orderDetail.od_cancel_by != null}
                     onChange={(event) => setCheckPrice(event.target.checked)}>
                     <p className="h6">เปลี่ยนราคาคอมมิชชัน {orderDetail.od_price == null && "เปลี่ยนแปลงราคาปัจจุบันได้หลังจากกำหนดราคาแล้ว"}</p>
                   </Checkbox>

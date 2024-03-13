@@ -177,7 +177,7 @@ export default function Profile() {
 
     const menus = [
         {
-            key: '4',
+            key: '1',
             label: "ผู้ติดตาม",
             children: <Followers myFollowerData={myFollowerData} />,
         }
@@ -303,23 +303,26 @@ export default function Profile() {
                                     <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
                                     <div className="user-about-text">
                                         {userdata.urs_type == 1 ? 
+                                            <>
                                             <Flex gap="small" vertical>
                                             <p>ผู้ติดตาม {myFollowerData.length} คน</p>
                                             <p>กำลังติดตาม {IFollowerData.length} คน </p>
                                             <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
                                             <p>เป็นสมาชิกเมื่อ {currentDate}</p>
-                                        </Flex>
+                                            </Flex>
+                                            <Flex gap="small" vertical>
+                                            <p>คอมมิชชัน เปิด</p>
+                                            <p>คิวว่าง 5 คิว</p>
+
+                                                </Flex>
+                                                </>
                                             :
                                             <Flex gap="small" vertical>
                                             <p>กำลังติดตาม {IFollowerData.length} คน </p>
                                             <p>เป็นสมาชิกเมื่อ {currentDate}</p>
                                         </Flex>}
                                         
-                                        <Flex gap="small" vertical>
-                                            <p>คอมมิชชัน เปิด</p>
-                                            <p>คิวว่าง 5 คิว</p>
-
-                                        </Flex>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -335,7 +338,7 @@ export default function Profile() {
                                 </>
                                 :
                                     <>
-                                        <Tabs defaultActiveKey="4" items={menus} />
+                                        <Tabs defaultActiveKey="1" items={menus} />
                                 
                                 </>
                             

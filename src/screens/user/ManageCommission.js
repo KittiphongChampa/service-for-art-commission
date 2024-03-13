@@ -270,7 +270,6 @@ export default function ManageCommission() {
       duration: 0,
       placement: "bottomRight",
       icon: <LoadingOutlined style={{ color: '#108ee9' }} />
-
     });
   };
 
@@ -375,8 +374,8 @@ export default function ManageCommission() {
 
 
 
-                <Row>
-                  <Col flex="auto" >
+                {/* <Row> */}
+                  {/* <Col flex="auto" > */}
                     <Form.Item
                       label="ชื่อคอมมิชชัน"
                       name="cmsName"
@@ -391,8 +390,8 @@ export default function ManageCommission() {
                     >
                       <Input />
                     </Form.Item>
-                  </Col>
-                  <Col flex="100px" style={{ marginLeft: "10px" }}>
+                  {/* </Col> */}
+                  {/* <Col flex="100px" style={{ marginLeft: "10px" }}>
                     <Form.Item
                       name="status"
                       label="สถานะ"
@@ -412,9 +411,9 @@ export default function ManageCommission() {
                           }
                         ]} />
                     </Form.Item>
-                  </Col>
+                  </Col> */}
 
-                </Row>
+                {/* </Row> */}
 
 
                 <Form.Item

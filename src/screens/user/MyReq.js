@@ -219,7 +219,7 @@ export default function MyReq() {
                             <tr className="table-head">
                                 <th>ไอดีออเดอร์</th>
                                 <th>คอมมิชชัน:แพ็กเกจ</th>
-                                <th>ราคาคมช.</th>
+                                <th>ราคา</th>
                                 <th>นักวาด</th>
                                 <th>ความคืบหน้า</th>
                             </tr>

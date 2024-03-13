@@ -323,7 +323,7 @@ export default function OrderOverview() {
                         <th className="number">คิว</th>
                         <th>ไอดีออเดอร์</th>
                         <th>คอมมิชชัน:แพ็กเกจ</th>
-                        <th>ราคาคมช.</th>
+                        <th>ราคา</th>
                         <th>ผู้จ้าง</th>
                         <th>ความคืบหน้า</th>
                     </tr>
@@ -452,7 +452,7 @@ export default function OrderOverview() {
                                 key: 'cma_name',
                             },
                             {
-                                title: 'ราคาคมช.',
+                                title: 'ราคา',
                                 dataIndex: 'od_price',
                                 key: 'od_price',
                             },
@@ -516,7 +516,7 @@ export default function OrderOverview() {
                                 key: 'cma_name',
                             },
                             {
-                                title: 'ราคาคมช.',
+                                title: 'ราคา',
                                 dataIndex: 'od_price',
                                 key: 'od_price',
                             },
@@ -591,6 +591,7 @@ export default function OrderOverview() {
             /> */}
 
             <Pagination
+                className="mt-4"
                 total={filterCmsReq == undefined ? 0 : filterCmsReq.length}
                 showQuickJumper
                 showTotal={(total) => `จำนวน ${total} รายการ`}

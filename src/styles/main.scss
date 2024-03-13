@@ -807,7 +807,7 @@ div.select-package-item {
 }
 
 table.queue-table {
-    width: 70%;
+    width: 100%;
     margin-inline: auto;
 
 
@@ -2638,20 +2638,20 @@ div.text-wraper {
     }
 }
 
-.anima {
-    animation: move 10s linear infinite;
-    padding-left: 100%;
-}
+// .anima {
+//     animation: move 10s linear infinite;
+//     padding-left: 100%;
+// }
 
-@keyframes move {
-    0% {
-        transform: translate(0, 0);
-    }
+// @keyframes move {
+//     0% {
+//         transform: translate(0, 0);
+//     }
 
-    100% {
-        transform: translate(-100%, 0);
-    }
-}
+//     100% {
+//         transform: translate(-100%, 0);
+//     }
+// }
 
 
 .report-grid {

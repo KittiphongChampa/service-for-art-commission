@@ -107,8 +107,14 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                         artist_id: orderDetail.artist_id,
                         all: orderDetail
                     }
-                );
-                sendReview()
+                ).then((response) => {
+                    const data = response.data
+                    if (data.status == "ok") {
+                        ReviewModalHandle()
+                        Swal.fire("รีวิวสำเร็จแล้ว", "", "success");
+                    }
+                })
+                sendReview(ReviewModalHandle)
             }
         });
     };
@@ -427,11 +433,11 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                             hour: "2-digit",
                             minute: "2-digit",
                         })} น.</p>
-                        {orderDetail.artist_id == myId ? <p>รีวิว</p> : <p>รีวิว</p>}
-                        <p><u>ลิ้งโหลดงาน</u></p>
+                        {orderDetail.artist_id == myId ? <p>งานคอมมิชชันเสร็จสิ้นแล้ว รอลูกค้ารีวิว</p> : <p>งานคอมมิชชันเสร็จสิ้นแล้ว </p>}
+                        {/* <p><u>ลิ้งโหลดงาน</u></p> */}
 
                         {orderDetail.artist_id !== myId ?
-                            message.checked !== 0 ?
+                            message.checked == 0 ?
                                 <>
                                     <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
                                 </>

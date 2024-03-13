@@ -22,6 +22,8 @@ export default function Dashboard() {
 
   const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1)); // วันแรกของปีปัจจุบัน
   const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), 11, 31)); // วันสุดท้ายของปีปัจจุบัน
+  console.log(startDate);
+  console.log(endDate);
 
   const [topCMS, setTopCMS] = useState([]);
   const [topCTM, setTopCtm] = useState([]);
@@ -97,7 +99,7 @@ export default function Dashboard() {
     let newEndDate = new Date();
 
     switch (filterType) {
-      case "year":
+      case 'year':
         newStartDate = new Date(currentDate.getFullYear(), 0, 1);
         newEndDate = new Date(currentDate.getFullYear(), 11, 31);
         break;
@@ -142,8 +144,8 @@ export default function Dashboard() {
   useEffect(() => {
     // getCountTopic();
     if (status === true) {
-      getYearData(startDate, endDate);
-      getYearDataBenefit(startDate, endDate);
+      // getYearData(startDate, endDate);
+      // getYearDataBenefit(startDate, endDate);
     } else {
       getOutOfYearData(startDate, endDate);
       getOutOfYearBenefit(startDate, endDate);
@@ -280,13 +282,13 @@ export default function Dashboard() {
   // การทำงาน filter ของรายได้
   const getYearDataBenefit = async (start, end) => {
     const response = await axios.get(`${host}/get/profit/yeardata`, {
-      params: {
-        startDate: start,
-        endDate: end,
-      },
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
+      },
+      params: {
+        startDate: start,
+        endDate: end,
       },
     });
 
@@ -434,7 +436,7 @@ export default function Dashboard() {
           </select>
         </div>
 
-        <div style={{ display: "flex", marginTop: "15px" }}>
+        {/* <div style={{ display: "flex", marginTop: "15px" }}>
           <div
             style={{
               borderRadius: "20px",
@@ -448,7 +450,8 @@ export default function Dashboard() {
             <BarChart barChartData={barChartData} />
           </div>
 
-          {/* <div
+        </div> */}
+        {/* <div
                 style={{
                   borderRadius: "20px",
                   border: "3px",
@@ -460,8 +463,6 @@ export default function Dashboard() {
                 <h4>หัวข้อที่นิยม</h4>
                 <PieChart countTopic={countTopic}/>
               </div> */}
-
-        </div>
 
         <div style={{ display: "flex", marginTop: "15px" }}>
           <div
