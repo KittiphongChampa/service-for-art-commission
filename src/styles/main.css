@@ -428,6 +428,14 @@ button {
   :where(.css-dev-only-do-not-override-1k979oh).ant-modal {
     max-width: none !important;
   }
+  .search-container {
+    padding: 10rem 0 !important;
+  }
+  .chat-sender {
+    padding: 10px !important;
+    -moz-column-gap: 0.5rem;
+         column-gap: 0.5rem;
+  }
 }
 @media (min-width: 0px) and (max-width: 767px) {
   .sys-section {
@@ -1633,6 +1641,7 @@ p.time-sent {
   flex-direction: column;
   border-radius: 26px 0 0 26px;
   position: relative;
+  min-width: 0;
 }
 .chatbox-container .chat-room .chat-header,
 .chatbox-container .aside-main-card .chat-header {
@@ -1692,11 +1701,13 @@ p.time-sent {
   -moz-column-gap: 1rem;
        column-gap: 1rem;
   border-radius: 0 0 0 26px;
+  min-width: 0;
 }
 .chatbox-container .chat-room .chat-sender input,
 .chatbox-container .aside-main-card .chat-sender input {
   padding: 0.5rem 1rem;
   border-radius: 1rem;
+  min-width: 0;
   width: 100%;
 }
 .chatbox-container .chat-room .chat,

@@ -71,7 +71,6 @@ export default function MyReq() {
             //หน้าเพจ - 1 = index 0 * จำนวนแสดงต่อหน้า 0-9 10-19 20-29
             const newStartIndex = (activePage - 1) * itemsPerPage;
             //เอาจำนวนที่เริ่ม + จำนวนที่แสดง (0+10 = 10) จะเป็น index 0-10 
-
             const newEndIndex = newStartIndex + (itemsPerPage);
             //index เริ่มและ index สุดท้าย
             setFilteredData(filteredData.slice(newStartIndex, newEndIndex))
@@ -262,6 +261,7 @@ export default function MyReq() {
                         </table>
 
                         <Pagination
+                            className="mt-4"
                             total={filteredData == undefined ? 0 : filteredData.length}
                             showQuickJumper
                             showTotal={(total) => `จำนวน ${total} รายการ`}

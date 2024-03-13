@@ -1117,6 +1117,7 @@ p.time-sent {
         flex-direction: column;
         border-radius: 26px 0 0 26px;
         position: relative;
+        min-width: 0;
 
         .chat-header {
             border-radius: 0rem 0rem 0rem 1.625rem;
@@ -1188,12 +1189,14 @@ p.time-sent {
             display: flex;
             column-gap: 1rem;
             border-radius: 0 0 0 26px;
+            min-width: 0;
 
             // height: 2rem
 
             input {
                 padding: 0.5rem 1rem;
                 border-radius: 1rem;
+                min-width: 0;
                 // border: 1px solid #CACACA;
                 // background: #ffffff;
                 width: 100%;

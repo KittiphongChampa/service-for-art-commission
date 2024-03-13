@@ -232,7 +232,7 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
                     {/* <p>01:23:58</p> */}
 
 
-                    <Flex gap="small" className="od-edit-brief">
+                    <Flex gap="small" className="od-edit-brief" wrap="wrap" justify="center">
                         <Button shape="round" onClick={handleBrief}>ดูบรีฟ</Button>
                         <Button shape="round" onClick={handleHistoryModal}>ดูประวัติการดำเนินการ</Button>
                         {!orderDetail.od_cancel_by && !orderDetail.finished_at && <Button shape="round" danger onClick={cancelReq2} >ยกเลิกออเดอร์</Button>}
@@ -247,7 +247,7 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
                         <p className="quota-headding">ประเภทงาน</p>
                         <p className="quota-amount">{orderDetail?.tou}</p>
                         <p className="quota-headding">กำหนดส่ง</p>
-                        <p className="quota-amount">{format(new Date(orderDetail?.od_deadline),'dd/MM HH:mm น.')}</p>
+                        <p className="quota-amount">-</p>
                     </div>
                     <Flex justify="flex-start" style={{ width: "100%" }}>
 

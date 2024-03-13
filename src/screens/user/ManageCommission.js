@@ -370,9 +370,6 @@ export default function ManageCommission() {
                   </Modal>
                 </Form.Item>
 
-
-
-
                 <Row>
                   <Col flex="auto" >
                     <Form.Item
@@ -644,6 +641,9 @@ export default function ManageCommission() {
                                     required: true,
                                     message: "กรุณาใส่คำอธิบาย",
                                   },
+                                  {
+                                    min: 1
+                                  },
                                   { type: "number" },
                                 ]}
                               >
@@ -659,6 +659,9 @@ export default function ManageCommission() {
                                   {
                                     required: true,
                                     message: "กรุณาใส่คำอธิบาย",
+                                  },
+                                  {
+                                    min: 0
                                   },
                                   { type: "number" },
                                 ]}
@@ -790,7 +793,7 @@ export default function ManageCommission() {
                                               },
                                             ]}
                                           >
-                                            <Input placeholder="ตัวอย่าง ภาพลงสี" />
+                                            <Input placeholder="ตัวอย่าง ภาพลงสี" prefix='ภาพ' />
                                           </Form.Item>
                                           <MinusCircleOutlined
                                             onClick={() =>

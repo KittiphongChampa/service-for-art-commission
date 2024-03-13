@@ -357,10 +357,10 @@ export default function Report(props) {
                     </div>
                   )}
 
-                  <div>
+                  {/* <div>
                     <p className="h6">อีเมลติดต่อกลับ</p>
                     <p>{reportDetail.sendrp_email}</p>
-                  </div>
+                  </div> */}
                 </Flex>
               </div>
             </Card>
@@ -389,10 +389,10 @@ export default function Report(props) {
                                 <p>{data.sendrp_link}</p>
                             </div>
                           )}
-                          <div>
+                          {/* <div>
                               <p className="h6">อีเมลติดต่อกลับ</p>
                               <p>{data.sendrp_email}</p>
-                          </div>
+                          </div> */}
 
                           {data.status !== null ? (
                             <div>

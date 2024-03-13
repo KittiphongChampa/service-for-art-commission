@@ -463,6 +463,7 @@ function Commissions({ IFollowingIDs }) {
           </Flex>
         )}
         <Pagination
+          className="mt-4"
           total={commission == undefined ? 0 : commission.length}
           showQuickJumper
           showTotal={(total) => `จำนวน ${total} รายการ`}
