@@ -201,6 +201,7 @@ export default function CmsDetail() {
             title: `${newStatus}คอมมิชชันแล้ว`,
             confirmButtonText: 'ตกลง',
           })
+          window.location.reload()
 
         }
 

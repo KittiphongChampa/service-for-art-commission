@@ -498,6 +498,10 @@ export default function ManageCommission() {
                         required: true,
                         message: "กรุณาใส่จำนวนคิว",
                       },
+                      // {
+                      //   min:1
+                      // },
+
                       { type: "number" },
                     ]}
                   >
@@ -645,6 +649,9 @@ export default function ManageCommission() {
                                     required: true,
                                     message: "กรุณาใส่คำอธิบาย",
                                   },
+                                  // {
+                                  //   min:1
+                                  // },
                                   { type: "number" },
                                 ]}
                               >
@@ -661,6 +668,9 @@ export default function ManageCommission() {
                                     required: true,
                                     message: "กรุณาใส่คำอธิบาย",
                                   },
+                                  // {
+                                  //   min:0
+                                  // },
                                   { type: "number" },
                                 ]}
                               >
@@ -754,7 +764,8 @@ export default function ManageCommission() {
                                       >
                                         <Input
                                           placeholder="ตัวอย่าง ภาพลงสี"
-                                          defaultValue="ภาพร่าง"
+                                          defaultValue="ร่าง"
+                                          prefix="ภาพ"
                                           readOnly
                                         />
                                       </Form.Item>
@@ -791,7 +802,7 @@ export default function ManageCommission() {
                                               },
                                             ]}
                                           >
-                                            <Input placeholder="ตัวอย่าง ภาพลงสี" />
+                                            <Input prefix="ภาพ" placeholder="ตัวอย่าง ภาพลงสี" />
                                           </Form.Item>
                                           <MinusCircleOutlined
                                             onClick={() =>
@@ -837,7 +848,8 @@ export default function ManageCommission() {
                                       <Form.Item name="final">
                                         <Input
                                           placeholder="ตัวอย่าง ภาพลงสี"
-                                          defaultValue="ภาพไฟนัล"
+                                          defaultValue="ไฟนัล"
+                                          prefix="ภาพ"
                                           readOnly
                                         />
                                       </Form.Item>
