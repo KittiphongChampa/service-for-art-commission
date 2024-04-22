@@ -17,7 +17,7 @@ const NavbarUser = (props) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false)
     const dropdownRef = useRef();
-    const { userdata, socket } = useAuth();
+    const { userdata, socket, logout } = useAuth();
 
     useEffect(() => {
         let handler = (event) => {
@@ -33,15 +33,29 @@ const NavbarUser = (props) => {
         }
     }, [])
 
+    const notiRef = useRef();
+    useEffect(() => {
+        let handler = (event) => {
+            if (!notiRef.current.contains(event.target)) {
+                setOpenNoti(false)
+            }
+        }
+        document.addEventListener("mousedown", handler);
+
+        return () => {
+            document.removeEventListener("mousedown", handler);
+        }
+    }, [])
+
     // ส่วนของการแสดงผล noti
     const [notifications, setNotifications] = useState([]);
+
     const [openNoti, setOpenNoti] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (socket) {
             socket.on('getNotification', (data) => {
-                console.log(data);
                 setNotifications((prev) => {
                     // เพิ่มการแจ้งเตือนที่มาใหม่ไปที่ตำแหน่งแรกของอาร์เรย์
                     prev.unshift(data.data);
@@ -60,25 +74,33 @@ const NavbarUser = (props) => {
     // ทำงานหลังจากกดอ่านแจ้งเตือน
     const handleNotificationClick = async (keyData, action) => {
         await axios.put(`${host}/noti/readed/?order_keyData=${keyData}&action=${action}`)
+        hasnotread = notifications.some((noti) => noti.noti_read === 0);
     };
 
+    //การแจ้งเตือนของ users
     const displayNotification = (data) => {
         // console.log(data);
         let action;
         let read;
         let linked;
         let keyData;
+        let system = "แจ้งเตือนระบบ";
         if (data.msg === 'รับคำขอจ้าง') {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
 
-        } else if (data.msg === 'ไม่รับคำขอจ้าง') {
+        } else if (data.msg === 'ยกเลิกคำขอจ้าง') {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
 
         } else if (data.msg === 'ได้ส่งภาพร่าง') {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
+        } else if (data.msg === "ได้ส่งภาพไฟนัล") {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
@@ -92,7 +114,7 @@ const NavbarUser = (props) => {
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
 
-        } else if (data.msg === 'ได้ส่งผลงานแล้ว') {
+        } else if (data.msg === 'ส่งความคืบหน้างาน') {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
@@ -102,7 +124,12 @@ const NavbarUser = (props) => {
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
 
-        } else if (data.msg === 'โปรดตั้งราคางาน') {
+        } else if (data.msg === 'อนุมัติภาพร่างแล้ว โปรดตั้งราคางาน') {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
+        } else if (data.msg === 'อนุมัติภาพความคืบหน้าแล้ว') {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
@@ -116,8 +143,47 @@ const NavbarUser = (props) => {
             action = data.msg
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
-        } else if (data.msg === 'ถูกลบโดยแอดมิน') {
+        
+        } else if (data.msg === "ให้คะแนนและความคิดเห็น") {
             action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+            
+        } else if (data.msg === "แจ้งแก้ไขภาพร่าง") {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
+        } else if (data.msg === "แจ้งแก้ไขใบเสร็จ") {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
+        } else if (data.msg === "แจ้งแก้ไขภาพ") {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
+        } else if (data.msg == "แจ้งแก้ไขภาพไฟนัล" ) {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
+        } else if (data.msg.includes("ถูกลบโดยแอดมิน")) {
+            action = data.msg
+            if (data.msg.includes("งานวาด")){
+                keyData = data.work_id
+                linked = `/artworkdetail/${data.work_id}`
+
+            } else if (data.msg.includes("คอมมิชชัน")) {
+                keyData = data.work_id
+                linked = `/cmsdetail/${data.work_id}`
+                
+            } else if (data.msg.includes("ออเดอร์")) {
+                keyData = data.work_id
+                linked = `/cmsdetail/${data.work_id}`
+                
+            } 
         }
 
         if (data.noti_read === 1) {
@@ -127,12 +193,72 @@ const NavbarUser = (props) => {
         }
 
         return (
-            <div key={keyData}>
+            // นี่คือส่วนของกล่องการแจ้งเตือน
+            // <div key={keyData}>
+
+            //     <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
+            //         <span>
+            //             <img src={data.sender_img} style={{ width: 30 }} />
+            //             {data.sender_name} {action} {data.created_at} {read}
+            //         </span>
+            //     </a>
+
+            // </div>
+
+
+            <div className='noti-wrapper' key={keyData} style={{ backgroundColor: read === 'อ่านแล้ว' ? 'white' : '#ebf1ff' }}>
                 <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
-                    <span><img src={data.sender_img} style={{ width: 30 }} />{data.sender_name} {action} {data.created_at} {read}</span>
+                    <div className="pic">
+                        <img src={data.sender_img} />
+                    </div>
+                    <div className="data">
+                        {data.sender_name} {action} {data.created_at}
+                    </div>
                 </a>
             </div>
         );
+
+               // return (
+        //     // นี่คือส่วนของกล่องการแจ้งเตือน
+        //     <div key={keyData}>
+        //         {action.includes('ถูกลบโดยแอดมิน') ? 
+        //             (
+        //                 <a href={linked}>
+        //                     <span>
+        //                         {system} {action} {data.created_at}
+        //                     </span>
+        //                 </a>
+        //             )
+        //         : 
+        //             (
+        //                 <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
+        //                     <span>
+        //                         <img src={data.sender_img} style={{ width: 30 }} />
+        //                         {data.sender_name} {action} {data.created_at} {read}
+        //                     </span>
+        //                 </a>
+        //             )
+        //         }
+        //     </div>
+        // );
+
+        // return (
+        //     <div key={keyData}>
+        //         <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
+        //             <span>
+        //                 {action.includes('ถูกลบโดยแอดมิน') ? (
+        //                     <>
+        //                         {system} {action} {data.created_at}
+        //                     </>
+        //                 ) : (
+        //                     <>
+        //                         <img src={data.sender_img} style={{ width: 30 }} alt={data.sender_name} /> {data.sender_name} {action} {data.created_at} {read}
+        //                     </>
+        //                 )} 
+        //             </span>
+        //         </a>
+        //     </div>
+        // );
     };
 
     const handleRead = () => {
@@ -144,7 +270,8 @@ const NavbarUser = (props) => {
         event.preventDefault();
         localStorage.removeItem("token");
         localStorage.removeItem("type");
-        navigate("/welcome");
+        logout();
+        navigate("/");
     };
 
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -154,6 +281,8 @@ const NavbarUser = (props) => {
     const onClose = () => {
         setOpenDrawer(false);
     };
+
+    let hasnotread = notifications.some((noti) => noti.noti_read === 0);
 
 
     return (
@@ -176,10 +305,10 @@ const NavbarUser = (props) => {
                         <Icon.Bell className='nav-icon' />
                        
                     </a> */}
-                    <div  ref={dropdownRef} style={{position:"relative"}}>
+                    <div  ref={notiRef} style={{position:"relative"}}>
                         <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
                             {/* <Badge dot={notifications.length > 0 ? true : false}> */}
-                                <Badge dot={false}>
+                                <Badge dot={hasnotread ? true : false}>
                                 <Icon.Bell className='nav-icon' />
                             </Badge>
                             {/* --โนติแบบมีเลข ห้ามลบบบ */}
@@ -205,7 +334,7 @@ const NavbarUser = (props) => {
                             )} */}
 
                         </button>
-                        <div className={`dropdown-area ${openNoti ? 'open' : 'close'}`} >
+                        <div className={`noti-area ${openNoti ? 'open' : 'close'}`} >
                             <div className="notifications">
                                 {/* {notifications.map(data => (
                                     <div key={data.reportId}>
@@ -213,9 +342,9 @@ const NavbarUser = (props) => {
                                     </div>
                                 ))} */}
                                 {notifications.map((n) => displayNotification(n))}
-                                <button className="nButton" onClick={handleRead}>
+                                {/* <button className="nButton" onClick={handleRead}>
                                     Mark as read
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>
@@ -307,7 +436,7 @@ const NavbarHomepage = (props) => {
                 </div>
                 <div class="inline-nav inhomepage">
                     <a href="/login">เข้าสู่ระบบ</a>
-                    <a href="/verify">สมัครสมาชิก</a>
+                    <a href="/selectrole">สมัครสมาชิก</a>
                 </div>
             </nav>
 
@@ -321,7 +450,7 @@ const NavbarHomepage = (props) => {
             >
                 <div className="ham-nav">
                     <a href="/login"><Icon.LogIn className='nav-icon mx-2' />เข้าสู่ระบบ</a>
-                    <a href="/verify"><Icon.LogIn className='nav-icon mx-2' />สมัครสมาชิก</a>
+                    <a href="/selectrole"><Icon.LogIn className='nav-icon mx-2' />สมัครสมาชิก</a>
                     <a href="/"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
                     <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
                 </div>
@@ -346,7 +475,7 @@ const NavbarGuest = (props) => {
                         <p>300 C</p>
                     </div> */}
                     <a href="/login">เข้าสู่ระบบ</a>
-                    <a href="/verify">สมัครสมาชิก</a>
+                    <a href="/selectrole">สมัครสมาชิก</a>
                     {/* <div className="dropdown-nav" ref={dropdownRef}>
                         <button onClick={() => { setOpen(!open) }} style={{ backgroundImage: "url(mainmoon.jpg)" }}>
                         </button>
@@ -370,13 +499,27 @@ const NavbarAdmin = (props) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false)
     const dropdownRef = useRef();
-    const { admindata, socket } = useAuth();
+    const { admindata, socket, logout } = useAuth();
 
     useEffect(() => {
         let handler = (event) => {
             if (!dropdownRef.current.contains(event.target)) {
                 setOpen(false)
                 // console.log(dropdownRef.current);
+            }
+        }
+        document.addEventListener("mousedown", handler);
+
+        return () => {
+            document.removeEventListener("mousedown", handler);
+        }
+    }, [])
+
+    const notiRef = useRef();
+    useEffect(() => {
+        let handler = (event) => {
+            if (!notiRef.current.contains(event.target)) {
+                setOpenNoti(false)
             }
         }
         document.addEventListener("mousedown", handler);
@@ -414,13 +557,17 @@ const NavbarAdmin = (props) => {
     // ทำงานหลังจากกดอ่านแจ้งเตือน
     const handleNotificationClick = async (keyData, action) => {
         await axios.put(`${host}/noti/readed/?report_keyData=${keyData}&action=${action}`)
+        hasnotread = notifications.some((noti) => noti.noti_read === 0);
     };
+    let hasnotread = notifications.some((noti) => noti.noti_read === 0);
 
     const displayNotification = (data) => {
         let action;
         let read;
         let linked;
         let keyData;
+
+        // การแจ้งเตือนของแอดมิน
         if (data.msg === 'ได้รายงานคอมมิชชัน') {
             action = data.msg;
             keyData = data.reportId;
@@ -431,8 +578,10 @@ const NavbarAdmin = (props) => {
             keyData = data.reportId;
             linked = `/admin/adminmanage/report/${data.reportId}`
 
-        } else if (data.msg === 'รายงานภาพไฟนัลซ้ำ') {
-
+        } else if (data.msg === 'ได้รายงานออเดอร์') {
+            action = data.msg;
+            keyData = data.reportId;
+            linked = `/admin/adminmanage/report/${data.reportId}`
         }
 
         if (data.noti_read === 1) {
@@ -441,10 +590,21 @@ const NavbarAdmin = (props) => {
             read = "่ยังไม่อ่าน"
         }
         return (
-            <div key={keyData}>
-                {/* < href={linked} onClick={() => handleNotificationClick(keyData, action)}> */}
+            // <div key={keyData}>
+            //     {/* < href={linked} onClick={() => handleNotificationClick(keyData, action)}> */}
+            //     <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
+            //         <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {action} {data.created_at} {read}</span>
+            //     </a>
+            // </div>
+
+            <div className='noti-wrapper' key={keyData}>
                 <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
-                    <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {action} {data.created_at} {read}</span>
+                    <div className="pic">
+                        <img src={data.sender_img} />
+                    </div>
+                    <div className="data">
+                        {data.sender_name} {action} {data.created_at} {read}
+                    </div>
                 </a>
             </div>
         );
@@ -455,8 +615,12 @@ const NavbarAdmin = (props) => {
         event.preventDefault();
         localStorage.removeItem("token");
         localStorage.removeItem("type");
-        navigate("/welcome");
+        logout();
+        navigate("/");
     };
+
+
+
 
     return (
         <div class="nav-box" >
@@ -480,14 +644,15 @@ const NavbarAdmin = (props) => {
                         </div>
                     </div> */}
 
-                    <div ref={dropdownRef} style={{ position: "relative" }}>
+                    <div ref={notiRef} style={{ position: "relative" }}>
                         <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
-                            {/* <Badge dot={notifications.length > 0 ? true : false}> */}
-                            <Badge dot={false}>
+                            
+                            {/* <Badge dot={hasnotread ? true : false}> */}
+                            <Badge dot={hasnotread ? true : false}>
                                 <Icon.Bell className='nav-icon' />
                             </Badge>
                         </button>
-                        <div className={`dropdown-area ${openNoti ? 'open' : 'close'}`} >
+                        <div className={`noti-area ${openNoti ? 'open' : 'close'}`} >
                             <div className="notifications">
                                 {/* {notifications.map(data => (
                                     <div key={data.reportId}>

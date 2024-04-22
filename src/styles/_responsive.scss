@@ -3,6 +3,13 @@
 //แนฟบา
 
 @media (min-width: 0px) and (max-width: 767px) {
+
+    .ant-modal .ant-modal-content{
+        border-radius: 0 !important;
+    }
+    .ant-modal .ant-modal-body{
+        overflow-y: auto !important;
+    }
     .ham-menu {
         display: block !important;
     }
@@ -11,6 +18,11 @@
     .dropdown-area {
         display: none;
     }
+
+    .inline-nav:last-child{
+        display: none;
+    }
+
 
     //หน้าตั้งค่า
 
@@ -42,23 +54,11 @@
         max-width:none !important;
 
     }
-
-    //index
-    .search-container{
-        padding: 10rem 0 !important;
-    }
-
-    //
-
-    .chat-sender{
-        padding: 10px !important;
-        column-gap: 0.5rem;
-    }
 }
 
-@media (min-width: 768px) and (max-width: 1200px) {
 
-}
+
+@media (min-width: 768px) and (max-width: 1200px) {}
 
 @media (min-width: 1901px) {}
 
@@ -96,6 +96,18 @@
         height: 50rem;
     }
 }
+
+// @media (min-height: 100vw){
+//     .box-container {
+//         height: 50vh;
+//     }
+// }
+
+
+// @include media-breakpoint-up(lg) {}
+
+//login
+
 
 @media (min-width: 0px) and (max-width: 899px) {
     .body {
@@ -192,15 +204,24 @@
 @media (min-width: 768px) and (max-width: 1200px) {
     .aside-panel {
         // flex: 15rem 1 auto;
-        flex-basis: 14rem !important;
+        flex-basis: 4rem !important;
 
-        // h1{
-        //     font-size: 16px;
-        //     font-weight:400;
-        // }
         .setting-menu {
-            // padding: 0;
+            padding: 0;
         }
+
+        p,
+        h1 {
+            display: none;
+        }
+
+        div {
+            width: fit-content;
+        }
+    }
+
+    .aside-main-card {
+        flex: 1 1 auto;
     }
 
 }

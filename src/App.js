@@ -16,6 +16,7 @@ import ViewProfile from './screens/user/ViewProfile';
 import Profile from './screens/user/Profile';
 import Verify from './screens/Verify';
 import Register from './screens/Register';
+import SelectRole from './screens/SelectRole';
 import ForgotPassword from './screens/ForgotPassword';
 import ResetPassword from './screens/ResetPassword';
 import SettingProfile from './screens/user/SettingProfile';
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="/:submenu" element={<Index />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/selectrole" element={<SelectRole />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

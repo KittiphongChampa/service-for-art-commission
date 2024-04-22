@@ -82,14 +82,11 @@
 }
 
 .box-container {
-  min-height: 100vh;
   background-color: rgb(37, 37, 37);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  max-height: -moz-fit-content;
-  max-height: fit-content;
-  padding-bottom: 1rem;
+  height: 50rem !important;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -155,6 +152,7 @@
 .cms-section {
   text-align: center;
   color: #525764;
+  margin: 1rem 0;
 }
 .cms-section .icon {
   width: 50px;
@@ -215,6 +213,30 @@
 
 .a {
   color: black;
+}
+
+.style-box {
+  background-color: white;
+  border-radius: 1rem;
+  width: 15rem;
+  height: 6rem;
+  display: flex;
+  overflow: hidden;
+  -moz-column-gap: 5px;
+       column-gap: 5px;
+}
+.style-box div, .style-box p {
+  flex: 1;
+}
+.style-box div img, .style-box p img {
+  -o-object-fit: cover;
+     object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.style-box p {
+  display: flex;
+  align-items: center;
 }
 
 .cms-example-swiper {
@@ -401,11 +423,20 @@ button {
 }
 
 @media (min-width: 0px) and (max-width: 767px) {
+  .ant-modal .ant-modal-content {
+    border-radius: 0 !important;
+  }
+  .ant-modal .ant-modal-body {
+    overflow-y: auto !important;
+  }
   .ham-menu {
     display: block !important;
   }
   .inline-nav a:not(.ham-menu),
   .dropdown-area {
+    display: none;
+  }
+  .inline-nav:last-child {
     display: none;
   }
   .setting-content-box {
@@ -513,7 +544,21 @@ button {
 }
 @media (min-width: 768px) and (max-width: 1200px) {
   .aside-panel {
-    flex-basis: 14rem !important;
+    flex-basis: 4rem !important;
+  }
+  .aside-panel .setting-menu {
+    padding: 0;
+  }
+  .aside-panel p,
+  .aside-panel h1 {
+    display: none;
+  }
+  .aside-panel div {
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+  .aside-main-card {
+    flex: 1 1 auto;
   }
 }
 @media (min-width: 0px) and (max-width: 799px) {
@@ -636,7 +681,7 @@ a:visited {
   gap: 2.5rem;
   /* background-color: aqua; */
 }
-.inline-nav div:not(.dropdown-nav, .dropdown-area) {
+.inline-nav div:not(.dropdown-nav, .dropdown-area, .noti-area) {
   border-radius: 100px;
   text-decoration: none;
   color: black;
@@ -713,7 +758,7 @@ a:visited {
   box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
 }
 .dropdown-area a {
-  padding: 1.2rem 2rem;
+  padding: 1.2rem;
 }
 
 .dropdown-area.close {
@@ -765,9 +810,145 @@ a:visited {
     width: 2000px;
   }
 }
+.noti-area {
+  display: flex;
+  flex-direction: column;
+  /* word-wrap: normal; */
+  background-color: white;
+  width: 30rem;
+  position: absolute;
+  top: 100%;
+  /*ลงมาอยู่ล่าง ถ้าtop 0 จะอยู่บนสุด*/
+  right: 0;
+  list-style: none;
+  border-radius: 1rem;
+  overflow: hidden;
+  color: #2c3248;
+  max-height: 90vh;
+  min-height: -moz-fit-content;
+  min-height: fit-content;
+  overflow-y: auto;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+.noti-area .noti-wrapper {
+  border-radius: 0px !important;
+}
+.noti-area .noti-wrapper:hover {
+  background-color: #CDD8FF;
+}
+.noti-area a {
+  padding: 1.2rem !important;
+  display: flex;
+  gap: 0.5rem;
+}
+.noti-area a .pic {
+  flex: 0 0 auto;
+  width: 45px;
+  height: 45px;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.noti-area a .pic img {
+  -o-object-fit: cover;
+     object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.noti-area a .data {
+  flex: 1;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  /* แยกข้อความเมื่อเกินความยาว */
+  /* ข้อความขึ้นบรรทัดใหม่เมื่อเกินความยาว */
+  display: flex;
+  align-items: center;
+}
+
+.noti-area.close {
+  display: none;
+}
+
+.noti-area.open {
+  display: flex;
+}
+
+.noti-area li {
+  padding: 1rem 2rem;
+}
+
+.notiModal {
+  z-index: 9999;
+}
+.notiModal .noti-wrapper {
+  border-radius: 0px !important;
+}
+.notiModal .noti-wrapper:hover {
+  background-color: #CDD8FF;
+}
+.notiModal a {
+  padding: 1.2rem !important;
+  display: flex;
+  gap: 0.5rem;
+}
+.notiModal a .pic {
+  flex: 0 0 auto;
+  width: 45px;
+  height: 45px;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.notiModal a .pic img {
+  -o-object-fit: cover;
+     object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.notiModal a .data {
+  flex: 1;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  /* แยกข้อความเมื่อเกินความยาว */
+  /* ข้อความขึ้นบรรทัดใหม่เมื่อเกินความยาว */
+  display: flex;
+  align-items: center;
+}
+
 * {
   box-sizing: border-box;
   font-weight: 300;
+}
+
+.setting-content-box .ant-form-item .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+  display: none !important;
+}
+
+.ant-input {
+  font-size: 16px !important;
+}
+
+.artwork-uploader .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
+.artwork-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+  width: 100% !important;
+  height: 30rem !important;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.artwork-uploader .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select img,
+.artwork-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select img {
+  width: 100% !important;
+  height: 100% !important;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+  width: 200px;
+  height: 200px;
 }
 
 .ant-typography,
@@ -832,8 +1013,13 @@ a:visited {
   font-weight: 400 !important;
 }
 
+div:where(.swal2-container) button:where(.swal2-styled) {
+  padding: 7px 20px !important;
+}
+
 .swal2-popup,
 .swal2-title {
+  justify-self: center;
   font-family: "Prompt", sans-serif;
   font-weight: 400 !important;
   border-radius: 1rem !important;
@@ -843,15 +1029,23 @@ a:visited {
   min-width: 20rem !important;
 }
 
+.swal2-html-container {
+  text-align: left !important;
+}
+
 button.swal2-styled {
   border-radius: 200px !important;
-  font-weight: 400 !important;
+  font-weight: 300 !important;
   font-size: 16px !important;
   /* แก้ไขค่าตามที่คุณต้องการ */
 }
 
 button.swal2-confirm {
   background-color: #7E9AFA !important;
+}
+
+button.swal2-deny {
+  background-color: gray !important;
 }
 
 button.swal2-cancel {
@@ -903,17 +1097,17 @@ label {
   font-size: 1.25rem !important;
 }
 
-.ant-input-search :where(.css-dev-only-do-not-override-3mqfnx).ant-input-group .ant-input-affix-wrapper:not(:last-child) {
+.ant-input-search .ant-input-group .ant-input-affix-wrapper:not(:last-child) {
   border-start-start-radius: 1rem;
   border-end-start-radius: 1rem;
 }
 
-:where(.css-dev-only-do-not-override-3mqfnx).ant-input-search > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button {
+.ant-input-search > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button {
   border-start-end-radius: 1rem;
   border-end-end-radius: 1rem;
 }
 
-:where(.css-dev-only-do-not-override-3mqfnx).ant-input-group-wrapper-lg .ant-input-group-addon {
+.ant-input-group-wrapper-lg .ant-input-group-addon {
   border-radius: 1rem;
 }
 
@@ -1041,6 +1235,13 @@ a:focus {
 }
 .content-top p.h3 {
   color: #525764;
+}
+
+.submenu-filter {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .body-con {
@@ -1210,15 +1411,19 @@ div.form-order .orderSubmitBtn {
   align-items: center;
 }
 .content-card div.cms-overview .cms-status-detail {
-  color: #52c41a;
+  color: #909090;
+  background-color: #ebebeb;
   font-weight: 400;
   border-radius: 100px;
   padding: 0.2rem 0.7rem;
-  background-color: #f6ffed;
   height: -moz-fit-content;
   height: fit-content;
   margin-left: 0.5rem;
   vertical-align: middle;
+}
+.content-card div.cms-overview .cms-status-detail.open {
+  color: #52c41a;
+  background-color: #f6ffed;
 }
 .content-card h1,
 .content-card h2,
@@ -1256,22 +1461,19 @@ div.form-order .orderSubmitBtn {
   /* offset-x | offset-y | blur-radius | color */
 }
 
-div#cms-artist-profile,
-.cms-artist-profile {
+div#cms-artist-profile {
   display: flex;
   align-items: center;
   min-width: -moz-fit-content;
   min-width: fit-content;
 }
-div#cms-artist-profile img,
-.cms-artist-profile img {
+div#cms-artist-profile img {
   border-radius: 100px;
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   margin-right: 10px;
 }
-div#cms-artist-profile p,
-.cms-artist-profile p {
+div#cms-artist-profile p {
   height: -moz-fit-content;
   height: fit-content;
   width: -moz-fit-content;
@@ -1279,13 +1481,11 @@ div#cms-artist-profile p,
   font-weight: 400;
   color: #525764;
 }
-div#cms-artist-profile p > span,
-.cms-artist-profile p > span {
+div#cms-artist-profile p > span {
   font-weight: 200;
   color: gray;
 }
-div#cms-artist-profile .q,
-.cms-artist-profile .q {
+div#cms-artist-profile .q {
   font-weight: 400;
 }
 
@@ -2010,7 +2210,8 @@ p.time-sent {
   min-width: 0;
 }
 .backdrop-modal-area .od-modal-card .od-headder div p:last-child {
-  color: #7A86B6;
+  color: #525764;
+  font-weight: 400;
 }
 .backdrop-modal-area .od-modal-card .od-all-status {
   text-align: center;
@@ -2022,7 +2223,7 @@ p.time-sent {
   row-gap: 0.3rem;
 }
 .backdrop-modal-area .od-modal-card .od-quota-grid p.quota-amount {
-  color: #7A86B6;
+  color: gray;
   justify-self: flex-end;
 }
 .backdrop-modal-area .od-modal-card .od-progress-check {
@@ -2080,16 +2281,10 @@ p.time-sent {
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   gap: 0.6rem;
 }
-.profile-gallery-container .profile-gallery {
-  aspect-ratio: 1/1;
-}
 .profile-gallery-container .profile-gallery img {
   margin-bottom: 10px;
   border-radius: 5px;
   width: 100%;
-  height: 100%;
-  -o-object-fit: cover;
-     object-fit: cover;
 }
 
 .filter {
@@ -2315,12 +2510,17 @@ table.overview-order-table th.number, table.overview-order-table th.q {
   display: flex;
   justify-content: space-between;
 }
-.all-user-head div,
-.all-admin-head div {
+.all-user-head div:not(.submenu-filter) > *,
+.all-admin-head div:not(.submenu-filter) > * {
   display: flex;
   -moz-column-gap: 1rem;
        column-gap: 1rem;
   align-items: center;
+}
+
+.ant-select-selector .ant-select-selection-overflow {
+  -moz-column-gap: 0 !important;
+       column-gap: 0 !important;
 }
 
 .ant-card-body {
@@ -2483,11 +2683,11 @@ table.overview-order-table th.number, table.overview-order-table th.q {
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   grid-template-rows: min-content;
   gap: 0.6rem;
+  min-height: 50rem;
 }
 .content-items div.artwork {
   overflow: hidden;
   border-radius: 0.5rem;
-  aspect-ratio: 1/1;
 }
 .content-items div.artwork img {
   -o-object-fit: cover;
@@ -2658,22 +2858,6 @@ textarea,
   border-radius: 1rem;
   min-width: 10rem;
 }
-.artwork-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select > .ant-upload img,
-.artwork-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select > .ant-upload img,
-.big-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select > .ant-upload img,
-.big-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select > .ant-upload img {
-  -o-object-fit: contain;
-     object-fit: contain;
-  height: 100%;
-}
-.artwork-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
-.artwork-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select,
-.big-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
-.big-uploader :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
-  width: 100%;
-  height: 50vh;
-}
-
 .ant-spin-dot .ant-spin-dot-item {
   background-color: lightblue;
   /* เปลี่ยน #your-color เป็นสีที่คุณต้องการ */
@@ -2862,4 +3046,8 @@ div.text-wraper p {
   height: 100%;
   -o-object-fit: cover;
      object-fit: cover;
+}
+
+iframe#webpack-dev-server-client-overlay {
+  display: none !important;
 }/*# sourceMappingURL=main.css.map */

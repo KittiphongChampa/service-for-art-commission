@@ -83,6 +83,7 @@ export default function ManageCommission() {
   useEffect(() => {
     if (jwt_token) {
       topic();
+      getBankData()
     } else {
       navigate("/login");
     }
@@ -136,7 +137,9 @@ export default function ManageCommission() {
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
-  const handleChange = ({ fileList: newFileList }) => { setFileList(newFileList); };
+  const handleChange = ({ fileList: newFileList }) => { 
+    setFileList(newFileList); 
+  };
   const ref = useRef();
 
   const [topicValues, setTopicValues] = useState([]);
@@ -207,6 +210,7 @@ export default function ManageCommission() {
           formData.append("arr_imageID", arr_imageID)
           formData.append("arr_image_name", arr_image_name)
           formData.append("userID", userID);
+          formData.append("cms_id", data.commissionId);
           axios.post(`${phost}/upload-json`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -263,14 +267,14 @@ export default function ManageCommission() {
       </Space>
     );
 
-    api.info({
-      message: "กำลังตรวจสอบรูปภาพ",
-      description: "กำลังตรวจสอบรูปภาพ",
-      btn,
-      duration: 0,
-      placement: "bottomRight",
-      icon: <LoadingOutlined style={{ color: '#108ee9' }} />
-    });
+    // api.info({
+    //   message: "กำลังตรวจสอบรูปภาพ",
+    //   description: "กำลังตรวจสอบรูปภาพ",
+    //   btn,
+    //   duration: 0,
+    //   placement: "bottomRight",
+    //   icon: <LoadingOutlined style={{ color: '#108ee9' }} />
+    // });
   };
 
   const menus = [
@@ -302,6 +306,23 @@ export default function ManageCommission() {
   ];
 
   const [cmsStatus, setCmsStatus] = useState('open')
+  const bankName = useRef()
+  const bankNum = useRef()
+  const [success,setSuccess] = useState(false)
+  
+  const getBankData = async () => {
+    await axios.get(`${host}/getbank`, {
+      headers: {
+        Authorization: "Bearer " + jwt_token,
+      },
+    }).then((response) => {
+      const data = response.data;
+      bankName.current = data[0].urs_account_name
+      bankNum.current = data[0].urs_promptpay_number
+      // console.log(bankName.current)
+      setSuccess(true)
+    })
+  }
 
   return (
     <div className="body-con">
@@ -320,6 +341,9 @@ export default function ManageCommission() {
                 <Link to="/manage-artwork" className="sub-menu">งานวาด</Link>
               </div> */}
               <Tabs defaultActiveKey="1" items={menus} />
+              {success &&
+                bankName.current && bankName.current &&
+                <>
               <h3 className="content-header d-flex justify-content-center mt-4">
                 เพิ่มคอมมิชชัน
               </h3>
@@ -505,7 +529,7 @@ export default function ManageCommission() {
                       { type: "number" },
                     ]}
                   >
-                    <InputNumber suffix="คิว" className="inputnumber-css" />
+                    <InputNumber suffix="คิว" className="inputnumber-css" min={1}/>
                   </Form.Item>
                 </Space>
 
@@ -658,6 +682,7 @@ export default function ManageCommission() {
                                 <InputNumber
                                   suffix="วัน"
                                   className="inputnumber-css"
+                                  min={1}
                                 />
                               </Form.Item>
                               <Form.Item
@@ -677,6 +702,7 @@ export default function ManageCommission() {
                                 <InputNumber
                                   suffix="ครั้ง"
                                   className="inputnumber-css"
+                                  min={1}
                                 />
                               </Form.Item>
                               <Form.Item
@@ -899,7 +925,28 @@ export default function ManageCommission() {
                   <Button size="large" type="primary" htmlType="submit" shape="round" loading={isLoading}>บันทึก</Button>
                 </Flex>
               </Form>
-              <br />
+                <br />
+                </>
+              
+              }
+
+
+              {success &&
+                !bankName.current && !bankName.current &&
+                <>
+                  <Flex vertical justify="center" align="center" style={{ width: "100%", height: '70vh' }} gap='small'>
+                    ยังไม่ได้เพิ่มช่องทางการรับเงิน โปรดเพิ่มช่องทางการรับเงินเพื่อใช้ฟีเจอร์การเปิดคอมมิชชัน
+
+                    <Flex>
+                      <Link to='/setting-profile'>
+                        <Button shape="round" size='large'>
+                          เพิ่มช่องทางการรับเงิน
+                        </Button>
+                      </Link>
+                    </Flex>
+
+                  </Flex>
+                </>}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, createElement } from "react";
-import { Modal, Button, Input, Select, Space, Upload, Flex, Radio, InputNumber, Form, Timeline } from 'antd';
+import { Modal, Button, Input, Select, Space, Upload, Flex, Radio, InputNumber, Form, Timeline,message, Badge } from 'antd';
 import * as Icon from 'react-feather';
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form"
@@ -11,7 +11,21 @@ import "../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { format, isToday, isYesterday, addHours } from 'date-fns';
-
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import "sweetalert2/src/sweetalert2.scss";
+import axios from "axios";
+import { host } from "../utils/api";
+import {
+    UploadOutlined,
+    CloseOutlined,
+    MinusCircleOutlined,
+    PlusOutlined,
+    RadiusBottomleftOutlined,
+    RadiusBottomrightOutlined,
+    RadiusUpleftOutlined,
+    RadiusUprightOutlined,
+    LoadingOutlined,
+} from "@ant-design/icons";
 import Switch from 'react-switch';
 // import 'rsuite/styles/index.less';
 import TextareaAutosize from "react-textarea-autosize";
@@ -20,23 +34,36 @@ import 'animate.css'
 import { waitFor } from "@testing-library/react";
 import { Container } from 'react-bootstrap/Container';
 
-export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleBrief, currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
+const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
+
+export default function ChatOrderDetail({socket, userdata , myId, cancelReq2, isBriefOpen, handleBrief, currentStep, messages, showOderDetailModal, handleOdModal, orderDetail, allSteps, currentStepName }) {
+    
+    const token = localStorage.getItem("token");
 
     function isTodayUTC7(date) {
         const dateUTC7 = addHours(date, 7); // เพิ่ม 7 ชั่วโมงเพื่อเปลี่ยนเป็นเวลาในโซนเวลา UTC+7
         return isToday(dateUTC7);
     }
 
-
+    const handleCancel = () => setPreviewOpen(false);
+    const [form] = Form.useForm();
+    const { TextArea } = Input;
     const odModalRef = useRef();
     const briefModalRef = useRef();
     const historyModalRef = useRef();
     const fullImgRef = useRef();
+    const reportModalRef = useRef();
 
     useEffect(() => {
         let handler = (event) => {
             if (!odModalRef.current.contains(event.target)) {
-                if (!formModalOpened && !isHistoryModalOpen && !isBriefOpen) {
+                if (!formModalOpened && !isHistoryModalOpen && !isBriefOpen && !reportModalIsOpened) {
                     const myElement = odModalRef?.current;
                     myElement?.classList.add('animate__animated', 'animate__fadeOutRight', 'animate__faster');
                     myElement?.style.setProperty('--animate-duration', '0.3s');
@@ -55,6 +82,7 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
 
     const [formModalOpened, setFormModalOpened] = useState(false)
     const [historyModalOpened, setHistoryModalOpened] = useState(false)
+    const [reportModalIsOpened, setReportModalIsOpened] = useState(false)
 
     useEffect(() => {
 
@@ -106,7 +134,6 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
             setSrc(imgsrc)
 
         }
-
 
         return <>
             {/* <ImgFullscreen src={src} opened={fullImgOpened} handleFullImg={handleFullImg} /> */}
@@ -208,8 +235,120 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
 
     function handleHistoryModal() {
         setIsHistoryModalOpen(!isHistoryModalOpen)
-
     }
+    const [fileList, setFileList] = useState([]);
+    const handleChange = ({ fileList: newFileList }) => {
+        let array = newFileList.filter(file => (file.type === 'image/jpeg' || file.type === 'image/png') && (file.size / 1024 / 1024 < 5))
+        setFileList(array)
+    };
+
+    function handleReportModal() {
+        setReportModalIsOpened(preveState => !preveState)
+        // alert(isOpened)
+    }
+
+    const beforeUpload = (file, { fileList: newFileList }) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            message.error('อัปโหลดได้แค่ไฟล์ JPG/PNG เท่านั้น');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 5;
+        if (!isLt2M) {
+            message.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
+        }
+        return isJpgOrPng && isLt2M && false;
+    };
+
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState("");
+    const [previewTitle, setPreviewTitle] = useState("");
+    
+
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
+        setPreviewTitle(
+            file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
+        );
+    };
+
+    const onFinish = async (values) => {
+        try {
+            const formData = new FormData();
+            fileList.forEach((file) => {
+                formData.append("image_file", file.originFileObj);
+            });
+            formData.append("rpheader", values.header);
+            formData.append("rpdetail", values.detail);
+            formData.append("rpemail", values.email);
+            formData.append("usr_reported_id", orderDetail.artist_id)
+            const response = await axios.post(`${host}/report/order/${orderDetail.od_id}`, formData, {
+                headers: {
+                    Authorization: "Bearer " + token,
+                    "Content-type": "multipart/form-data",
+                },
+            });
+            if (response.status === 200) {
+                // เพิ่มการส่งข้อมูลไปยัง socket server
+                const reportData = {
+                    sender_id: userdata.id,
+                    sender_name: userdata.urs_name,
+                    sender_img: userdata.urs_profile_img,
+                    artworkId: orderDetail.artist_id,
+                    reportId: response.data.reportId,
+                    msg: "ได้รายงานออเดอร์"
+                };
+                socket.emit('reportOrder', reportData);
+
+                // บันทึก notification
+                await axios.post(`${host}/admin/noti/add`, {
+                    reporter: myId,
+                    reported: 0,
+                    reportId: response.data.reportId,
+                    msg: "ได้รายงานออเดอร์"
+                }).then((response) => {
+                    if (response.status === 200) {
+                        Swal.fire({
+                            title: "รายงานสำเร็จ",
+                            icon: "success"
+                        }).then(() => {
+                            window.location.reload(false);
+                        });
+                    } else {
+                        console.log("เกิดข้อผิดพลาดในการบันทึกข้อมูลการแจ้งเตือนของแอดมิน");
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่",
+                    icon: "error"
+                }).then(() => {
+                    window.location.reload(false);
+                });
+            }
+        } catch (error) {
+            console.error('เกิดข้อผิดพลาด', error);
+        }
+    };
+
+    const [reported, setReported] = useState(false);
+
+    const report = async() => {
+        await axios.get(`${host}/get/reported/${orderDetail.od_id}`).then((response) => {
+            if (response.data.msg == "true") {
+                setReported(true)
+            } else {
+                setReported(false)
+            }
+        })
+    }
+
+    useEffect(() => {
+        report();
+    },[reported])
 
     return (
         <>
@@ -217,13 +356,13 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
             {/* {historyModalOpened ? <HistoryModal /> : null} */}
             <div className="backdrop-modal-area" ref={odModalRef} >
                 <div className="od-modal-card">
-                    <div className="od-headder">
+                    {/* <div className="od-headder">
                         <img src="เหมียวเวห์.jpg" />
                         <div style={{ width: '100%' }}>
                             <div className="text-wraper"><p>{orderDetail?.cms_name}</p></div>
                             <div className="text-wraper"><p>{orderDetail?.pkg_name}</p></div>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="od-all-status">
                         <p className="od-q">คิวที่ {orderDetail?.od_q_number}</p>
                         <p className="od-stat">{currentStepName}</p>
@@ -263,6 +402,20 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
                                 })}
                         />
                     </Flex>
+                     <Flex>
+                        {myId != orderDetail.artist_id ? 
+                            (reported == true ?  
+                                <p>รายงานออเดอร์แล้ว</p>
+                                :
+                                <Button danger type="text" shape="round" onClick={handleReportModal}>
+                                    รายงานออเดอร์นี้
+                                </Button>
+                            )
+                        :
+                            <></>
+                        }
+                        
+                    </Flex>
 
 
                 </div>
@@ -292,6 +445,108 @@ export default function ChatOrderDetail({ myId, cancelReq2, isBriefOpen, handleB
                     })}
 
                 </table>
+            </Modal>
+
+            <Modal width={1000} title="รายงานออเดอร์" open={reportModalIsOpened} onCancel={handleReportModal} footer="" ref={reportModalRef}>
+                <Space gap="small" direction="vertical" style={{ width: "100%" }}>
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={onFinish} 
+                        // onFinishFailed={onFinishFailed}
+                        autoComplete="off"
+                        className="ant-form"
+                    >
+
+                        <Form.Item
+                            name="header"
+                            label="ปัญหาที่พบ"
+                            rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'string', max: 100 }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="detail"
+                            label="รายละเอียดของปัญหา"
+                            rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'string', max: 455 }]}
+                        >
+                            <TextArea />
+                        </Form.Item>
+
+                        {/* <Button onClick={()=> console.log(fileList.length)}>click</Button> */}
+                        
+
+                        <Form.Item
+                            name=""
+                            label="แนบรูปภาพของปัญหา"
+                            rules={[
+                                {
+                                    required: true,
+                                    message:null
+                                },
+                                ({}) => ({
+                                    validator(_,value) {
+                                        if (fileList.length == 0 ) {
+                                            return Promise.reject(new Error('กรุณาแนบไฟล์ภาพ'));
+                                        } else {
+                                            return Promise.resolve();
+                                        }
+                                    },
+                                }),
+                                
+                            ]}
+                        >
+                            <Upload
+                                listType="picture-card"
+                                fileList={fileList}
+                                onPreview={handlePreview}
+                                onChange={handleChange}
+                                multiple={true}
+                                beforeUpload={beforeUpload}
+                            >
+                                <div>
+                                    <PlusOutlined />
+                                    <div
+                                        style={{
+                                            marginTop: 8,
+                                        }}
+                                    >
+                                        Upload
+                                    </div>
+                                </div>
+                            </Upload>
+                        </Form.Item>
+
+                        <Modal
+                            open={previewOpen}
+                            title={previewTitle}
+                            footer={null}
+                            onCancel={handleCancel}
+                        >
+                            <img
+                                alt="example"
+                                style={{
+                                    width: "100%",
+                                }}
+                                src={previewImage}
+                            />
+                        </Modal>
+
+                        <Form.Item
+                            name="email"
+                            label="อีเมลติดต่อกลับ"
+                            rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        
+                        <Flex gap="small" justify="flex-end">
+                            {/* <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button> */}
+                            <Button shape="round" size="large" type="primary" htmlType="submit" >รายงาน</Button>
+                        </Flex>
+                    </Form>
+                </Space>
             </Modal>
 
         </>

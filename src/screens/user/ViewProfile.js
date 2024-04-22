@@ -14,16 +14,16 @@ import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../../components/Navbar
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CmsItem from "../../components/CmsItem";
-// import { Button } from "react-bootstrap";
+import ArtistBox from '../../components/ArtistBox'
 import Form from "react-bootstrap/Form";
-// import Modal from "react-bootstrap/Modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
 import * as alertData from "../../alertdata/alertData";
 import { useAuth } from '../../context/AuthContext';
 import { Modal, Button, Input, Rate, Tabs, Flex } from 'antd';
-import { host } from "../../utils/api";
+import * as ggIcon from "@mui/icons-material";
 import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
+import { host } from "../../utils/api";
 
 const title = "ViewProfile";
 const bgImg = "";
@@ -45,20 +45,25 @@ export default function ViewProfile() {
 
   const { id } = useParams();
   const [userInfo, setUserInfo] = useState([]); //จะเป็นข้อมูลของคนอื่น
-  const [follow, setFollow] = useState([]);
-  const [myFollower, setFollowIds] = useState([]);
+
+  const [follow, setFollow] = useState([]); //status การกดติดตาม
   const [myFollowerData, setMyFollowerData] = useState([]);
+  const [IFollowerData, setIFollowerData] = useState([]);
 
   const [showCoverModal, setShowCoverModal] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(null);
-  // const [loading, setLoading] = useState(false);
 
   const [myCommission, setMyCms] = useState([]);
+  const [myGallery, setMyGallery] = useState([]);
+  const [all_review, setAllReview]  = useState([]);
+
+
   const [profileMenuSelected, setprofileMenuSelected] = useState("cms");
 
   useEffect(() => {
     getUserCms();
-    // getUserArtwork();
+    getUserGallerry();
+    getAllReview();
     if (jwt_token) {
       getUserProfile();
     } else {
@@ -68,17 +73,20 @@ export default function ViewProfile() {
 
   const getUserProfile_notlogin = async () => {
     await axios
-      .get(`${host}/profile_notlogin/${id}`, {
-        headers: {
-          Authorization: "Bearer " + jwt_token,
-        },
-      })
+      .get(`${host}/profile_notlogin/${id}`)
       .then((response) => {
         const data = response.data;
         if (data.status === "ok") {
           setUserInfo(data.users[0]);
           setFollow(data.message);
-          setFollowIds(data.followerIds);
+          axios.get(`${host}/openFollowing?iFollowing=${data.IFollowingsIds}`).then((response) => {
+            const data = response.data;
+            setIFollowerData(data.ifollowing)
+          })
+          axios.get(`${host}/openFollower?myFollower=${data.MyFollowerIds}`).then((response) => {
+            const data = response.data;
+            setMyFollowerData(data.myfollower)
+          })
         } else if (data.status === "error") {
           toast.error(data.message, toastOptions);
         } else {
@@ -99,7 +107,14 @@ export default function ViewProfile() {
         if (data.status === "ok") {
           setUserInfo(data.users[0]);
           setFollow(data.message);
-          setFollowIds(data.followerIds);
+          axios.get(`${host}/openFollowing?iFollowing=${data.IFollowingsIds}`).then((response) => {
+            const data = response.data;
+            setIFollowerData(data.ifollowing)
+          })
+          axios.get(`${host}/openFollower?myFollower=${data.MyFollowerIds}`).then((response) => {
+            const data = response.data;
+            setMyFollowerData(data.myfollower)
+          })
         } else if (data.status === "error") {
           toast.error(data.message, toastOptions);
         } else {
@@ -110,17 +125,25 @@ export default function ViewProfile() {
 
   const getUserCms = async () => {
     await axios
-      .get(`${host}/userCommission/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + jwt_token,
-        },
-      })
+      .get(`${host}/userCommission/${id}`)
       .then((response) => {
         const myCms = response.data;
         setMyCms(myCms.commissions);
       });
   };
+
+  const getUserGallerry = async () => {
+    await axios.get(`${host}/userGallery/${id}`).then((response) => {
+        const data = response.data;
+        setMyGallery(data.myGallery);
+    })
+  }
+
+  const getAllReview = async () => {
+    await axios.get(`${host}/userReview/all/${id}`).then((response) => {
+        setAllReview(response.data);
+    })
+  }
 
   function menuProfile(event, menu) {
     let oldSelected = document.querySelector(".sub-menu.selected");
@@ -179,22 +202,6 @@ export default function ViewProfile() {
     }
   };
 
-
-  const openFollower = () => {
-    const formData = new FormData();
-    formData.append("myFollower", myFollower);
-    axios
-      .post(`${host}/openFollower`, formData, {
-        headers: {
-          Authorization: "Bearer " + jwt_token,
-        },
-      })
-      .then((response) => {
-        const data = response.data;
-        setMyFollowerData(data.results);
-      });
-  };
-
   //admin
   const [banReason, setBanReason] = useState("");
 
@@ -229,7 +236,7 @@ export default function ViewProfile() {
       });
   };
 
-  const menus = [
+  const menusArtist = [
     {
       key: '1',
       label: "คอมมิชชัน",
@@ -238,13 +245,36 @@ export default function ViewProfile() {
     {
       key: '2',
       label: "งานวาด",
-      children: <AllArtworks />,
+      children: <AllArtworks myGallery={myGallery}/>,
     },
     {
       key: '3',
       label: "รีวิว",
-      children: <AllReviews />,
+      children: <AllReviews all_review={all_review}/>,
+    },
+    {
+        key: '4',
+        label: "ผู้ติดตาม",
+        children: <Followers myFollowerData={myFollowerData} />,
+    },
+    {
+        key: '5',
+        label: "กำลังติดตาม",
+        children: <Followings IFollowerData={IFollowerData} />,
     }
+  ];
+
+  const menus = [
+    {
+        key: "5",
+        label: "กำลังติดตาม",
+        children: <Followings IFollowerData={IFollowerData} />,
+    },
+    // {
+    //   key: "1",
+    //   label: "ผู้ติดตาม",
+    //   children: <Followers myFollowerData={myFollowerData} />,
+    // },
   ];
 
   const [isModalOpened, setIsModalOpened] = useState(false);
@@ -362,48 +392,45 @@ export default function ViewProfile() {
                 <p className="bio-profile">{userInfo.urs_bio}</p>
               </div>
               <div className="user-col-about">
-                {/* <div className="user-about-menu">
-                  <button className="sub-menu selected">overview</button>
-                  <button className="sub-menu">about me</button>
-                </div> */}
+     
                 <div className="user-about-content">
-                  <div className="user-about-review mb-4">
-                    <div className="user-about-review mb-4"><p className="fs-3">{userInfo.urs_all_review ? userInfo.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userInfo.rw_number ? userInfo.rw_number : 0} รีวิว</p></div>
-                  </div>
+                  <div className="user-about-review mb-4"><p className="fs-3">{userInfo.urs_all_review ? userInfo.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userInfo.rw_number ? userInfo.rw_number : 0} รีวิว</p></div>
                   <div className="user-about-text">
-                    <div>
-                      <p>
-                        ผู้ติดตาม {myFollower.length}{" "}คน
-                      </p>
-                      <div>
-                        {myFollowerData.map((data) => (
-                          <a
-                            key={data.id}
-                            href={`/profile/${data.id}`}
-                            style={{ display: "flex" }}
-                          >
-                            <img
-                              src={data.urs_profile_img}
-                              style={{ width: "30px" }}
-                            />
-                            <p>{data.urs_name}</p>
-                          </a>
-                        ))}
-                      </div>
-                      <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
-                      <p>เป็นสมาชิกเมื่อ {currentDate}</p>
-                    </div>
-                    <div>
-                      <p>คอมมิชชัน เปิด</p>
-                      <p>คิวว่าง 1 คิว</p>
-                    </div>
+                    {userInfo.urs_type == 1 ? 
+                      <>
+                        <Flex gap="small" vertical>
+                          <p>ผู้ติดตาม {myFollowerData.length} คน</p>
+                          <p>กำลังติดตาม {IFollowerData.length} คน </p>
+                          <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
+                          <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                        </Flex>
+                        <Flex gap="small" vertical>
+                          <p>คอมมิชชันทั้งหมด</p>
+                          <p>คิวว่าง 5 คิว</p>
+                        </Flex>
+                      </>
+                      :
+                      <Flex gap="small" vertical>
+                        <p>ผู้ติดตาม {myFollowerData.length} คน</p>
+                        <p>กำลังติดตาม {IFollowerData.length} คน </p>
+                        <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                      </Flex>
+                    }
                   </div>
                 </div>
               </div>
             </div>
             <div className="user-profile-contentCard">
               <div>
-                <Tabs defaultActiveKey="1" items={menus} />
+                {userInfo.urs_type == 1 ? (
+                  <>
+                    <Tabs defaultActiveKey="1" items={menusArtist} />
+                  </>
+                ) : (
+                  <>
+                    <Tabs defaultActiveKey="1" items={menus} />
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -426,7 +453,6 @@ export default function ViewProfile() {
   );
 }
 
-// เกี่ยวกับตรงนี้
 function AllCms(props) {
   const type = localStorage.getItem("type");
   const { myCommission, userID } = props;
@@ -439,7 +465,7 @@ function AllCms(props) {
       <div class="content-items">
         {type != "admin" ? (
           <>
-            {myCommission.map((mycms) => (
+            {myCommission.length != 0 ? (myCommission.map((mycms) => (
               <div key={mycms.cms_id}>
                 <Link to={`/cmsdetail/${mycms.cms_id}`}>
                   <CmsItem
@@ -447,14 +473,17 @@ function AllCms(props) {
                     headding={mycms.cms_name}
                     price={mycms.pkg_min_price}
                     desc={mycms.cms_desc}
+                    total_reviews={mycms.total_reviews} 
+                    cms_all_review={mycms.cms_all_review} 
+                    status={mycms.cms_status}
                   />
                 </Link>
               </div>
-            ))}
+            ))): (<p>ยังไม่มีข้อมูล</p>)}
           </>
         ) : (
           <>
-            {myCommission.map((mycms) => (
+            {myCommission.length != 0 ? (myCommission.map((mycms) => (
               <div key={mycms.cms_id} style={{ display: "flex" }}>
                 <Link onClick={() => handleRedirect(mycms.cms_id)}>
                   <CmsItem
@@ -465,7 +494,7 @@ function AllCms(props) {
                   />
                 </Link>
               </div>
-            ))}
+            ))) : (<p>ยังไม่มีข้อมูล</p>)}
           </>
         )}
       </div>
@@ -474,24 +503,81 @@ function AllCms(props) {
 }
 
 function AllArtworks(props) {
+  const { myGallery } = props
   return (
     <>
       <p className="h3 mt-3 mb-2">งานวาด</p>
-      <div className="profile-gallery">
-        <img src="b3.png" />
-        <img src="AB1.png" />
-        <img src="mainmoon.jpg" />
-        <img src="b3.png" />
-        <img src="b3.png" />
+      <div className="profile-gallery-container">
+        {myGallery.length != 0 ? (myGallery.map((data) => (
+            <Link to={`/artworkdetail/` + data.artw_id}>
+                <div className="profile-gallery" key={data.artw_id}>
+                    <img key={data.artw_id} src={data.ex_img_path} />
+                </div>
+            </Link>
+        ))) : (<p>ยังไม่มีข้อมูล</p>)}
       </div>
     </>
   );
 }
 
 function AllReviews(props) {
+  const { all_review } = props
   return (
     <>
       <p className="h3 mt-3 mb-2">รีวิว</p>
+      {all_review.length != 0 ? (all_review.map(review => (
+        <div className="review-box">
+        <div className="reviewer-box">
+          <div>
+            <img src={review.urs_profile_img} />
+          </div>
+          <div>
+            <p>{review.urs_name}</p>
+            <p>{new Date(review.created_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</p>
+          </div>
+        </div>
+        {/* <p style={{ fontWeight: "500" }}>แพ็กเกจ : {review.pkg_name}</p> */}
+        <p>
+          {[...Array(review.rw_score)].map((_, index) => (
+            <ggIcon.Star key={index} className="fill-icon" />
+          ))}
+        </p>
+        <p>{review.rw_comment}</p>
+      </div>
+      ))) : (<p>ไม่มีข้อมูล</p>)}
     </>
   );
+}
+
+function Followers(props) {
+  const { myFollowerData } = props
+
+  return <>
+      <p className="h3 mt-3 mb-2">ผู้ติดตาม</p>
+      <div className="artistbox-items">
+          {myFollowerData.length != 0 ? myFollowerData.map(data => (
+              <a key={data.id} href={`/profile/${data.id}`}>
+                  
+                      <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
+                  
+              </a>
+          )) : (<p>ยังไม่มีข้อมูล</p>)}
+      </div>
+  </>
+}
+
+function Followings(props) {
+  const { IFollowerData } = props;
+  // console.log(IFollowerData);
+
+  return <>
+      <p className="h3 mt-3 mb-2">กำลังติดตาม</p>
+      <div className="artistbox-items">
+          {IFollowerData.length != 0 ? IFollowerData.map(data => (
+              <a key={data.id} href={`/profile/${data.id}`}>
+                  <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
+              </a>
+          )) : <p>ยังไม่มีข้อมูล</p>}
+      </div>
+  </>
 }

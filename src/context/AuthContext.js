@@ -117,12 +117,18 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const logout = () => {
+        setIsLoggedIn(false);
+    };
+
     const handleAuthError = (error) => {
         if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
             alert("Token has expired. Please log in again.");
             localStorage.removeItem("token");
             localStorage.removeItem("type");
+            setIsLoggedIn(false);
             window.location.href = "/login";
+            
         } else {
             console.error("Error fetching user data:", error);
         }
@@ -133,7 +139,7 @@ export const AuthProvider = ({ children }) => {
     // console.log(today.toLocaleString("th-TH", { timeZone: "Asia/Bangkok" }));
 
     return (
-        <AuthContext.Provider value={{ login, isLoggedIn, userdata, admindata, socket  }}>
+        <AuthContext.Provider value={{ login, logout, isLoggedIn, userdata, admindata, socket  }}>
             {children}
         </AuthContext.Provider>
     );

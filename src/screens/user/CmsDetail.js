@@ -28,7 +28,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useNavigate, Link, useParams, useLocation } from "react-router-dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
-import { Radio, Dropdown, Breadcrumb, Flex, Modal, Progress, notification, Button, Upload, Checkbox, Form, Input, Space, Card, Tooltip, Alert, Select, message, InputNumber, Tabs } from "antd";
+import { Radio, Dropdown, Breadcrumb, Flex, Modal, Progress, notification, Button, Upload, Checkbox, Form, Input, Space, Card, Tooltip, Alert, Select, message, InputNumber, Tabs, Rate, Empty } from "antd";
 import { CloseOutlined, MoreOutlined, HomeOutlined, UserOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
 import ReactQuill from 'react-quill';
@@ -59,6 +59,7 @@ export default function CmsDetail() {
   const cmsID = useParams();
   const [artistDetail, setArtistDetail] = useState([]);
   const [cmsDetail, setCmsDetail] = useState([]);
+  
   const [imgDetail, setImgDetail] = useState([]);
   const [pkgDetail, setPkgDetail] = useState([]);
   const [touDetail, setTouDetail] = useState([]);
@@ -387,6 +388,7 @@ export default function CmsDetail() {
         rpdetail: values['rp-detail'],
         rplink: values['rp-link'],
         rpemail: values['rp-email'],
+        usr_reported_id: artistDetail.artistId
       };
       const response = await axios.post(`${host}/report/commission/${cmsID.id}`, postData, {
         headers: {
@@ -582,7 +584,7 @@ export default function CmsDetail() {
     {
       key: '2',
       label: "รีวิว",
-      children: <Review />,
+      children: <Review cmsID={cmsID.id}/>,
     },
     {
       key: '3',
@@ -694,9 +696,26 @@ export default function CmsDetail() {
                 <>
                   {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
-                    <h1 className="h3 me-3">{cmsDetail.cms_name}<span class="cms-status-detail">{cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}</span></h1>
+                    <h1 className="h3 me-3">{cmsDetail.cms_name}
+                      
+                      
+                      { !cmsDetail.deleted_by &&
+                        <span className={cmsDetail.cms_status === "open" ? "cms-status-detail open" : "cms-status-detail"}>
+                      {cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}
+                    </span>}
+
+                      { cmsDetail.deleted_by &&
+                        <span className="cms-status-detail close">
+                          ถูกลบโดยแอดมิน เนื่องจาก {cmsDetail.delete_reason}
+                    </span>}
+                    
+                    
+                    </h1>
                     {isLoggedIn &&
                       <Flex gap="small" justify="flex-end" flex={1}>
+
+                        {!cmsDetail.deleted_by ?
+
                         <Dropdown
                           menu={{
                             items,
@@ -705,7 +724,13 @@ export default function CmsDetail() {
                         >
                           <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
                           </Button>
-                        </Dropdown>
+                          </Dropdown>
+                          :
+                          <></>
+
+                        }
+                        
+                        
                       </Flex>
                     }
 
@@ -814,7 +839,6 @@ export default function CmsDetail() {
 
                         <Checkbox value="1" style={{ lineHeight: '32px' }}>
                           Personal use (ใช้ส่วนตัว)
-
                         </Checkbox>
                         <Checkbox value="2" style={{ lineHeight: '32px' }}>
                           License (มีสิทธ์บางส่วน)
@@ -1238,70 +1262,60 @@ function Package(props) {
   );
 }
 
-function Review() {
+function Review(props) {
+  const cmsID = props.cmsID;
+  const [ cms_review, setReviewCms]  = useState([]);
+  const [ Average_cms_review, setReviewCmsAverage] = useState([]);
+  const total_review = cms_review.length;
+
+  
+  const queryReview = () => {
+    axios.get(`${host}/get/cms/review/${cmsID}`, {}).then((response) => {
+      setReviewCms(response.data)
+    })
+  }
+  const queryAllReview = () => {
+    axios.get(`${host}/get/cms/allreview/${cmsID}`, {}).then((response) => {
+      setReviewCmsAverage(response.data)
+    })
+  }
+
+  useEffect(() => {
+    queryReview();
+    queryAllReview();
+  },[])
+
   return (
     <>
-      <h2 className="h3">รีวิว (4.0 จาก 3 รีวิว)</h2>
-      <div className="review-box">
+      <h2 className="h3">คะแนนรีวิว เฉลี่ย {Average_cms_review == null ? 0 : Average_cms_review}<Rate disabled defaultValue={2} className="one-star" />  (จาก {total_review} รีวิว)</h2>
+      {cms_review.length != 0 ? (cms_review.map(review => (
+        <div className="review-box">
         <div className="reviewer-box">
           <div>
-            <img src="https://i.kym-cdn.com/entries/icons/original/000/043/403/cover3.jpg" />
+            <img src={review.urs_profile_img} />
           </div>
           <div>
-            <p>K.Kav</p>
-            <p>เมื่อวานนี้ 10:10 น.</p>
+            <p>{review.urs_name}</p>
+            <p>{new Date(review.created_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</p>
           </div>
         </div>
-        <p style={{ fontWeight: "500" }}>แพ็กเกจ : Half Body</p>
+        <p style={{ fontWeight: "500" }}>แพ็กเกจ : {review.pkg_name}</p>
         <p>
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
+          {[...Array(review.rw_score)].map((_, index) => (
+            <ggIcon.Star key={index} className="fill-icon" />
+          ))}
         </p>
-        <p>เขียนรีวิว</p>
-        {/* <div className="img-box"><img src="kaveh.png" /></div> */}
+        <p>{review.rw_comment}</p>
       </div>
-      <div className="review-box">
-        <div className="reviewer-box">
-          <div>
-            <img src="https://i.cbc.ca/1.5359228.1577206958!/fileImage/httpImage/image.jpg_gen/derivatives/16x9_940/smudge-the-viral-cat.jpg" />
-          </div>
-          <div>
-            <p>Arora</p>
-            <p>20/08/2566 19:56 น.</p>
-          </div>
-        </div>
-        <p style={{ fontWeight: "500" }}>แพ็กเกจ : Half Body</p>
-        <p>
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-        </p>
-        <p>เขียนรีวิว</p>
-        {/* <div className="img-box" ><img src="kaveh.png" /></div> */}
-      </div>
-      <div className="review-box">
-        <div className="reviewer-box">
-          <div>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREmaQdvWJzdLZ2M0QpDmDxHXY5K_5Uz2ZSNg&usqp=CAU" />
-          </div>
-          <div>
-            <p>Sarah Baba</p>
-            <p>17/08/2566 19:56 น.</p>
-          </div>
-        </div>
-        <p style={{ fontWeight: "500" }}>แพ็กเกจ : Half Body</p>
-        <p>
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-          <ggIcon.Star className="fill-icon" />
-        </p>
-        <p>เขียนรีวิว</p>
-        {/* <div className="img-box"><img src="kaveh.png" /></div> */}
-      </div>
+      ))) : 
+        <Flex justify="center">
+          <Empty description={
+            <span>
+              ยังไม่มีข้อมูล
+            </span>
+          } />
+        </Flex>
+      }
     </>
   );
 }
@@ -1314,28 +1328,37 @@ function Queue(props) {
   return (
     <>
       <h2 className='h3'>คิว ({allqueueData.length}/{cms_amount_q})</h2>
-      <table className="queue-table">
-        <tr>
-          <th className="q">ลำดับ</th>
-          <th>คอมมิชชัน:แพคเกจ</th>
-          <th>ชื่อผู้จ้าง</th>
-          <th>วันที่จ้าง</th>
-          <th>ความคืบหน้า</th>
-        </tr>
-        {allqueueData.length == 0 ? (<div>
-          <h4>ยังไม่มีออเดอร์</h4>
-        </div>)
+      {allqueueData.length == 0 ? 
+        (
+          <Flex justify="center">
+            <Empty description={
+              <span>
+                ยังไม่มีข้อมูล
+              </span>
+            } />
+          </Flex>
+        )
           :
-          (allqueueData.map((data, index) => (
-            <tr key={data.od_id}>
-              <td>{index + 1}</td>
-              <td>{data.cms_name} : {data.pkg_name}</td>
-              <td>{data.urs_name}</td>
-              <td>{data.ordered_at}</td>
-              <td>{data.step_name}</td>
-            </tr>
-          )))}
-      </table>
+        (<table className="queue-table">
+          <tr>
+            <th className="q">ลำดับ</th>
+            <th>คอมมิชชัน:แพคเกจ</th>
+            <th>ชื่อผู้จ้าง</th>
+            <th>วันที่จ้าง</th>
+            <th>ความคืบหน้า</th>
+          </tr>
+      
+            {allqueueData.map((data, index) => (
+              <tr key={data.od_id}>
+                <td>{index + 1}</td>
+                <td>{data.cms_name} : {data.pkg_name}</td>
+                <td>{data.urs_name}</td>
+                <td>{data.ordered_at}</td>
+                <td>{data.step_name}</td>
+              </tr>
+            ))}
+        </table>)
+      }
     </>
   );
 }

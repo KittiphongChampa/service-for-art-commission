@@ -22,8 +22,6 @@ export default function Dashboard() {
 
   const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1)); // วันแรกของปีปัจจุบัน
   const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), 11, 31)); // วันสุดท้ายของปีปัจจุบัน
-  console.log(startDate);
-  console.log(endDate);
 
   const [topCMS, setTopCMS] = useState([]);
   const [topCTM, setTopCtm] = useState([]);
@@ -38,7 +36,6 @@ export default function Dashboard() {
     getCountOrder();
     getTopCommission();
     getTopCustomer();
-
   }, [])
 
   const getCountFollower = async () => {
@@ -144,8 +141,8 @@ export default function Dashboard() {
   useEffect(() => {
     // getCountTopic();
     if (status === true) {
-      // getYearData(startDate, endDate);
-      // getYearDataBenefit(startDate, endDate);
+      getYearData(startDate, endDate);
+      getYearDataBenefit(startDate, endDate);
     } else {
       getOutOfYearData(startDate, endDate);
       getOutOfYearBenefit(startDate, endDate);
@@ -282,13 +279,13 @@ export default function Dashboard() {
   // การทำงาน filter ของรายได้
   const getYearDataBenefit = async (start, end) => {
     const response = await axios.get(`${host}/get/profit/yeardata`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
       params: {
         startDate: start,
         endDate: end,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
       },
     });
 
@@ -426,7 +423,7 @@ export default function Dashboard() {
         </Flex>
 
         <div style={{ marginTop: "20px" }}>
-          <label>Filter: </label>
+          <label>กรองจาก: </label>
           <select onChange={(e) => handleDateChange(e.target.value)}>
             <option value="year">ปีนี้</option>
             <option value="today">วันนี้</option>
@@ -436,7 +433,7 @@ export default function Dashboard() {
           </select>
         </div>
 
-        {/* <div style={{ display: "flex", marginTop: "15px" }}>
+        <div style={{ display: "flex", marginTop: "15px" }}>
           <div
             style={{
               borderRadius: "20px",
@@ -449,8 +446,7 @@ export default function Dashboard() {
             <h4>รายได้</h4>
             <BarChart barChartData={barChartData} />
           </div>
-
-        </div> */}
+        </div>
         {/* <div
                 style={{
                   borderRadius: "20px",
@@ -487,7 +483,7 @@ export default function Dashboard() {
               <tr>
                 <th>ลำดับ</th>
                 <th>ชื่อคอมมิชชัน</th>
-                <th>ลูกค้าทั้งหมด</th>
+                <th>ลูกค้าทั้งหมด(คน)</th>
                 <th>จำนวนเงินที่ได้ทั้งหมด</th>
               </tr>
             </thead>
@@ -502,13 +498,14 @@ export default function Dashboard() {
                   <tr key={item.cms_id}>
                     <td>{index + 1}</td>
                     <td>{item.cms_name}</td>
-                    <td style={{ display: "flex" }}>
+                    <td>{item.customers.length}</td>
+                    {/* <td style={{ display: "flex" }}>
                       {item.customers.map(customer => (
                         <div key={customer.id} style={{ marginRight: "15px" }}>
                           <img src={customer.urs_profile_img} style={{ width: 20, borderRadius: 50 }} />
                         </div>
                       ))}
-                    </td>
+                    </td> */}
                     <td>{item.profit}</td>
                   </tr>
                 )))

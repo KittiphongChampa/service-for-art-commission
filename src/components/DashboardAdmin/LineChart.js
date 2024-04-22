@@ -226,7 +226,7 @@ const LineChart = () => {
   return (
     <div>
       <div style={{ marginTop: '20px' }}>
-        <label>Filter: </label>
+        <label>กรองจาก: </label>
         <select onChange={(e) => handleDateChange(e.target.value)}>
           <option value="year">ปีนี้</option>
           <option value="today">วันนี้</option>

@@ -97,7 +97,6 @@ export default function ChatBox() {
     }
   }, []);
 
-  const [messages, setMessages] = useState([]);
   useEffect(() => {
     reportWindowSize()
   }, [chat_order_id])
@@ -138,11 +137,12 @@ export default function ChatBox() {
 
 
   // Callback function ที่จะส่งไปยัง child
+  const [messages, setMessages] = useState([]);
+  const [msg ,setArrivalMessage] = useState("")
+
   const updateMessages = (messages) => {
     setMessages(messages);
   };
-
-  const [msg ,setArrivalMessage] = useState("")
 
   // ทำงานแล้วดึงข้อมูลของผู้ติดต่อและข้อความ
   useEffect(() => {
@@ -159,21 +159,11 @@ export default function ChatBox() {
         console.error("Error fetching contacts:", error);
       }
     };
+    
     if (socket) {
-      socket.on("msg-receive", ({ img, msgId, msg, to, od_id, step_id, step_name, status, checked, isSystemMsg, from }) => {
+      socket.on("msg-receive", ({ msg }) => {
         setArrivalMessage({
-          img: img,
-          msgId: msgId,
-          fromSelf: false,
           message: msg,
-          timestamp_chat: timestamp_chat,
-          created_at: currentDate,
-          step_id: step_id,
-          step_name: step_name,
-          od_id: od_id,
-          status: status,
-          checked: checked,
-          isSystemMsg: isSystemMsg
         })
       })
     }

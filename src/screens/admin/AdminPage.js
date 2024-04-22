@@ -27,6 +27,7 @@ export default function AdminPage() {
   const [user, setUser] = useState([]); //ข้อมูลของผู้ใช้งานทั้งหมด
   const [cmsData, setCmsdata] = useState([]); //ข้อมูลของ cms ที่รอตรวจสอบทั้งหมด
   const [reportAll, setReportAll] = useState([]); //ข้อมูลของ report ทั้งหมด
+  const [artistRank, setArtistRank] = useState([]); //ข้อมูลลำดับของนักวาด
 
   useEffect(() => {
     if (token && type == "admin") {
@@ -34,6 +35,7 @@ export default function AdminPage() {
       getAllUsersData();
       getAllCmsProblem();
       getReport();
+      getArtistRank();
     } else {
       navigate("/login");
     }
@@ -93,6 +95,20 @@ export default function AdminPage() {
       });
   };
 
+  const getArtistRank = async () => {
+    await axios .get(`${host}/get/artist/ranking`, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }).then((response) => {
+      if (response.status == 200) {
+        setArtistRank(response.data.results)
+      } else {
+        console.log("เกิดข้อผิดพลาดในการหา artist rank");
+      }
+    })
+  };
+
 
 
   return (
@@ -105,7 +121,6 @@ export default function AdminPage() {
             <AdminMenuAside onActive={null} />
           </div>
           <div className="aside-main-card" style={{ padding: "1.3rem 3rem" }}>
-            {/* <div className="container"> */}
             {/* <h3>Welcome,{admindata.admin_name}</h3> */}
             <h1 className="h3">แดชบอร์ด</h1>
             <Flex gap="small" wrap="wrap">
@@ -164,8 +179,46 @@ export default function AdminPage() {
                 <PieChart />
               </div>
             </div>
+
+            <div>
+              <h6>อันดับนักวาด</h6>
+              <div style={{ display: "flex", marginTop: "15px" }}>
+                <table className="table is-striped is-fullwidth">
+                  <thead>
+                    <tr>
+                      <th>ลำดับ</th>
+                      <th>ชื่อนักวาด</th>
+                      <th>จำนวนรีวิว</th>
+                      <th>คะแนนรีวิว</th>
+                      <th>จำนวนออเดอร์</th>
+                      <th>เงินที่ได้ทั้งหมด</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {artistRank.length == 0 ? (<tr>
+                        <td>ยังไม่มีข้อมูล</td>
+                      </tr>
+                      )
+                      :
+                      (artistRank.map((item, index) => (
+                        <tr key={item.id}>
+                          <td>{index + 1}</td>
+                          <td>
+                            <img src={item.urs_profile_img} style={{ width: 20, borderRadius: 50 }} /> {item.urs_name}
+                          </td>
+                          <td>{item.review_count}</td>
+                          <td>{item.urs_all_review}</td>
+                          <td>{item.order_count}</td>
+                          <td>{item.profit}</td>
+                        </tr>
+                      )))
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
-          {/* </div> */}
         </div>
       </div>
     </>

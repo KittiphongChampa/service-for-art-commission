@@ -1,6 +1,6 @@
 import { NavbarUser, NavbarAdmin, NavbarHomepage, NavbarGuest } from "../../components/Navbar";
 import * as Icon from 'react-feather';
-import { Select,Dropdown, Input, Radio, Space, Tag, Modal, Form, message, Button, Flex } from 'antd';
+import { Select,Dropdown, Input, Radio, Space, Tag, Modal, Form, message, Button, Flex ,Alert} from 'antd';
 import React, { useState, useEffect, useRef } from "react";
 import ReportModal from "../../modal/ReportModal";
 import { MoreOutlined, CloseCircleOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -116,6 +116,7 @@ export default function ArtworkDetail() {
                 rpdetail: values['rp-detail'],
                 rplink: values['rp-link'],
                 rpemail: values['rp-email'],
+                usr_reported_id: gallery.id
             };
             const response = await axios.post(`${host}/report/artwork/${artworkId.id}`, postData, {
                 headers: {
@@ -202,6 +203,7 @@ export default function ArtworkDetail() {
             }
         ];
     }
+    
     const onEdit = (values) => {
         const formData = new FormData();
         formData.append("detail", values.detail);
@@ -300,7 +302,8 @@ export default function ArtworkDetail() {
                                         <p className="time">{thaiDate}</p>
                                     </div>
                                     <Flex gap="small">
-                                        <Dropdown
+
+                                        { !gallery.deleted_by && <Dropdown
                                             menu={{
                                                 items,
                                             }}
@@ -308,11 +311,13 @@ export default function ArtworkDetail() {
                                         >
                                             <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
                                             </Button>
-                                        </Dropdown>
+                                        </Dropdown>} 
+
                                     </Flex>
                                 </div>
 
-                                {openEditForm ? <Form
+                                {openEditForm ?
+                                    <Form
                                     form={form}
                                     layout="vertical"
                                     onFinish={onEdit}
@@ -369,7 +374,13 @@ export default function ArtworkDetail() {
                                                 <a href={`#${data.tp_id}`}>{data.tp_name}</a>
                                             </Tag>
                                         ))}
-                                    </div>
+                                        </div>
+                                        {gallery.deleted_by && 
+                                            
+
+                                            <Alert message={"งานวาดของคุณถูกลบแล้ว เนื่องจาก" + gallery.delete_reason} type="error" style={{marginTop:'1.5rem'}}/>
+
+                                        }
                                 </>    
                                 }                            
                             </div>

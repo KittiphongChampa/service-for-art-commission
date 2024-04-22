@@ -62,9 +62,14 @@ export default function SettingProfile() {
   } = useForm({});
 
   // let userdata = []
+
   const [userdata, setUserdata] = useState([]);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
+  const usernameRef = useRef();
+  const bioRef = useRef()
+
+
 
   const [bankAccName, setBankAccName] = useState("");
   const [ppNumber, setPpNumber] = useState("");
@@ -81,6 +86,42 @@ export default function SettingProfile() {
   };
 
   useEffect(() => {
+    const getUser = async () => {
+      await axios
+        .get(`${host}/profile`, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        })
+        .then((response) => {
+          const data = response.data;
+          if (data.status === "ok") {
+            setUserdata(data.users[0]);
+            setName(data.users[0].urs_name);
+            usernameRef.current = data.users[0].urs_name
+            setBio(data.users[0].urs_bio);
+            bioRef.current = data.users[0].urs_bio
+            setCover(data.users[0].urs_cover_color);
+            setBankAccName(data.users[0].urs_account_name);
+            setPpNumber(data.users[0].urs_promptpay_number);
+
+            // userdata= data.users[0];
+          } else if (data.status === "error") {
+            toast.error(data.message, toastOptions);
+          } else {
+            toast.error("ไม่พบผู้ใช้งาน", toastOptions);
+          }
+        }).catch((error) => {
+          if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
+            alert("Token has expired. Please log in again.");
+            localStorage.removeItem("token");
+            navigate("/login");
+          } else {
+            console.error("Error:", error);
+          }
+        });
+    };
+
     if (token) {
       getUser();
     } else {
@@ -88,44 +129,18 @@ export default function SettingProfile() {
     }
   }, []);
 
-  const getUser = async () => {
-    await axios
-      .get(`${host}/profile`, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.status === "ok") {
-          setUserdata(data.users[0]);
-          setName(data.users[0].urs_name);
-          setBio(data.users[0].urs_bio);
-          setCover(data.users[0].urs_cover_color);
-          setBankAccName(data.users[0].urs_account_name);
-          setPpNumber(data.users[0].urs_promptpay_number);
 
-          // userdata= data.users[0];
-        } else if (data.status === "error") {
-          toast.error(data.message, toastOptions);
-        } else {
-          toast.error("ไม่พบผู้ใช้งาน", toastOptions);
-        }
-      }).catch((error) => {
-        if (error.response && error.response.status === 401 && error.response.data === "Token has expired") {
-          alert("Token has expired. Please log in again.");
-          localStorage.removeItem("token");
-          navigate("/login");
-        } else {
-          console.error("Error:", error);
-        }
-      });
-  };
-  const profileupdate = async (event) => {
-    event.preventDefault();
+  const profileupdate = async (values) => {
+    // event.preventDefault();
+    let bioValue;
+    if (values.bio == null) {
+      bioValue = ''
+    } else {
+      bioValue = values.bio
+    }
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("bio", bio);
+    formData.append("name", values.username);
+    formData.append("bio", bioValue);
     await axios
       .patch(`${host}/profile/update`, formData, {
         headers: {
@@ -141,16 +156,24 @@ export default function SettingProfile() {
             window.location.reload(false);
           });
         } else {
-          //   toast.error(data.message, toastOptions);
+            toast.error(data.message, toastOptions);
         }
       });
   };
 
-  const bankupdate = async (event) => {
-    event.preventDefault();
+  const bankupdate = async (values) => {
     const formData = new FormData();
-    formData.append("bankAccName", bankAccName);
-    formData.append("ppNumber", ppNumber);
+    // let bname
+    // let pnum
+    // if (values.bankAccName == null) {
+    //   bname = ''
+    // }
+
+    // if (values.ppNumber) {
+    //   pnum = ''
+    // }
+    formData.append("bankAccName", values.bankAccName);
+    formData.append("ppNumber", values.ppNumber);
     await axios
       .patch(`${host}/bank/update`, formData, {
         headers: {
@@ -164,7 +187,7 @@ export default function SettingProfile() {
             window.location.reload(false);
           });
         } else {
-          //   toast.error(data.message, toastOptions);
+            toast.error(data.message, toastOptions);
         }
       });
   };
@@ -291,8 +314,8 @@ export default function SettingProfile() {
     event.preventDefault()
     const formData = new FormData();
     formData.append("cover_color", selectedColor);
-    Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
-      if (result.isConfirmed) {
+    // Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
+      // if (result.isConfirmed) {
         axios.patch(`${host}/cover_color/update`, formData, {
           headers: {
             Authorization: "Bearer " + token,
@@ -306,8 +329,8 @@ export default function SettingProfile() {
             Swal.fire({ ...alertData.changeCoverIsError })
           }
         })
-      }
-    })
+      // }
+    // })
   }
 
   const profileupdate_img = async (event) => {
@@ -337,6 +360,21 @@ export default function SettingProfile() {
         }
       });
   };
+  
+  const [form] = Form.useForm();
+  const [form_two] = Form.useForm();
+
+  form.setFieldsValue({
+    username: name,
+    bio: bio
+  });
+
+  form_two.setFieldsValue({
+    bankAccName: bankAccName,
+    ppNumber: ppNumber
+  });
+
+  const { TextArea } = Input;
 
   return (
     <div className="body-con">
@@ -362,7 +400,16 @@ export default function SettingProfile() {
                   <h2 className="h3">โปรไฟล์</h2>
                 </div>
                 <div className="in-setting-page">
-                  <form onSubmit={profileupdate}>
+                  {/* <form onSubmit={profileupdate}> */}
+                  <Form
+                    form={form}
+                    name='profileForm'
+                    layout="vertical"
+                    onFinish={profileupdate}
+                  // initialValues={initialValues}
+                  >
+
+
                     <div className="setting-img-box">
                       <div
                         className="setting-cover"
@@ -385,43 +432,41 @@ export default function SettingProfile() {
                     </div>
 
                     {/* มีปัญหา */}
-                    <div>
-                      <label>ชื่อผู้ใช้</label>
-                      <TextareaAutosize
-                        className="txtarea"
-                        id="username"
-                        maxlength="50"
-                        disabled={editProfileBtn}
-                        style={{ border: !editProfileBtn && '1px solid #d9d9d9' }}
-                        {...register("username", { maxLength: 50 })}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                      <p
-                        className="text-align-right"
-                        style={{ display: editProfileBtn ? 'none' : 'block' }}
-                      >
-                        {/* {name.length}/50 */}
-                      </p>
 
-                      <label >คำอธิบายตัวเอง</label>
-                      <TextareaAutosize
-                        className="txtarea"
-                        id="bio"
-                        maxlength="350"
-                        disabled={editProfileBtn}
-                        style={{ border: !editProfileBtn && '1px solid #d9d9d9' }}
-                        {...register("bio", { maxLength: 350 })}
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
-                      />
-                      <p
-                        className="text-align-right"
-                        style={{ display: editProfileBtn ? 'none' : 'block' }}
-                      >
-                        {/* {bio.length}/350 */}
-                      </p>
-                    </div>
+                    <Form.Item
+                      label='ชื่อผู้ใช้'
+                      name='username'
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกชื่อผู้ใช้",
+                        },
+                        {
+                          min: 4,
+                          message: "กรุณากรอกรหัสผ่านอย่างน้อย 4 ตัว",
+                        },
+                        { type: "text" },
+                      ]}
+
+                    >
+                      {editProfileBtn ? 
+                        <p>{name}</p>
+                      :
+                        <Input/>
+                      }
+                      
+
+                    </Form.Item>
+
+                    <Form.Item
+                      label='คำอธิบายตัวเอง'
+                      name='bio'>
+                      {editProfileBtn ?
+                        <p>{bio}</p>
+                        :
+                        <Input />
+                      }
+                    </Form.Item>
 
                     <Flex className="mt-3" id="sendDataBtn" justify="center" gap="small">
                       {!editProfileBtn && <><Button shape="round" size="large" className="gradiant-btn" htmlType="submit">
@@ -434,27 +479,7 @@ export default function SettingProfile() {
                         แก้ไขโปรไฟล์
                       </Button>}
                     </Flex>
-                  </form>
-                  {/* <Form
-                    onFinish={profileupdate}
-                    layout="vertical"
-                    name="updateProfile"
-                    initialValues={
-                      {
-                        username: name,
-                      }
-                    }
-                  >
-                    <Form.Item
-                      label="ชื่อผู้ใช้"
-                      name="username">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item
-                      label="คำอธิบายตัวเอง">
-                      <Input />
-                    </Form.Item>
-                  </Form> */}
+                  </Form>
                 </div>
               </div>
 
@@ -463,14 +488,25 @@ export default function SettingProfile() {
                   <h2 className="h3">อีเมลและรหัสผ่าน</h2>
                 </div>
                 <div className="in-setting-page">
-                  <div>
-                    <label >อีเมล</label>
-                    <p>
-                      {userdata.urs_email}{" "}
-                      {/* <Button className="change-email gradient-border-btn">
-                    <p>เปลี่ยนอีเมล</p>
-                  </Button> */}
-                    </p>
+
+                    <Form.Item label='อีเมล' name='email'>
+                      <p>{userdata.urs_email}</p>
+                      {/* <Input style={{ border: 'none', pointerEvents:'none' }} /> */}
+
+                    </Form.Item>
+
+                    <Form.Item label='รหัสผ่าน'>
+                      <Button
+                        // className="change-pass gradient-border-btn"
+                        onClick={handleModalPass}
+                        shape="round"
+                      >
+                        <p>เปลี่ยนรหัสผ่าน</p>
+                      </Button>
+
+                    </Form.Item>
+
+                  {/* <div>
                     <label>รหัสผ่าน</label>
                     <Button
                       // className="change-pass gradient-border-btn"
@@ -479,56 +515,56 @@ export default function SettingProfile() {
                     >
                       <p>เปลี่ยนรหัสผ่าน</p>
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
-              {userdata.urs_type == 1 && 
-                <div className="settingCard">
+              <div className="settingCard">
                 <div>
                   <h2 className="h3">บัญชีพร้อมเพย์</h2>
                 </div>
                 <div className="in-setting-page">
-                  <form onSubmit={bankupdate}>
-                    <div>
-                      <label >ชื่อบัญชีพร้อมเพย์</label>
-                      <TextareaAutosize
-                        className="txtarea"
-                        id="bankAccName"
-                        maxlength="50"
-                        disabled={editPromptpayBtn}
-                        style={{ border: !editPromptpayBtn && '1px solid #d9d9d9' }}
-                        {...register("bankAccName", { maxLength: 50 })}
-                        value={bankAccName}
-                        onChange={(e) => setBankAccName(e.target.value)}
-                      />
-                      <p
-                        className="text-align-right"
-                        style={{ display: editPromptpayBtn ? 'none' : 'block' }}
-                      >
-                        {/* {bankAccName.length}/200 */}
-                      </p>
 
+                  <Form
+                    form={form_two}
+                    name='bank'
+                    layout="vertical"
+                    onFinish={bankupdate}
+                  >
+                    <Form.Item label='ชื่อบัญชีพร้อมเพย์' name='bankAccName'
+                      rules={[
+                       {
+                          required: true,
+                          message: "กรุณากรอกชื่อบัญชีพร้อมเพย์",
+                        },
+                        { type: "text" },
+                      ]}
+                    >
+                      {editPromptpayBtn ?
+                        <p>{bankAccName}</p>
+                        :
+                        <Input />}
 
-                      <label >เลขพร้อมเพย์</label>
-                      <TextareaAutosize
-                        className="txtarea"
-                        id="ppNumber"
-                        maxlength="350"
-                        disabled={editPromptpayBtn}
-                        style={{ border: !editPromptpayBtn && '1px solid #d9d9d9' }}
-                        {...register("ppNumber", { maxLength: 50 })}
-                        value={ppNumber}
-                        onChange={(e) => setPpNumber(e.target.value)}
-                      />
-                      <p
-                        className="text-align-right"
-                        style={{ display: editPromptpayBtn ? 'none' : 'block' }}
-                      >
-                        {/* {ppNumber.length}/50 */}
-                      </p>
+                    </Form.Item>
+                    <Form.Item label='เลขพร้อมเพย์' name='ppNumber'
+                      rules={[
+                       {
+                          required: true,
+                          message: "กรุณากรอกชื่อผู้ใช้",
+                        },
+                        {
+                          max: 13,
+                          message: "เลขพร้อมเพย์มีเลขไม่เกิน 13 หลัก",
+                        },
+                        { type: "text" },
+                      ]}>
+                      {editPromptpayBtn ? 
+                        <p>{ppNumber}</p>
+                      :
+                        <Input/>}
 
-                    </div>
+                    </Form.Item>
+
                     <Flex gap="small" justify="center">
                       {!editPromptpayBtn && <>
 
@@ -544,11 +580,12 @@ export default function SettingProfile() {
                         แก้ไขข้อมูลบัญชีธนาคาร
                       </Button>}
                     </Flex>
-                  </form>
+
+                  </Form>
+                  
+                  
                 </div>
               </div>
-            }
-              
 
               {/* <div style={{ border: "none", padding: "0",width: "100%",height: "fit-content"}}> */}
               <Button
@@ -674,8 +711,6 @@ export default function SettingProfile() {
                 <Button shape="round" size="large" onClick={openProfileModal}>ยกเลิก</Button>
               </Flex>
             </form>
-            {/* </div>
-                </div> */}
           </Modal>
 
 

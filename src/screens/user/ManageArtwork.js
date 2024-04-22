@@ -118,21 +118,21 @@ export default function ManageArtwork() {
     };
 
     function selectPic(ex_img_id, ex_img_path) {
-        Swal.fire({
-            imageUrl: ex_img_path,
-            imageHeight: 300,
-            imageAlt: "ภาพที่คุณเลือก",
-            title: "เลือกภาพนี้หรือไม่?",
-            showCancelButton: true,
-            confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+        // Swal.fire({
+        //     imageUrl: ex_img_path,
+        //     imageHeight: 300,
+        //     imageAlt: "ภาพที่คุณเลือก",
+        //     title: "เลือกภาพนี้หรือไม่?",
+        //     showCancelButton: true,
+        //     confirmButtonText: "ตกลง",
+        //     cancelButtonText: "ยกเลิก"
+        // }).then(async (result) => {
+        //     if (result.isConfirmed) {
                 setImageId(ex_img_id)
                 setImageUrl(ex_img_path)
                 handleCmsArtworkModal()
-            }
-        });
+        //     }
+        // });
     }
 
     const [topicValues, setTopicValues] = useState([]);
@@ -181,15 +181,15 @@ export default function ManageArtwork() {
             </Space>
         );
 
-        api.info({
-            message: 'กำลังตรวจสอบรูปภาพ',
-            description:
-                'กำลังตรวจสอบรูปภาพซ้ำ', btn,
-            duration: 0,
-            placement: 'bottomRight',
-            // icon: <LoadingOutlined style={{ color: '#108ee9' }} />
-            icon: <Progress type="circle" percent={50} size={20} />
-        });
+        // api.info({
+        //     message: 'กำลังตรวจสอบรูปภาพ',
+        //     description:
+        //         'กำลังตรวจสอบรูปภาพซ้ำ', btn,
+        //     duration: 0,
+        //     placement: 'bottomRight',
+        //     // icon: <LoadingOutlined style={{ color: '#108ee9' }} />
+        //     icon: <Progress type="circle" percent={50} size={20} />
+        // });
     }
 
     const menus = [

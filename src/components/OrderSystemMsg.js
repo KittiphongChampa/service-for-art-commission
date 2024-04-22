@@ -89,14 +89,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
         setSrc(imgsrc)
     }
 
-    const submitReview = (values) => {
-        Swal.fire({
-            title: values.comment + reviewValue,
-            showCancelButton: true,
-            confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก",
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+    const submitReview = async (values) => {
                 await axios.post(
                     `${host}/sendreview`,
                     {
@@ -115,8 +108,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                     }
                 })
                 sendReview(ReviewModalHandle)
-            }
-        });
+
     };
 
     function formatTime(rawTime) {
@@ -281,7 +273,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                     </div>
                     <div>
                         <p>ชื่อบัญชี : {accName}</p>
-                        <p>จำนวนเงิน {amount} บาท</p>
+                        <p>จำนวนเงิน {amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} บาท</p>
                     </div>
                     {orderDetail.artist_id == myId ?
                         message.checked == 0 ?
