@@ -105,28 +105,28 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
 
 
 
-    const submitReview = (values) => {
-        Swal.fire({
-            title: values.comment + reviewValue,
-            showCancelButton: true,
-            confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก",
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                await axios.post(
-                    `${host}/sendreview`,
-                    {
-                        od_id: orderDetail.od_id,
-                        rw_comment: values.comment,
-                        rw_score: reviewValue,
-                        cms_id: orderDetail.cms_id,
-                        artist_id: orderDetail.artist_id,
-                        all: orderDetail
-                    }
-                );
-                sendReview()
+    const submitReview = async(values) => {
+        // Swal.fire({
+        //     title: values.comment + reviewValue,
+        //     showCancelButton: true,
+        //     confirmButtonText: "ตกลง",
+        //     cancelButtonText: "ยกเลิก",
+        // }).then(async (result) => {
+        // if (result.isConfirmed) {
+        await axios.post(
+            `${host}/sendreview`,
+            {
+                od_id: orderDetail.od_id,
+                rw_comment: values.comment,
+                rw_score: reviewValue,
+                cms_id: orderDetail.cms_id,
+                artist_id: orderDetail.artist_id,
+                all: orderDetail
             }
-        });
+        );
+        sendReview()
+        //     }
+        // });
     };
 
     function formatTime(rawTime) {
@@ -256,7 +256,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                     </div>
                     <div>
                         <p>ชื่อบัญชี : {accName}</p>
-                        <p>จำนวนเงิน {amount} บาท</p>
+                        <p>จำนวนเงิน {amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} บาท</p>
                     </div>
                     {orderDetail.artist_id == myId ?
                         message.checked == 0 ?

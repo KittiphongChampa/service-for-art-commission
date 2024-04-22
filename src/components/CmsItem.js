@@ -13,8 +13,8 @@ export default function CmsItem(props) {
           class="cms-card-img col"
           style={{ backgroundImage: `url("${props.src}")` }}
         >
-          <div className="status-wrapper">
-            <p>{props.status == "open" ? "เปิด" : "ปิด"}</p>
+          <div className="status-wrapper" >
+            <p className={props.status}> {props.status == "open" ? "เปิด" : "ปิด"} </p>
             {/* ถ้าปิดเป็น classname close */}
           </div>
         </div>

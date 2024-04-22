@@ -17,7 +17,7 @@ import Scrollbars from 'react-scrollbars-custom';
 // import { Pagination } from 'rsuite';
 import { Link } from 'react-router-dom';
 // import { DateRangePicker } from 'rsuite';
-import { Pagination, Input, Select, Space, Tabs, Flex, DatePicker, Table } from 'antd';
+import { Pagination, Input, Select, Space, Tabs, Flex, DatePicker, Badge } from 'antd';
 import axios from "axios";
 import { host } from "../utils/api";
 import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
@@ -41,6 +41,12 @@ export default function OrderOverview() {
     const [sortdateValue, setSortdateValue] = useState('ทุกปี')
     const [allData, setAllData] = useState()
     const [filterCmsReq, setFilterCmsReq] = useState()
+
+    const [countAll, setCountAll] = useState()
+    const [countWait, setCountWait] = useState()
+    const [countAccepted, setCountAccepted] = useState()
+    const [countCancel, setCountCancel] = useState()
+    const [countFinish, setCountFinish] = useState()
 
     let layout = ['total', '-', 'pager', 'skip']
 
@@ -102,6 +108,17 @@ export default function OrderOverview() {
             // console.log(allreqData)
             setAllData(allreqData.data)
             setFilterCmsReq(allreqData.data)
+
+            const array0 = allreqData.data
+            setCountAll(array0.length == 0 ? '0' : array0.length)
+            const array1 = allreqData.data.filter(data => data?.step_name.includes('รับคำขอจ้าง') && data?.od_cancel_by == null)
+            setCountWait(array1.length == 0 ? '0' : array1.length)
+            const array3 = allreqData.data.filter(data => data?.od_cancel_by !== null)
+            setCountCancel(array3.length == 0 ? '0' : array3.length)
+            const array4 = allreqData.data.filter(data => data?.finished_at !== null)
+            setCountFinish(array4.length == 0 ? '0' : array4.length)
+            const array5 = allreqData.data.filter(data => data?.finished_at !== null && data?.od_cancel_by !== null)
+            setCountAccepted(array5.length == 0 ? '0' : array5.length)
         }
 
         getData()
@@ -186,27 +203,49 @@ export default function OrderOverview() {
     const menus = [
         {
             key: 'all',
-            label: "ทั้งหมด",
+            label:
+                <>
+                    <span>ทั้งหมด </span>
+                    <Badge count={countAll} showZero color="#faad14" />
+                </>,
             // children: <Foryou statusUserLogin={statusUserLogin} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
         },
         {
             key: 'wait',
-            label: "รอการตอบรับ",
+            label:
+
+                <>
+                    <span>รอการตอบรับ </span>
+                    <Badge count={countWait} showZero color="#faad14" />
+                </>
+            ,
             // children: <Commissions IFollowingIDs={IFollowingIDs} />,
         },
         {
             key: 'accepted',
-            label: "ยอมรับแล้ว",
+            label:
+                <>
+                    <span>ยอมรับแล้ว </span>
+                    <Badge count={countAccepted} showZero color="#faad14" />
+                </>,
             // children: <Gallery IFollowingIDs={IFollowingIDs} />,
         },
         {
             key: 'finish',
-            label: "เสร็จสิ้น",
+            label:
+                <>
+                    <span>เสร็จสิ้น </span>
+                    <Badge count={countFinish} showZero color="#faad14" />
+                </>
             // children: <Artists IFollowingIDs={IFollowingIDs} />,
         },
         {
             key: 'cancel',
-            label: "ยกเลิกแล้ว",
+            label:
+                <>
+                    <span>ยกเลิกแล้ว </span>
+                    <Badge count={countCancel} showZero color="#faad14" />
+                </>,
             // children: <Artists IFollowingIDs={IFollowingIDs} />,
         },
 
@@ -216,18 +255,33 @@ export default function OrderOverview() {
 
     function changeMenu(key) {
         // key == "all" && const aa = allReq.filter(menu => menu.step_name == "")
-        var req;
+        // var req;
+        // if (key == 'all') {
+        //     req = allData
+        // } else if (key == 'wait') {
+        //     req = allData.filter(menu => menu.step_name == "รับคำขอจ้าง")
+        // } else if (key == 'accepted') {
+        //     req = allData.filter(menu => !menu.step_name?.includes('คำขอจ้าง') || !menu.step_name?.includes('แอดมินอนุมัติ'))
+        // } else if (key == 'cancel') {
+        //     req = allData.filter(menu => menu.od_cancel_by !== null)
+        // }
+        // else if (key == 'finish') {
+        //     req = allData.filter(menu => menu.finished_at !== null)
+        // }
+
+        let req;
         if (key == 'all') {
             req = allData
         } else if (key == 'wait') {
-            req = allData.filter(menu => menu.step_name == "รับคำขอจ้าง")
-        } else if (key == 'accepted') {
-            req = allData.filter(menu => !menu.step_name?.includes('คำขอจ้าง') || !menu.step_name?.includes('แอดมินอนุมัติ'))
+            req = allData.filter(menu => menu?.step_name.includes('รับคำขอจ้าง') && menu?.od_cancel_by == null)
         } else if (key == 'cancel') {
-            req = allData.filter(menu => menu.od_cancel_by !== null)
+            req = allData.filter(menu => menu?.od_cancel_by !== null)
+        } else if (key == 'finish') {
+            req = allData.filter(menu => menu?.finished_at !== null)
         }
-        else if (key == 'finish') {
-            req = allData.filter(menu => menu.finished_at !== null)
+        else {
+            // กรณีแอกเซ็ป
+            req = allData.filter(menu => menu?.finished_at !== null && menu?.od_cancel_by !== null && menu?.step_name.includes('รับคำขอจ้าง'))
         }
         setFilterCmsReq(req)
         if (searchValue) {
@@ -366,7 +420,9 @@ export default function OrderOverview() {
                                             <td>{req.cms_name} : {req.pkg_name}</td>
                                             <td>{req.od_price}</td>
                                             <td>{req.customer_name}</td>
-                                            <td>{req.step_name == undefined ? "-" : req.step_name}</td>
+                                            <td>รอ{req.od_cancel_by == null && req.finished_at == null && req.step_name}
+                                                {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
+                                                {req.od_cancel_by == !null && 'ยกเลิกแล้ว'}</td>
                                         </tr>
                                         {showDetail === index + 1 + startIndex && <tr className="tr-detail">
                                             <td colSpan="12">

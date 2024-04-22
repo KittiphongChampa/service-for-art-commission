@@ -700,7 +700,7 @@ export default function CmsDetail() {
                 <>
                   {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
-                    <h1 className="h3 me-3">{cmsDetail.cms_name}<span class="cms-status-detail">{cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}</span></h1>
+                    <h1 className="h3 me-3">{cmsDetail.cms_name}<span className={cmsDetail.cms_status === "open" ? "cms-status-detail open" : "cms-status-detail"}>{cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}</span></h1>
                     {isLoggedIn &&
                       <Flex gap="small" justify="flex-end" flex={1}>
                         <Dropdown

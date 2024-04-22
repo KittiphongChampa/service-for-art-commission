@@ -211,7 +211,7 @@ p {
 .setting-menu div.active {
     color: #000000;
     background: #F4F1F9;
-    box-shadow: 0px 0px 11px #CDACFC;
+    /* box-shadow: 0px 0px 11px #CDACFC; */
     border-radius: 20px;
 }
 
@@ -1089,16 +1089,23 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .cms-card-img p {
+    color: #909090;
+    background-color: #ebebeb;
     font-size: 14px;
-    color: #52c41a;
     height: fit-content;
     font-weight: 400;
     border-radius: 100px;
     padding: 0.2rem 0.7rem;
-    background-color: #f6ffed;
     width: fit-content;
     border-radius: 1rem;
 }
+
+
+.cms-card-img p.open {
+    color: #52c41a;
+    background-color: #f6ffed;
+}
+
 
 .cms-card-img p.close {
     color: #c4281a;

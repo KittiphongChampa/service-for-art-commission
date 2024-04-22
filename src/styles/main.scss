@@ -15,6 +15,45 @@
     font-weight: 300;
 }
 
+.setting-content-box {
+    .ant-form-item .ant-form-item-label>label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+        display: none !important;
+    }
+}
+
+.ant-input {
+    font-size: 16px !important;
+}
+
+
+
+.artwork-uploader{
+    .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
+    .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+        width: 100% !important;
+        height: 30rem !important;
+        object-fit: contain;
+
+        img{
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+    }
+
+}
+
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container,
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+    width: 200px;
+    height:200px;
+}
+
+
 .ant-typography,
 .ant-btn,
 .ant-input,
@@ -32,7 +71,7 @@
     align-items: center !important;
 }
 
-.ant-image-preview-close{
+.ant-image-preview-close {
     background-color: white;
     color: $darkMineral;
 }
@@ -82,8 +121,14 @@
     font-weight: 400 !important;
 }
 
+div:where(.swal2-container) button:where(.swal2-styled) {
+    padding: 7px 20px !important;
+    // font-weight: 100 !important;
+}
+
 .swal2-popup,
 .swal2-title {
+    justify-self: center;
     font-family: 'Prompt', sans-serif;
     font-weight: 400 !important;
     border-radius: 1rem !important;
@@ -93,15 +138,23 @@
     // line-height: 1
 }
 
+.swal2-html-container{
+    text-align: left !important;
+}
+
 button.swal2-styled {
     border-radius: 200px !important;
-    font-weight: 400 !important;
+    font-weight: 300 !important;
     font-size: 16px !important;
     /* แก้ไขค่าตามที่คุณต้องการ */
 }
 
 button.swal2-confirm {
     background-color: $lightBlue !important;
+}
+
+button.swal2-deny {
+    background-color: gray !important;
 }
 
 button.swal2-cancel {
@@ -156,18 +209,18 @@ label {
     font-size: 1.25rem !important;
 }
 
-.ant-input-search :where(.css-dev-only-do-not-override-3mqfnx).ant-input-group .ant-input-affix-wrapper:not(:last-child) {
+.ant-input-search .ant-input-group .ant-input-affix-wrapper:not(:last-child) {
     border-start-start-radius: 1rem;
     border-end-start-radius: 1rem;
     // padding: 0.5rem 1rem;
 }
 
-:where(.css-dev-only-do-not-override-3mqfnx).ant-input-search>.ant-input-group>.ant-input-group-addon:last-child .ant-input-search-button {
+.ant-input-search>.ant-input-group>.ant-input-group-addon:last-child .ant-input-search-button {
     border-start-end-radius: 1rem;
     border-end-end-radius: 1rem;
 }
 
-:where(.css-dev-only-do-not-override-3mqfnx).ant-input-group-wrapper-lg .ant-input-group-addon {
+.ant-input-group-wrapper-lg .ant-input-group-addon {
     border-radius: 1rem;
 }
 
@@ -337,6 +390,13 @@ a:focus {
     p.h3 {
         color: $darkMineral;
     }
+}
+
+.submenu-filter {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .body-con {
@@ -559,14 +619,18 @@ div.form-order {
         // justify-content: center;
         // background-color: aqua;
         .cms-status-detail {
-            color: #52c41a;
+            color: #909090;
+            background-color: #ebebeb;
             font-weight: 400;
             border-radius: 100px;
             padding: 0.2rem 0.7rem;
-            background-color: #f6ffed;
             height: fit-content;
             margin-left: 0.5rem;
             vertical-align: middle;
+            &.open {
+                color: #52c41a;
+                background-color: #f6ffed;
+            }
         }
     }
 
@@ -653,8 +717,8 @@ div#cms-artist-profile {
 
     img {
         border-radius: 100px;
-        width: 64px;
-        height: 64px;
+        width: 45px;
+        height: 45px;
         margin-right: 10px;
     }
 
@@ -1046,6 +1110,7 @@ p.time-sent {
                         font-weight: 500;
                         font-size: 14px;
                     }
+
                     span.finish {
                         background-color: #42fa14;
                         color: white;
@@ -1388,7 +1453,7 @@ p.time-sent {
                             word-break: break-word;
                         }
 
-                        
+
 
                         div.att-image {
                             img {
@@ -1481,7 +1546,8 @@ p.time-sent {
     padding: 1rem;
     box-shadow: rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px;
     background-color: white;
-    img{
+
+    img {
         pointer-events: none;
         cursor: pointer;
     }
@@ -1599,7 +1665,8 @@ p.time-sent {
                 @extend .oneline-textoverflow;
 
                 p:last-child {
-                    color: $lightPurple;
+                    color: $darkMineral;
+                    font-weight: 400;
                 }
             }
         }
@@ -1630,7 +1697,7 @@ p.time-sent {
             p.quota-headding {}
 
             p.quota-amount {
-                color: $lightPurple;
+                color: gray;
                 justify-self: flex-end;
 
             }
@@ -2011,7 +2078,7 @@ table.overview-order-table {
     display: flex;
     justify-content: space-between;
 
-    div {
+    div:not(.submenu-filter)>* {
         display: flex;
         column-gap: 1rem;
         // justify-content: center;
@@ -2021,6 +2088,9 @@ table.overview-order-table {
     // button {
     //     @include default-ellipse-btn(#495C83, white, transparent)
     // }
+}
+.ant-select-selector .ant-select-selection-overflow{
+    column-gap: 0 !important;
 }
 
 .ant-card-body {
@@ -2228,7 +2298,7 @@ table.overview-order-table {
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-    grid-template-rows:min-content;
+    grid-template-rows: min-content;
     gap: 0.6rem;
     min-height: 50rem;
 
@@ -2467,26 +2537,26 @@ textarea,
 
 }
 
-.artwork-uploader,
-.big-uploader {
+// .artwork-uploader,
+// .big-uploader {
 
-    :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select>.ant-upload,
-    :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select>.ant-upload {
+//     :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select>.ant-upload,
+//     :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select>.ant-upload {
 
-        // height:50vh;
-        img {
-            object-fit: contain;
-            height: 100%;
-        }
-    }
+//         // height:50vh;
+//         img {
+//             object-fit: contain;
+//             height: 100%;
+//         }
+//     }
 
-    :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
-    :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
-        width: 100%;
-        height: 50vh;
+//     :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
+//     :where(.css-dev-only-do-not-override-3mqfnx).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+//         width: 100%;
+//         height: 50vh;
 
-    }
-}
+//     }
+// }
 
 
 .ant-spin-dot {
@@ -2657,7 +2727,7 @@ div.text-wraper {
 
 //------------------------
 
-.dashboard-item{
+.dashboard-item {
     padding: 1rem;
     border-radius: 1rem;
     background-color: white;
@@ -2665,4 +2735,79 @@ div.text-wraper {
     border: 1px solid #c7cbdd5d;
     margin-right: 10;
     width: 250px;
+}
+
+//---ตรวจสอบภาพเหมือน
+
+.sim-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    height: 100%;
+    overflow: hidden;
+
+    .problem-pic-container {
+        height: 100%;
+        min-height: 0;
+        flex-direction: column;
+        display: flex;
+
+        // background-color: black;
+        div.pic {
+            flex: 1 0 1;
+            min-height: 0;
+            // height: 80%;
+            // height: 90%;
+            margin-left: -24px;
+            margin-right: -24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+
+    }
+
+    .sim-pic-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+        grid-template-rows: min-content;
+        gap: 0.5rem;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: auto;
+
+        // background-color: pink;
+        .pic-box {
+            .pic-detail {
+                text-align: center;
+            }
+
+            .pic-wrapper {
+                aspect-ratio: 1/1;
+                margin-left: -24px;
+                margin-right: -24px;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+    }
+
+}
+
+
+
+
+iframe#webpack-dev-server-client-overlay {
+    display: none !important
 }

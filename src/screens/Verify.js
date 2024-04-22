@@ -104,6 +104,9 @@ export default function Verify() {
           } else {
             Swal.fire({ ...alertData.otpisnotcorrect })
             setValues("");
+            form.setFieldsValue({
+              otp: '',
+            });
           }
         })
         .catch((error) => {
@@ -151,6 +154,10 @@ export default function Verify() {
     }
   };
 
+  const [form] = Form.useForm()
+
+
+
   return (
     <div className="body-con">
       <Helmet>
@@ -196,6 +203,7 @@ export default function Verify() {
                 <Form
                   name="verify"
                   layout="vertical"
+                  form = {form}
                   onFinish={handleSubmit}>
                   <Form.Item
                     label="รหัสยืนยัน"

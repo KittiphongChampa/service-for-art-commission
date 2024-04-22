@@ -12,7 +12,7 @@ import {
   Empty,
   Flex,
   Tabs,
-  Card,Form
+  Card, Form, Badge, Pagination
 } from "antd";
 import React, { useState, useEffect, useRef } from "react";
 import ReportItem from "../../components/ReportItem";
@@ -32,10 +32,18 @@ import * as ggIcon from "@mui/icons-material";
 import { Helmet } from "react-helmet";
 import { useAuth } from "../../context/AuthContext";
 import { host } from "../../utils/api";
+import _ from 'lodash';
 
 const title = "รายงาน";
 
 export default function Report(props) {
+
+  const [countAll, setCountAll] = useState(0)
+  const [countKept, setCountKept] = useState(0)
+  const [countDeleted, setCountDeleted] = useState(0)
+
+
+
   const navigate = useNavigate();
   const type = localStorage.getItem("type");
   const jwt_token = localStorage.getItem("token");
@@ -54,11 +62,11 @@ export default function Report(props) {
   const [workDetail, setWorkDetail] = useState([]);
   const [imgDetail, setImgDetail] = useState([]);
 
+
   const time = workDetail.created_at;
   const date = new Date(time);
-  const thaiDate = `${date.getDate()}/${date.getMonth() + 1}/${
-    date.getFullYear() + 543
-  }`;
+  const thaiDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear() + 543
+    }`;
 
   // console.log(reportDetail);
 
@@ -87,10 +95,19 @@ export default function Report(props) {
       .then((response) => {
         const data = response.data;
         if (data.status === "ok") {
+          const array0 = data.results.filter(data => data?.status == null || data?.status == undefined)
+          setCountAll(array0.length == 0 ? '0' : array0.length) //เช็คสเตตัสที่ว่างเปล่า
+          const array1 = data.results.filter(data => data?.status?.includes('k'))
+          setCountKept(array1.length == 0 ? '0' : array1.length) //เช็คสเตตัสที่กดเก็บ
+          const array3 = data.results.filter(data => data?.status?.includes('de'))
+          setCountDeleted(array3.length == 0 ? '0' : array3.length) //เช็คสเตตัสที่ลบแล้ว
           setReportAll(data.results);
+          setFilteredUser(array0)
         }
       });
   };
+
+
 
   const getReportDetail = () => {
     axios.get(`${host}/report/detail/${reportid}`).then((response) => {
@@ -104,8 +121,8 @@ export default function Report(props) {
     });
   };
 
-  const [deleteModal,setDeleteModal] = useState(false)
-  
+  const [deleteModal, setDeleteModal] = useState(false)
+
   function openDelModal() {
     setDeleteModal(!deleteModal)
   }
@@ -140,11 +157,11 @@ export default function Report(props) {
             });
           }
         })
-        
+
       }
     })
   }
-  
+
   const [form] = Form.useForm();
 
   function deleteReport(values) {
@@ -160,7 +177,7 @@ export default function Report(props) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axios.post(`${host}/report/delete/${reportid}`, postData, {
-          headers: {Authorization: "Bearer " + jwt_token}
+          headers: { Authorization: "Bearer " + jwt_token }
         }).then((response) => {
           const data = response.data;
           if (data.status === "ok") {
@@ -215,9 +232,13 @@ export default function Report(props) {
     })
   }
 
+  const [searchQuery, setSearchQuery] = useState()
+  const [searchValue, setSearchValue] = useState()
+
   const handleSearch = (event) => {
     const query = event.target.value.toLowerCase();
-    const filtered = reportAll.filter(
+    setSearchValue(query)
+    const filtered = filteredUser.filter(
       (item) =>
         item.reporter_name.toLowerCase().includes(query) ||
         item.reported_name.toLowerCase().includes(query) ||
@@ -225,26 +246,170 @@ export default function Report(props) {
         item.sendrp_detail.toLowerCase().includes(query) ||
         item.text.toLowerCase().includes(query)
     );
-    setFilteredUser(filtered);
+    setSearchQuery(filtered);
+    // setFilteredUser(filtered);
   };
+
+  function search2(rep) {
+    const filtered = rep.filter(
+      (item) =>
+        item.reporter_name.toLowerCase().includes(searchValue) ||
+        item.reported_name.toLowerCase().includes(searchValue) ||
+        item.sendrp_header.toLowerCase().includes(searchValue) ||
+        item.sendrp_detail.toLowerCase().includes(searchValue) ||
+        item.text.toLowerCase().includes(searchValue)
+    );
+    setSearchQuery(filtered);
+
+  }
 
   const menus = [
     {
-      key: 1,
-      label:'กำลังดำเนินการ',
+      key: 'wait',
+      label: <>
+        <span>รอดำเนินการ </span>
+        <Badge count={countAll} showZero color="#faad14" />
+      </>,
       children: ''
     },
     {
-      key: 2,
-      label: 'เก็บไว้แล้ว',
+      key: 'kept',
+      label: <>
+        <span>เก็บไว้แล้ว </span>
+        <Badge count={countKept} showZero color="#faad14" />
+      </>,
       children: ''
     },
     {
-      key: 3,
-      label: 'ลบแล้ว',
+      key: 'deleted',
+      label: <>
+        <span>ลบแล้ว </span>
+        <Badge count={countDeleted} showZero color="#faad14" />
+      </>,
       children: ''
     },
   ]
+
+  const [sortby, setsortby] = useState('ล่าสุด')
+
+  const [activePage, setActivePage] = useState(1);
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(9);
+  const itemsPerPage = 10;
+  const [typeValues, setTypeValues] = useState(['Artwork', 'Commission', 'Order'])
+
+  useEffect(() => {
+    if (filteredUser) {
+      //หน้าเพจ - 1 = index 0 * จำนวนแสดงต่อหน้า 0-9 10-19 20-29
+      const newStartIndex = (activePage - 1) * itemsPerPage;
+      //เอาจำนวนที่เริ่ม + จำนวนที่แสดง (0+10 = 10) จะเป็น index 0-10 
+
+      const newEndIndex = newStartIndex + (itemsPerPage);
+      //index เริ่มและ index สุดท้าย
+      setFilteredUser(filteredUser.slice(newStartIndex, newEndIndex))
+      setStartIndex(newStartIndex);
+      setEndIndex(newEndIndex);
+      // setFilterCmsReq(allData);
+      console.log(activePage, newStartIndex, newEndIndex)
+    }
+  }, [activePage]);
+
+  // const [nowKey, setNowKey] = useState('wait')
+  const nowKey = useRef('wait')
+
+  function changeMenu(key) {
+    // setNowKey(key)
+    nowKey.current = key
+    let rep;
+    if (key == 'wait') {
+      rep = reportAll.filter(data => data?.status == null || data?.status == undefined)
+    } else if (key == 'kept') {
+      rep = reportAll.filter(data => data?.status?.includes('k'))
+    } else if (key == 'deleted') {
+      rep = reportAll.filter(data => data?.status?.includes('de'))
+    }
+    setFilteredUser(rep)
+    filterType(rep) //กรองตามประเภท
+
+    if (searchValue) {
+      search2(filteredUser)
+    }
+  }
+
+  useEffect(() => {
+    sortAllData()
+  }, [sortby])
+
+  useEffect(() => {
+    filterType(reportAll)
+    // filterMenu(nowKey)
+  }, [typeValues])
+
+
+  function sortAllData() {
+    let sortData;
+    if (filteredUser) {
+      if (sortby == "ล่าสุด") {
+        sortData = _.orderBy(filteredUser, ['created_at'], ['desc']);
+      } else if (sortby == "เก่าสุด") {
+        sortData = _.orderBy(filteredUser, ['created_at'], ['asc']);
+      }
+      setFilteredUser(sortData)
+      // setReportAll(sortData)
+    }
+    if (reportAll) {
+      if (sortby == "ล่าสุด") {
+        sortData = _.orderBy(reportAll, ['created_at'], ['desc']);
+      } else if (sortby == "เก่าสุด") {
+        sortData = _.orderBy(reportAll, ['created_at'], ['asc']);
+      }
+      setReportAll(sortData)
+      // setReportAll(sortData)
+    }
+    if (searchQuery) {
+      if (sortby == "ล่าสุด") {
+        sortData = _.orderBy(searchQuery, ['created_at'], ['desc']);
+      } else if (sortby == "เก่าสุด") {
+        sortData = _.orderBy(searchQuery, ['created_at'], ['asc']);
+      }
+      setSearchQuery(sortData)
+    }
+  }
+
+  function changeType(value) {
+    setTypeValues(value)
+  }
+
+  function filterType(arr) {
+    const filteredData = arr.filter(data => typeValues.includes(data.text));
+
+    let rep;
+    if (nowKey.current == 'wait') {
+      rep = filteredData.filter(data => data?.status == null || data?.status == undefined)
+    } else if (nowKey.current == 'kept') {
+      rep = filteredData.filter(data => data?.status?.includes('k'))
+    } else if (nowKey.current == 'deleted') {
+      rep = filteredData.filter(data => data?.status?.includes('de'))
+    }
+
+    setFilteredUser(rep);
+    console.log(filteredData)
+    console.log(nowKey.current)
+
+  }
+
+  function filterMenu(key) {
+    let rep;
+    if (key == 'wait') {
+      rep = filteredUser.filter(data => data?.status == null || data?.status == undefined)
+    } else if (key == 'kept') {
+      rep = filteredUser.filter(data => data?.status?.includes('k'))
+    } else if (key == 'deleted') {
+      rep = filteredUser.filter(data => data?.status?.includes('de'))
+    }
+    setFilteredUser(rep)
+  }
+
 
   return (
     <>
@@ -255,71 +420,121 @@ export default function Report(props) {
         <>
           <h1 className="h3">การรายงาน</h1>
           {/* <div className="all-user-head"></div> */}
-          <Tabs defaultActiveKey='1' items={menus} />
-          {/* <div className="sub-menu-group mt-4">
-            <Link to="#" className="sub-menu selected">
-              กำลังดำเนินการ
-            </Link>
-            <Link to="#" className="sub-menu">
-              อนุมัติแล้ว
-            </Link>
-            <Link to="#" className="sub-menu">
-              ลบแล้ว
-            </Link>
-          </div> */}
-          {/* <div className="report-item-area"> */}
-            {/* <Link to="/admin/adminmanage/report/11"><ReportItem /></Link> */}
-
-            {/* ต้อง map */}
-            {/* {reportAll.map((data) => (
-              <div key={data.sendrp_id}>
-                <Link to={`/admin/adminmanage/report/${data.sendrp_id}`}>
-                  <ReportItem
-                    type={data.text}
-                    sendrp_header={data.sendrp_header}
-                    ex_img_path={data.ex_img_path}
-                    usr_reporter_id={data.usr_reporter_id}
-                    urs_name={data.urs_name}
-                    created_at={data.created_at}
-                  />
-                </Link>
-              </div>
-            ))} */}
-          {/* </div> */}
+          <Tabs defaultActiveKey='1' items={menus} onChange={changeMenu} />
 
           <div className="all-user-head">
-            <h2 className="h4">จำนวนทั้งหมด ({reportAll.length})</h2>
-            <div>
+            {/* <h2 className="h4">จำนวนทั้งหมด ({reportAll.length})</h2> */}
+            <div className="submenu-filter">
+
+              เรียงตาม :
+              <Select
+                // value={{ value: sortBy, label: sortBy }}
+                style={{ width: 120 }}
+                // onChange={handleSortByChange}
+                value={sortby}
+                onChange={setsortby}
+                options={[
+                  { value: 'ล่าสุด', label: 'ล่าสุด' },
+                  { value: 'เก่าสุด', label: 'เก่าสุด' },
+                ]}
+              />
+
+              ประเภท : <Select
+                mode="multiple"
+                style={{ minWidth: '10rem', maxWidth: 'fit-content' }}
+                placeholder="Please select"
+                value={typeValues}
+                id="topicSelector"
+                onChange={changeType}
+                // maxTagCount='responsive'
+                options={[
+                  // { value: 'ทั้งหมด', label: 'ทั้งหมด' },
+                  { value: 'Artwork', label: 'งานวาด' },
+                  { value: 'Commission', label: 'คอมมิชชัน' },
+                  { value: 'Order', label: 'ออเดอร์' },
+                ]}
+                allowClear
+              >
+                {/* {children} */}
+              </Select>
+
+
+            </div>
+            <div className="search">
               <Input type="search" onChange={handleSearch} placeholder=" ค้นหา..." />
             </div>
           </div>
 
           <table className="table is-striped is-fullwidth">
             <thead>
-                <tr>
-                  <th>ลำดับ</th>
-                  <th>ผู้รายงาน</th>
-                  <th>ผู้ถูกรายงาน</th>
-                  <th>หัวข้อ</th>
-                  <th>ประเภท</th>
-                  <th>เวลา</th>
-                  <th>Action</th>
-                </tr>
+              <tr>
+                <th>ลำดับ</th>
+                <th>ผู้รายงาน</th>
+                <th>ผู้ถูกรายงาน</th>
+                <th>หัวข้อ</th>
+                <th>ประเภท</th>
+                <th>เวลา</th>
+                <th>Action</th>
+              </tr>
             </thead>
             <tbody>
-              {filteredUser.map((data, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{data.reporter_name}</td>
-                  <td>{data.reported_name}</td>
-                  <td>{data.sendrp_header}</td>
-                  <td>{data.text}</td>
-                  <td>{data.created_at}</td>
-                  <td><Link to={`/admin/adminmanage/report/${data.sendrp_id}`}>จัดการ</Link></td>
-                </tr>
-              ))}
+
+
+              {searchQuery && searchValue != '' ?
+                <>
+                  {searchQuery.map((data, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{data.reporter_name}</td>
+                      <td>{data.reported_name}</td>
+                      <td>{data.sendrp_header}</td>
+                      <td>
+                        <Badge count={data.text} color={data.text.includes('work') ? "#faad14" : data.text.includes('mission') ? "#52c41a" : '#FF8716'} />
+                      </td>
+                      <td>{data.created_at}</td>
+                      <td>
+                        <Button shape="round" >
+                          <Link to={`/admin/adminmanage/report/${data.sendrp_id}`}>จัดการ</Link>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </> :
+                <>
+                  {filteredUser.map((data, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{data.reporter_name}</td>
+                      <td>{data.reported_name}</td>
+                      <td>{data.sendrp_header}</td>
+                      <td>
+                        <Badge count={data.text} color={data.text.includes('work') ? "#faad14" : data.text.includes('mission') ? "#52c41a" : '#FF8716'} />
+                      </td>
+                      <td>{data.created_at}</td>
+                      <td>
+                        <Button shape="round" >
+                          <Link to={`/admin/adminmanage/report/${data.sendrp_id}`}>จัดการ</Link>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </>}
+
+
+
+
             </tbody>
           </table>
+
+          <Pagination
+            total={filteredUser == undefined ? 0 : filteredUser.length}
+            showQuickJumper
+            showTotal={(total) => `จำนวน ${total} รายการ`}
+            defaultPageSize={10}
+            current={activePage}
+            responsive
+            onChange={setActivePage}
+          />
         </>
       ) : (
         <>
@@ -352,226 +567,148 @@ export default function Report(props) {
             <ImgSlide imgDetail={imgDetail} />
 
             <Flex justify="center" gap="small" className="mt-3">
-              <Button size="large" shape="round" onClick={keep}>
-                เก็บไว้
-              </Button>
-              <Button size="large" shape="round" danger onClick={openDelModal}>
-                ลบ
-              </Button>
+
+              {!reportDetail.status?
+                  <>
+                    <Button size="large" shape="round" onClick={keep}>
+                      เก็บไว้ {reportDetail.status}
+                    </Button>
+                    <Button size="large" shape="round" danger onClick={openDelModal}>
+                      ลบ
+                    </Button>
+                
+                  </>
+              :
+                  <>
+                    <p>{reportDetail.status}แล้ว</p>
+            </>
+
+                }
+
+
+          </Flex>
+        </Card>
+      <div>
+        <Card>
+          <div className="report-content">
+            <Flex gap="1rem" vertical wrap="wrap">
+              <Link to={`/profile/${reportDetail.id}`}>
+                <div id="cms-artist-profile">
+                  <img src={reportDetail.urs_profile_img} alt="" />
+                  <p>แจ้งโดย {reportDetail.urs_name}</p>
+                </div>
+              </Link>
+              <div>
+                <p className="h6">
+                  หัวข้อที่มีการละเมิด: {reportDetail.sendrp_header}
+                </p>
+              </div>
+              <div>
+                <p className="h6">รายละเอียดที่มีการแจ้ง</p>
+                <p>{reportDetail.sendrp_detail}</p>
+              </div>
+              {reportDetail.sendrp_link != null && (
+                <div>
+                  <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
+                  <p>{reportDetail.sendrp_link}</p>
+                </div>
+              )}
+
+              <div>
+                <p className="h6">อีเมลติดต่อกลับ</p>
+                <p>{reportDetail.sendrp_email}</p>
+              </div>
             </Flex>
-          </Card>
-          <div>
-            <Card>
-              <div className="report-content">
-                <Flex gap="1rem" vertical wrap="wrap">
-                  <Link to={`/profile/${reportDetail.id}`}>
-                    <div id="cms-artist-profile">
-                      <img src={reportDetail.urs_profile_img} alt="" />
-                      <p>แจ้งโดย {reportDetail.urs_name}</p>
-                    </div>
-                  </Link>
-                  <div>
-                    <p className="h6">
-                      หัวข้อที่มีการละเมิด: {reportDetail.sendrp_header}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="h6">รายละเอียดที่มีการแจ้ง</p>
-                    <p>{reportDetail.sendrp_detail}</p>
-                  </div>
-                  {reportDetail.sendrp_link != null && (
-                    <div>
-                      <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                      <p>{reportDetail.sendrp_link}</p>
-                    </div>
-                  )}
-
-                  <div>
-                    <p className="h6">อีเมลติดต่อกลับ</p>
-                    <p>{reportDetail.sendrp_email}</p>
-                  </div>
-                </Flex>
-              </div>
-            </Card>
-            <h5 className="h4 mt-4 mb-4">รายงานที่เกี่ยวข้อง</h5>
-            <div className="report-grid">
-              {relatedTo.map((data) => (
-                <Card key={data.id}>
-                  <div className="report-content">
-                      <Flex gap="1rem" vertical wrap="wrap">
-                          <Link to={`/profile/${data.id}`}>
-                              <div id="cms-artist-profile">
-                                  <img src={data.urs_profile_img} alt="" />
-                                  <p>แจ้งโดย {data.urs_name}</p>
-                              </div>
-                          </Link>
-                          <div>
-                              <p className="h6">หัวข้อที่มีการละเมิด: {data.sendrp_header}</p>
-                          </div>
-                          <div>
-                              <p className="h6">รายละเอียดที่มีการแจ้ง</p>
-                              <p>{data.sendrp_detail}</p>
-                          </div>
-                          {data.sendrp_link != null && (
-                            <div>
-                                <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                                <p>{data.sendrp_link}</p>
-                            </div>
-                          )}
-                          <div>
-                              <p className="h6">อีเมลติดต่อกลับ</p>
-                              <p>{data.sendrp_email}</p>
-                          </div>
-
-                          {data.status !== null ? (
-                            <div>
-                                <p className="h6">สถานะ : {data.status === "approve" ? "อนุมัติแล้ว" : (data.status === "delete" ? "ไม่อนุมัติ" : "ยังไม่ได้ตรวจสอบ")}</p>
-                            </div>
-                          ) : (
-                            <div>
-                                <p className="h6">สถานะ : ยังไม่ได้ตรวจสอบ</p>
-                            </div>
-                          )}
-
-                      </Flex>
-                  </div>
-              </Card>
-              ))}
-              
-              </div>
-              <Empty description={
-                <span>
-                  ไม่มีรายงานที่เกี่ยวข้อง
-                </span>
-              } />
           </div>
+        </Card>
+        <h5 className="h4 mt-4 mb-4">รายงานที่เกี่ยวข้อง</h5>
 
-          <Modal title="ระบุเหตุผลการลบ" open={deleteModal} onCancel={openDelModal} footer="">
-            <Form
-              form={form}
-              name="delReport"
-              onFinish={deleteReport}
+        {relatedTo ?
+          <div className="report-grid">
+            {relatedTo.map((data) => (
+              <Card key={data.id}>
+                <div className="report-content">
+                  <Flex gap="1rem" vertical wrap="wrap">
+                    <Link to={`/profile/${data.id}`}>
+                      <div id="cms-artist-profile">
+                        <img src={data.urs_profile_img} alt="" />
+                        <p>แจ้งโดย {data.urs_name}</p>
+                      </div>
+                    </Link>
+                    <div>
+                      <p className="h6">หัวข้อที่มีการละเมิด: {data.sendrp_header}</p>
+                    </div>
+                    <div>
+                      <p className="h6">รายละเอียดที่มีการแจ้ง</p>
+                      <p>{data.sendrp_detail}</p>
+                    </div>
+                    {data.sendrp_link != null && (
+                      <div>
+                        <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
+                        <p>{data.sendrp_link}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="h6">อีเมลติดต่อกลับ</p>
+                      <p>{data.sendrp_email}</p>
+                    </div>
+
+                    {data.status !== null ? (
+                      <div>
+                        <p className="h6">สถานะ : {data.status === "approve" ? "อนุมัติแล้ว" : (data.status === "delete" ? "ไม่อนุมัติ" : "ยังไม่ได้ตรวจสอบ")}</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="h6">สถานะ : ยังไม่ได้ตรวจสอบ</p>
+                      </div>
+                    )}
+
+                  </Flex>
+                </div>
+              </Card>
+            ))}
+          </div> :
+          <Flex justify="center" align="center" style={{ width: "100%", height: "fit-content", padding: '5rem 1rem' }}>
+            <Empty description={
+              <span>
+                ไม่มีรายงานที่เกี่ยวข้อง
+              </span>
+            } />
+          </Flex>
+        }
+
+
+      </div>
+
+      <Modal title="ระบุเหตุผลการลบ" open={deleteModal} onCancel={openDelModal} footer="">
+        <Form
+          form={form}
+          name="delReport"
+          onFinish={deleteReport}
+        >
+          <Flex gap='middle' vertical>
+            <Form.Item
+              name="reason"
+              label="ใส่เหตุผลการลบ"
+              rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'string', max: 100 }]}
             >
-              <Flex gap='middle' vertical>
-                <Form.Item
-                  name="reason"
-                  label="ใส่เหตุผลการลบ"
-                  rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'string', max: 100 }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Flex gap='small' justify="flex-end">
-                  <Button shape="round" size="large" htmlType="submit" danger>ยืนยัน</Button>
-                  <Button shape="round" size="large" onClick={openDelModal}>ยกเลิก</Button>
-                </Flex>
-            
-                </Flex>
-              </Form>
-            
+              <Input />
+            </Form.Item>
+            <Flex gap='small' justify="flex-end">
+              <Button shape="round" size="large" htmlType="submit" danger>ยืนยัน</Button>
+              <Button shape="round" size="large" onClick={openDelModal}>ยกเลิก</Button>
+            </Flex>
 
-          </Modal>
+          </Flex>
+        </Form>
 
-          {/* <p className="h6">รายงานที่เกี่ยวข้องกับคอมมิชชันนี้</p>
-                    <div className="report-grid">
-                        <Card>
-                            <div className="report-content">
-                                <Flex gap="1rem" vertical wrap="wrap">
-                                    <Link to={`/profile/`}>
-                                        <div id="cms-artist-profile">
-                                            <img src="/AB1.png" alt="" />
-                                            <p>แจ้งโดย xxxxx</p>
-                                        </div>
-                                    </Link>
-                                    <div>
-                                        <p className="h6">หัวข้อที่มีการละเมิด: sy;-hvpjvp</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">รายละเอียดที่มีการแจ้ง</p>
-                                        <p>เบลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆๆๆๆๆลๆๆๆๆๆๆๆ</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                                        <p>บลาๆๆ</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">อีเมลติดต่อกลับ</p>
-                                        <p>email.ccccc</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">คอมมิชชันหรืองานวาดที่ถูกรายงาน</p>
-                                        <p>xxxxxxx</p>
-                                    </div>
-                                </Flex>
 
-                            </div>
-                        </Card>
-                        <Card>
-                            <div className="report-content">
-                                <Flex gap="1rem" vertical wrap="wrap" flex={1}>
-                                    <Link to={`/profile/`}>
-                                        <div id="cms-artist-profile">
-                                            <img src="/AB1.png" alt="" />
-                                            <p>แจ้งโดย xxxxx</p>
-                                        </div>
-                                    </Link>
-                                    <div>
-                                        <p className="h6">หัวข้อที่มีการละเมิด: sy;-hvpjvp</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">รายละเอียดที่มีการแจ้ง</p>
-                                        <p>เบลๆๆๆๆๆๆๆๆๆๆลๆๆๆๆๆๆๆ</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                                        <p>บลาๆๆ</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">อีเมลติดต่อกลับ</p>
-                                        <p>email.ccccc</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">คอมมิชชันหรืองานวาดที่ถูกรายงาน</p>
-                                        <p>xxxxxxx</p>
-                                    </div>
-                                </Flex>
+      </Modal>
 
-                            </div>
-                        </Card>
-                        <Card>
-                            <div className="report-content">
-                                <Flex gap="1rem" vertical wrap="wrap">
-                                    <Link to={`/profile/`}>
-                                        <div id="cms-artist-profile">
-                                            <img src="/AB1.png" alt="" />
-                                            <p>แจ้งโดย xxxxx</p>
-                                        </div>
-                                    </Link>
-                                    <div>
-                                        <p className="h6">หัวข้อที่มีการละเมิด: sy;-hvpjvp</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">รายละเอียดที่มีการแจ้ง</p>
-                                        <p>เบลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆลๆๆๆๆๆๆๆๆๆๆลๆๆๆๆๆๆๆ</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                                        <p>บลาๆๆ</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">อีเมลติดต่อกลับ</p>
-                                        <p>email.ccccc</p>
-                                    </div>
-                                    <div>
-                                        <p className="h6">คอมมิชชันหรืองานวาดที่ถูกรายงาน</p>
-                                        <p>xxxxxxx</p>
-                                    </div>
-                                </Flex>
-                            </div>
-                        </Card>
-                    </div> */}
-        </>
-      )}
-      {/* ในกรณีที่มีการลบโพสต์แล้วรายงานที่เกี่ยวข้องจะขึ้นว่าถูกลบแล้วทั้งหมด */}
+    </>
+  )
+}
+{/* ในกรณีที่มีการลบโพสต์แล้วรายงานที่เกี่ยวข้องจะขึ้นว่าถูกลบแล้วทั้งหมด */ }
     </>
   );
 }

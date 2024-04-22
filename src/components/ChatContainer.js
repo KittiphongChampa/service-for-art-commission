@@ -34,7 +34,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => rreject(error);
   });
 
-export default function ChatContainer({ currentChat, updateMessages  }) {
+export default function ChatContainer({ currentChat, updateMessages }) {
   const { userdata, socket } = useAuth();
   const token = localStorage.getItem("token");
   const [userid, setUserid] = useState();
@@ -52,7 +52,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   useEffect(() => {
     // ตัวอย่าง: เมื่อมีการอัปเดต arrivalMessage
     updateMessages(messages.length);
-  }, [ messages ]);
+  }, [messages]);
 
   // เวลา วันที่
   const currentDate = new Date();
@@ -1145,7 +1145,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
   //*---------------------------------------------------------------------
   const handleSendImage = async (image) => {
-    
+
     const formData = new FormData();
     formData.append("from", userid);
     formData.append("to", currentChat.id);
@@ -1153,7 +1153,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
     formData.append("image", image);
     console.log(formData);
     await axios
-      .post(`${host}/messages/addmsg`, formData, )
+      .post(`${host}/messages/addmsg`, formData,)
       .then((response) => {
         const data = response.data;
         let msg = data.image_chat;
@@ -1218,6 +1218,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   };
   const handleCancel = () => {
     setIsModalOpen(false);
+    setPreviewUrl(null)
     setPage("0")
   };
 
@@ -1489,6 +1490,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           </>}
           {page == "1" &&
             <>
+              <p className="h5">แนบไฟล์ภาพ</p>
               <form
                 id="sendImage"
                 onClick={() => document.querySelector(".input-field").click()}
@@ -1515,20 +1517,34 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                 {previewUrl ? (
                   <img src={previewUrl} alt={fileName} className="imagePreview" />
                 ) : (
-                  <h4>Drop images here</h4>
+                  <div>
+                    <PlusOutlined />
+                    <div
+                      style={{
+                        marginTop: 8,
+                      }}
+                    >
+                      Upload
+                    </div>
+                  </div>
                 )}
               </form>
-              <Button variant="danger" onClick={handleCancel}>
+              {/* <Button variant="danger" onClick={handleCancel}>
                 ยกเลิก
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                form="sendImage"
-                onClick={handleCancel}
-              >
-                ส่งภาพ
-              </Button>
+              </Button> */}
+
+              <Flex justify="center">
+                <Button
+                  type="primary"
+                  shape="round"
+                  size="large"
+                  htmlType="submit"
+                  form="sendImage"
+                  onClick={handleCancel}
+                >
+                  ส่งภาพ
+                </Button>
+              </Flex>
 
             </>}
           {page == "2" &&
@@ -1679,7 +1695,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
       </Modal>
       <div className="chat-header">
         <div className="chat-name">
-          <Link to="/chatbox" className="back-btn me-2" onClick={()=>chat_order_id = null}>
+          <Link to="/chatbox" className="back-btn me-2" onClick={() => chat_order_id = null}>
             <Icon.ArrowLeft />
           </Link>
           <img src={currentChat.urs_profile_img}></img>
@@ -1851,6 +1867,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
         </div>
       </Scrollbars>
 
+      {/* ใส่แยกไทป์ */}
       <form className="input-container" onSubmit={(event) => sendChat(event)}>
         <div className="chat-sender">
           <Button shape="round" type="primary" icon={<PlusOutlined />}

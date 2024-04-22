@@ -37,21 +37,18 @@ const ChangeCoverModal = (props) => {
         // const colorValue = colorPicker.value;
         const formData = new FormData();
         formData.append("cover_color", data.cover);
-        Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
-            if (result.isConfirmed) {
-                axios.patch(`${host}/cover_color/update`, formData,{
-                    headers: {
-                        Authorization: "Bearer " + token,
-                    }
-                }).then((response) => {
-                    if(response.data.status === "ok"){
-                        Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
-                            window.location.reload(false);
-                        })
-                    }else{
-                        Swal.fire({ ...alertData.changeCoverIsError })
-                    }
+
+        axios.patch(`${host}/cover_color/update`, formData, {
+            headers: {
+                Authorization: "Bearer " + token,
+            }
+        }).then((response) => {
+            if (response.data.status === "ok") {
+                Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
+                    window.location.reload(false);
                 })
+            } else {
+                Swal.fire({ ...alertData.changeCoverIsError })
             }
         })
     }
@@ -77,7 +74,7 @@ const ChangeCoverModal = (props) => {
                     {/* <div className="text-align-right close-btn" onClick={closeModal}><Icon.X /></div> */}
                     <div className="form-area">
                         <form onSubmit={handleSubmit(submitChangeCoverForm)}>
-                            <h2 style={{display:"flex",justifyContent: "center",marginBottom:"1rem"}}>เปลี่ยนสีปก</h2>
+                            <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนสีปก</h2>
                             <div className="setting-img-box">
                                 <div className="setting-cover">
                                     <input {...register("cover")} type="color" id="color-input" style={{ cursor: "pointer" }} />

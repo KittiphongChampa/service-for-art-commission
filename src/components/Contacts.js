@@ -25,7 +25,7 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
   const uniqueContactIds = new Set();
   const filteredContacts = [];
  
-  contacts_order.forEach((contact_o) => {
+  contacts_order?.forEach((contact_o) => {
     const combinedId = contact_o.id + contact_o.od_id;
     if (!uniqueContactIds.has(combinedId)) {
       uniqueContactIds.add(combinedId);
@@ -51,7 +51,7 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
 
           {/* แสดงผลคนที่เราสามารถแชทด้วยได้ */}
 
-          {contacts.map((contact, index) => {
+          {contacts?.map((contact, index) => {
             return (
               <>
                 {selectedChatType == "private" || selectedChatType == "all" ?
@@ -95,7 +95,7 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
             );
           })}
 
-          {filteredContacts.map((contact_order, index) => {
+          {filteredContacts?.map((contact_order, index) => {
             return (
               <>
                 {selectedChatType == "order" && contact_order.od_id != 0 || selectedChatType == "all" ?

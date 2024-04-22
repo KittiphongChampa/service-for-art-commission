@@ -37,6 +37,7 @@
     "react-icons": "^4.3.1",
     "react-lazy-load-image-component": "^1.6.0",
     "react-load-script": "^0.0.6",
+    "react-lottie": "^1.2.4",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.15.0",
     "react-scripts": "5.0.1",

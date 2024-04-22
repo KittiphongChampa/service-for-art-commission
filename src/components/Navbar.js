@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as ggIcon from '@mui/icons-material';
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
-import { Button, Drawer, Radio, Flex, Avatar, Badge, Space } from 'antd';
+import { Button, Drawer, Radio, Flex, Avatar, Badge, Space, Modal } from 'antd';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
@@ -17,6 +17,7 @@ const NavbarUser = (props) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false)
     const dropdownRef = useRef();
+    const notiRef = useRef();
     const { userdata, socket } = useAuth();
 
     useEffect(() => {
@@ -32,6 +33,23 @@ const NavbarUser = (props) => {
             document.removeEventListener("mousedown", handler);
         }
     }, [])
+
+    useEffect(() => {
+        let handler = (event) => {
+            if (!notiRef.current.contains(event.target)) {
+                setOpenNoti(false)
+            }
+        }
+        document.addEventListener("mousedown", handler);
+
+        return () => {
+            document.removeEventListener("mousedown", handler);
+        }
+    }, [])
+
+
+
+
 
     // ส่วนของการแสดงผล noti
     const [notifications, setNotifications] = useState([]);
@@ -127,9 +145,15 @@ const NavbarUser = (props) => {
         }
 
         return (
-            <div key={keyData}>
+            <div className='noti-wrapper' key={keyData}>
                 <a href={linked} onClick={() => handleNotificationClick(keyData, action)}>
-                    <span><img src={data.sender_img} style={{ width: 30 }} />{data.sender_name} {action} {data.created_at} {read}</span>
+                    <div className="pic">
+                        {/* <img src={data.sender_img} /> */}
+                        <img src='./images/b-welcompage2.png' />
+                    </div>
+                    <div className="data">
+                        {data.sender_name} {action} {data.created_at} {read}
+                    </div>
                 </a>
             </div>
         );
@@ -155,6 +179,12 @@ const NavbarUser = (props) => {
         setOpenDrawer(false);
     };
 
+    const [notiModal,setNotiModal] = useState(false);
+
+    function handleNotiModal() {
+        setNotiModal(!notiModal);
+    }
+
 
     return (
         <div class="nav-box" >
@@ -176,7 +206,7 @@ const NavbarUser = (props) => {
                         <Icon.Bell className='nav-icon' />
                        
                     </a> */}
-                    <div  ref={dropdownRef} style={{position:"relative"}}>
+                    <div ref={notiRef} style={{position:"relative"}}>
                         <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
                             {/* <Badge dot={notifications.length > 0 ? true : false}> */}
                                 <Badge dot={false}>
@@ -205,7 +235,7 @@ const NavbarUser = (props) => {
                             )} */}
 
                         </button>
-                        <div className={`dropdown-area ${openNoti ? 'open' : 'close'}`} >
+                        <div className={`noti-area ${openNoti ? 'open' : 'close'}`} >
                             <div className="notifications">
                                 {/* {notifications.map(data => (
                                     <div key={data.reportId}>
@@ -269,7 +299,7 @@ const NavbarUser = (props) => {
                         </a>
                         <a href="/"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
                         <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
-                        <a href="/setting-profile"><Icon.Bell className='nav-icon mx-2' />การแจ้งเตือน</a>
+                        <a href="#" onClick={handleNotiModal}><Icon.Bell className='nav-icon mx-2' />การแจ้งเตือน</a>
                         <a href="/chatbox"><Icon.MessageCircle className='nav-icon mx-2' />แชท</a>
                         <a href="/setting-profile"><Icon.Settings className='nav-icon mx-2' />ตั้งค่าโปรไฟล์</a>
                         <a href="/myreq"><DescriptionOutlinedIcon className='nav-icon mx-2' />รายการจ้างของฉัน</a>
@@ -283,6 +313,20 @@ const NavbarUser = (props) => {
                     </div>
                 </Drawer>
             </nav>
+
+            <Modal open={notiModal} onCancel={handleNotiModal} footer='' className="notiModal">
+                    <div className="notifications">
+                        {/* {notifications.map(data => (
+                                    <div key={data.reportId}>
+                                        <span><img src={data.sender_img} style={{width:30}}/>{data.sender_name} {data.msg} </span>
+                                    </div>
+                                ))} */}
+                        {notifications.map((n) => displayNotification(n))}
+                        <button className="nButton" onClick={handleRead}>
+                            Mark as read
+                        </button>
+                    </div>
+            </Modal>
         </div>
     )
 }
@@ -307,7 +351,7 @@ const NavbarHomepage = (props) => {
                 </div>
                 <div class="inline-nav inhomepage">
                     <a href="/login">เข้าสู่ระบบ</a>
-                    <a href="/verify">สมัครสมาชิก</a>
+                    <a href="/newRegister">สมัครสมาชิก</a>
                 </div>
             </nav>
 
@@ -346,7 +390,7 @@ const NavbarGuest = (props) => {
                         <p>300 C</p>
                     </div> */}
                     <a href="/login">เข้าสู่ระบบ</a>
-                    <a href="/verify">สมัครสมาชิก</a>
+                    <a href="/newRegister">สมัครสมาชิก</a>
                     {/* <div className="dropdown-nav" ref={dropdownRef}>
                         <button onClick={() => { setOpen(!open) }} style={{ backgroundImage: "url(mainmoon.jpg)" }}>
                         </button>
@@ -371,12 +415,26 @@ const NavbarAdmin = (props) => {
     const [open, setOpen] = useState(false)
     const dropdownRef = useRef();
     const { admindata, socket } = useAuth();
+    const notiRef = useRef();
 
     useEffect(() => {
         let handler = (event) => {
             if (!dropdownRef.current.contains(event.target)) {
                 setOpen(false)
                 // console.log(dropdownRef.current);
+            }
+        }
+        document.addEventListener("mousedown", handler);
+
+        return () => {
+            document.removeEventListener("mousedown", handler);
+        }
+    }, [])
+
+    useEffect(() => {
+        let handler = (event) => {
+            if (!notiRef.current.contains(event.target)) {
+                setOpenNoti(false)
             }
         }
         document.addEventListener("mousedown", handler);
@@ -480,14 +538,14 @@ const NavbarAdmin = (props) => {
                         </div>
                     </div> */}
 
-                    <div ref={dropdownRef} style={{ position: "relative" }}>
+                    <div ref={notiRef} style={{ position: "relative" }}>
                         <button onClick={() => setOpenNoti(!openNoti)} className="noti-btn">
                             {/* <Badge dot={notifications.length > 0 ? true : false}> */}
                             <Badge dot={false}>
                                 <Icon.Bell className='nav-icon' />
                             </Badge>
                         </button>
-                        <div className={`dropdown-area ${openNoti ? 'open' : 'close'}`} >
+                        <div className={`noti-area ${openNoti ? 'open' : 'close'}`} >
                             <div className="notifications">
                                 {/* {notifications.map(data => (
                                     <div key={data.reportId}>

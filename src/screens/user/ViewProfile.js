@@ -23,10 +23,11 @@ import * as alertData from "../../alertdata/alertData";
 import { useAuth } from '../../context/AuthContext';
 import { Modal, Button, Input, Rate, Tabs } from 'antd';
 import { host } from "../../utils/api";
+import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
 
 const title = "ViewProfile";
 const bgImg = "";
-const body = { backgroundColor: "#F1F5F9" };
+const body = { backgroundColor: "white" };
 
 const toastOptions = {
   position: "bottom-right",
@@ -224,140 +225,152 @@ export default function ViewProfile() {
     }
   ];
 
+  let currentDate;
+
+  if (!Number.isNaN(new Date(userdata.created_at).getTime())) {
+    currentDate = format(new Date(userdata.created_at), 'dd/MM/yyyy');
+  }
+
+
+
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
-      {showCoverModal}
-      {showProfileModal}
+      <div className="body-con">
+        <Helmet>
+          <title>{title}</title>
+        </Helmet>
 
-      {isLoggedIn ? (
-        type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
-      ) : (
-        <NavbarHomepage />
-      )}
+        {isLoggedIn ? (
+          type === 'admin' ? <NavbarAdmin /> : <NavbarUser />
+        ) : (
+          <NavbarHomepage />
+        )}
 
-      <div class="body-nopadding" style={body}>
-        <div className="cover-grid">
-          <div
-            className="cover"
-          // onClick={openModal}
-          >
+        <div class="body-nopadding" style={body}>
+          <div className="cover-grid">
             <div
-              className="cover-color"
-              style={{ backgroundColor: userdata.urs_cover_color }}
-            ></div>
-          </div>
-          <div className="container-xl profile-page">
-            <div className="user-profile-area">
-              <div className="user-col-profile">
-                <ProfileImg
-                  src={userdata.urs_profile_img}
-                  type="only-show"
-                // onPress={() => openModal("profile")}
-                />
-                {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
-                <p className="username-profile fs-5">{userdata.urs_name}</p>
-                <p className="follower-profile">follower</p>
-                {type != "admin" ? (
-                  <div className="group-btn-area">
-                    {follow === "no_follow" ? (
-                      <Button shape="round" onClick={eventfollow}>
-                        ติดตาม
-                      </Button>
-                    ) : (
-                      <Button shape="round" onClick={eventUnfollow}>
-                        เลิกติดตาม
-                      </Button>
-                    )}
+              className="cover"
+            // onClick={openModal}
+            >
+              <div
+                className="cover-color"
+                style={{ backgroundColor: userdata.urs_cover_color }}
+              ></div>
+            </div>
+            <div className="container-xl profile-page">
+              <div className="user-profile-area">
+                <div className="user-col-profile">
+                  <ProfileImg
+                    src={userdata.urs_profile_img}
+                    type="only-show"
+                  // onPress={() => openModal("profile")}
+                  />
+                  {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
+                  <p className="username-profile fs-5">{userdata.urs_name}</p>
+                  {/* <p className="follower-profile">follower</p> */}
+                  {type == "admin" ? (
+                    <>
+                      <div className="group-btn-area">
+                        <Button shape="round" danger onClick={() => setpopup(true)}>ระงับบัญชีผู้ใช้</Button>
+                      </div>
+                      <Modal show={popup} onHide={Close}>
+                        <Modal.Header>
+                          <Modal.Title>เหตุผลการแบน</Modal.Title>
+                        </Modal.Header>
 
-                    <a href={`/chatbox?id=${userdata.id}&od_id=0`}>
-                      {/* <Link to={{ pathname: "/chatbox", state: { data: id } }}> */}
-                      <Button shape="round" >
-                        แชท
-                      </Button>
-                      {/* </Link> */}
-                    </a>
-                  </div>
-                ) : (
-                  <>
-                    <button onClick={() => setpopup(true)}>ระงับบัญชีผู้ใช้</button>
-                    <Modal show={popup} onHide={Close}>
-                      <Modal.Header>
-                        <Modal.Title>เหตุผลการแบน</Modal.Title>
-                      </Modal.Header>
+                        <Modal.Body>
+                          <Form>
+                            <Form.Control
+                              as="textarea"
+                              rows={3}
+                              placeholder="เหตุผลการแบน..."
+                              value={banReason}
+                              onChange={(e) => setBanReason(e.target.value)}
+                            />
+                          </Form>
+                        </Modal.Body>
 
-                      <Modal.Body>
-                        <Form>
-                          <Form.Control
-                            as="textarea"
-                            rows={3}
-                            placeholder="เหตุผลการแบน..."
-                            value={banReason}
-                            onChange={(e) => setBanReason(e.target.value)}
-                          />
-                        </Form>
-                      </Modal.Body>
+                        <Modal.Footer>
+                          <Button variant="secondary" onClick={Close}>
+                            ปิด
+                          </Button>
+                          <Button variant="danger" onClick={deleteUser}>
+                            แบนไอดี
+                          </Button>
+                        </Modal.Footer>
+                      </Modal>
+                    </>
+                    
+                  ) : (
+                      
+                      <div className="group-btn-area">
+                        {follow === "no_follow" ? (
+                          <Button shape="round" onClick={eventfollow}>
+                            ติดตาม
+                          </Button>
+                        ) : (
+                          <Button shape="round" onClick={eventUnfollow}>
+                            เลิกติดตาม
+                          </Button>
+                        )}
 
-                      <Modal.Footer>
-                        <Button variant="secondary" onClick={Close}>
-                          ปิด
-                        </Button>
-                        <Button variant="danger" onClick={deleteUser}>
-                          แบนไอดี
-                        </Button>
-                      </Modal.Footer>
-                    </Modal>
-                  </>
-                )}
-                <p className="bio-profile">{userdata.urs_bio}</p>
-              </div>
-              <div className="user-col-about">
-                {/* <div className="user-about-menu">
+                        <a href={`/chatbox?id=${userdata.id}&od_id=0`}>
+                          {/* <Link to={{ pathname: "/chatbox", state: { data: id } }}> */}
+                          <Button shape="round" >
+                            แชท
+                          </Button>
+                          {/* </Link> */}
+                        </a>
+                      </div>
+                    
+                  )}
+                  <p className="bio-profile">{userdata.urs_bio}</p>
+                </div>
+                <div className="user-col-about">
+                  {/* <div className="user-about-menu">
                   <button className="sub-menu selected">overview</button>
                   <button className="sub-menu">about me</button>
                 </div> */}
-                <div className="user-about-content">
-                  <div className="user-about-review mb-4">
-                    <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
-                  </div>
-                  <div className="user-about-text">
-                    <div>
-                      <p>
-                        ผู้ติดตาม {myFollower.length}{" "}คน
-                      </p>
-                      <div>
-                        {myFollowerData.map((data) => (
-                          <a
-                            key={data.id}
-                            href={`/profile/${data.id}`}
-                            style={{ display: "flex" }}
-                          >
-                            <img
-                              src={data.urs_profile_img}
-                              style={{ width: "30px" }}
-                            />
-                            <p>{data.urs_name}</p>
-                          </a>
-                        ))}
-                      </div>
-                      <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
-                      <p>เป็นสมาชิกเมื่อ {userdata.created_at}</p>
+                  <div className="user-about-content">
+                    <div className="user-about-review mb-4">
+                      <div className="user-about-review mb-4"><p className="fs-3">{userdata.urs_all_review ? userdata.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userdata.rw_number ? userdata.rw_number : 0} รีวิว</p></div>
                     </div>
-                    <div>
-                      <p>คอมมิชชัน เปิด</p>
-                      <p>คิวว่าง 1 คิว</p>
+                    <div className="user-about-text">
+                      <div>
+                        <p>
+                          ผู้ติดตาม {myFollower.length}{" "}คน
+                        </p>
+                        <div>
+                          {myFollowerData.map((data) => (
+                            <a
+                              key={data.id}
+                              href={`/profile/${data.id}`}
+                              style={{ display: "flex" }}
+                            >
+                              <img
+                                src={data.urs_profile_img}
+                                style={{ width: "30px" }}
+                              />
+                              <p>{data.urs_name}</p>
+                            </a>
+                          ))}
+                        </div>
+                        <p>งานสำเร็จแล้ว {userdata.success} งาน</p>
+                        <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                      </div>
+                      <div>
+                        <p>คอมมิชชัน เปิด</p>
+                        <p>คิวว่าง 1 คิว</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="user-profile-contentCard">
-              <div>
-                <Tabs defaultActiveKey="1" items={menus} />
-              </div>
-              {/* <button
+              <div className="user-profile-contentCard">
+                <div>
+                  <Tabs defaultActiveKey="1" items={menus} />
+                </div>
+                {/* <button
                 className="sub-menu selected"
                 onClick={(event) => menuProfile(event, "cms")}
               >
@@ -380,6 +393,7 @@ export default function ViewProfile() {
               ) : null}
               {profileMenuSelected === "gallery" ? <AllArtworks /> : null}
               {profileMenuSelected === "review" ? <AllReviews /> : null} */}
+              </div>
             </div>
           </div>
         </div>
@@ -438,13 +452,28 @@ function AllArtworks(props) {
   return (
     <>
       <p className="h3 mt-3 mb-2">งานวาด</p>
-      <div className="profile-gallery">
-        <img src="b3.png" />
-        <img src="AB1.png" />
-        <img src="mainmoon.jpg" />
-        <img src="b3.png" />
-        <img src="b3.png" />
+      <div className="profile-gallery-container">
+        <div className="profile-gallery" >
+          <img src="b3.png" />
+
+        </div>
+        <div className="profile-gallery" >
+          <img src="b3.png" />
+
+        </div>
+
       </div>
+
+      {/* <p className="h3 mt-3 mb-2">งานวาด</p>
+      <div className="profile-gallery-container">
+        {myGallery.map((data) => (
+          <Link to={`/artworkdetail/` + data.artw_id}>
+            <div className="profile-gallery" key={data.artw_id}>
+              <img key={data.artw_id} src={data.ex_img_path} />
+            </div>
+          </Link>
+        ))}
+      </div> */}
     </>
   );
 }

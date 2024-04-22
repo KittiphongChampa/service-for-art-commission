@@ -22,7 +22,7 @@ import { Modal, Button, Rate, Select, Tabs, Flex } from 'antd';
 import ChangeProfileImgModal from "../../modal/ChangeProfileImgModal";
 import { ChangeCoverModal, openInputColor } from "../../modal/ChangeCoverModal"
 // import Button from "react-bootstrap/Button";
-
+import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, parseISO } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { host } from "../../utils/api";
@@ -200,23 +200,23 @@ export default function Profile() {
         event.preventDefault()
         const formData = new FormData();
         formData.append("cover_color", selectedColor);
-        Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
-            if (result.isConfirmed) {
-                axios.patch(`${host}/cover_color/update`, formData, {
-                    headers: {
-                        Authorization: "Bearer " + token,
-                    }
-                }).then((response) => {
-                    if (response.data.status === "ok") {
-                        Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
-                            window.location.reload(false);
-                        })
-                    } else {
-                        Swal.fire({ ...alertData.changeCoverIsError })
-                    }
+        // Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
+        // if (result.isConfirmed) {
+        axios.patch(`${host}/cover_color/update`, formData, {
+            headers: {
+                Authorization: "Bearer " + token,
+            }
+        }).then((response) => {
+            if (response.data.status === "ok") {
+                Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
+                    window.location.reload(false);
                 })
+            } else {
+                Swal.fire({ ...alertData.changeCoverIsError })
             }
         })
+        // }
+        // })
     }
 
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting, isDirty, isValid }, reset } = useForm();
@@ -259,18 +259,19 @@ export default function Profile() {
     };
 
     const [selectedColor, setSelectedColor] = useState(userdata.urs_cover_color);
+    // let a = new Date(userdata.created_at)
+    // let currentDate = format(a, 'dd/MM');
 
     return (
         <div className="body-con">
             <Helmet>
                 <title>{title}</title>
             </Helmet>
-            {showCoverModal}
-            {showProfileModal}
+            {/* {showCoverModal}
+            {showProfileModal} */}
             {/* <Navbar /> */}
             <NavbarUser />
             <div class="body-nopadding" style={body}>
-
                 <div className="cover-grid">
                     <div className="cover" onClick={openCoverModal}>
                         <div className="cover-color" style={{ backgroundColor: userdata.urs_cover_color }}></div>
@@ -285,7 +286,7 @@ export default function Profile() {
                                 />
                                 {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
                                 <p className="username-profile fs-5">{userdata.urs_name}</p>
-                                <p className="follower-profile">follower</p>
+                                {/* <p className="follower-profile">follower</p> */}
                                 <div className="group-btn-area">
                                     {/* <button className="message-btn"><Icon.MessageCircle /></button>
                                         <button className="follow-btn">ติดตาม</button> */}
@@ -386,13 +387,15 @@ function Followers(props) {
 
     return <>
         <p className="h3 mt-3 mb-2">ผู้ติดตาม</p>
-        {myFollowerData.map(data => (
-            <a key={data.id} href={`/profile/${data.id}`}>
-                <div className="artistbox-items">
+        <div className="artistbox-items">
+            {myFollowerData.map(data => (
+                <a key={data.id} href={`/profile/${data.id}`}>
+
                     <ArtistBox img={data.urs_profile_img} name={data.urs_name} />
-                </div>
-            </a>
-        ))}
+
+                </a>
+            ))}
+        </div >
 
 
     </>
@@ -435,17 +438,12 @@ function AllArtworks(props) {
         <p className="h3 mt-3 mb-2">งานวาด</p>
         <div className="profile-gallery-container">
             {myGallery.map((data) => (
-                <div className="profile-gallery" key={data.artw_id}>
-                    <img key={data.artw_id} src={data.ex_img_path} />
-                </div>
+                <Link to={`/artworkdetail/` + data.artw_id}>
+                    <div className="profile-gallery" key={data.artw_id}>
+                        <img key={data.artw_id} src={data.ex_img_path} />
+                    </div>
+                </Link>
             ))}
-            {/* <div className="profile-gallery">
-                <img src="b3.png" />
-                <img src="AB1.png" />
-                <img src="mainmoon.jpg" />
-                <img src="b3.png" />
-                <img src="b3.png" />
-            </div> */}
         </div>
     </>
 }

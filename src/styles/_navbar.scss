@@ -7,9 +7,9 @@ a:visited {
     cursor: pointer;
 }
 
-.noti-btn{
+.noti-btn {
     position: relative;
-    padding : 0;
+    padding: 0;
     background-color: transparent;
     border: none;
 }
@@ -42,9 +42,10 @@ a:visited {
     display: inline-flex;
     align-items: center;
     gap: 2.5rem;
+
     /* background-color: aqua; */
     // a:not(.in-dropdown),
-    div:not(.dropdown-nav, .dropdown-area) {
+    div:not(.dropdown-nav, .dropdown-area, .noti-area) {
         // margin-right: 20px;
         // padding: 0.5rem 0.6rem;
         border-radius: 100px;
@@ -131,11 +132,11 @@ a:visited {
     overflow: hidden;
     color: #2c3248;
     box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
-    0 3px 6px -4px rgba(0, 0, 0, 0.12),
-    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+        0 3px 6px -4px rgba(0, 0, 0, 0.12),
+        0 9px 28px 8px rgba(0, 0, 0, 0.05);
 
     & a {
-        padding: 1.2rem 2rem;
+        padding: 1.2rem;
     }
 
 }
@@ -195,4 +196,141 @@ a:visited {
     .nav-container {
         width: 2000px;
     }
+}
+
+//------------
+
+.noti-area {
+    display: flex;
+    flex-direction: column;
+    /* word-wrap: normal; */
+    background-color: white;
+    // white-space: nowrap;
+    width: 30rem;
+    position: absolute;
+    top: 100%;
+    /*ลงมาอยู่ล่าง ถ้าtop 0 จะอยู่บนสุด*/
+    right: 0;
+    list-style: none;
+    border-radius: 1rem;
+    // border: 1px solid #969cb1;
+    overflow: hidden;
+    color: #2c3248;
+    max-height: 90vh;
+    min-height: fit-content;
+    overflow-y: auto;
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+        0 3px 6px -4px rgba(0, 0, 0, 0.12),
+        0 9px 28px 8px rgba(0, 0, 0, 0.05);
+        
+
+
+    .noti-wrapper {
+        border-radius: 0px !important;
+
+        &:hover {
+            background-color: #CDD8FF;
+        }
+    }
+
+    & a {
+        padding: 1.2rem !important;
+        display: flex;
+        gap: 0.5rem;
+        // flex-wrap: wrap;
+
+        .pic {
+            flex: 0 0 auto;
+            width: 45px;
+            height: 45px;
+            border-radius: 100px;
+            overflow: hidden;
+
+            img {
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        .data {
+            flex: 1;
+            // background-color: pink;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            /* แยกข้อความเมื่อเกินความยาว */
+            // white-space: normal;
+            /* ข้อความขึ้นบรรทัดใหม่เมื่อเกินความยาว */
+            display: flex;
+            align-items: center;
+
+
+        }
+    }
+
+
+
+}
+
+// .dropdown-area a {
+//     padding: 1.2rem 2rem;
+// }
+
+.noti-area.close {
+    display: none;
+}
+
+.noti-area.open {
+    display: flex;
+}
+
+.noti-area li {
+    padding: 1rem 2rem;
+}
+
+.notiModal{
+    z-index: 9999;
+    .noti-wrapper {
+        border-radius: 0px !important;
+
+        &:hover {
+            background-color: #CDD8FF;
+        }
+    }
+
+    & a {
+        padding: 1.2rem !important;
+        display: flex;
+        gap: 0.5rem;
+        // flex-wrap: wrap;
+
+        .pic {
+            flex: 0 0 auto;
+            width: 45px;
+            height: 45px;
+            border-radius: 100px;
+            overflow: hidden;
+
+            img {
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        .data {
+            flex: 1;
+            // background-color: pink;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            /* แยกข้อความเมื่อเกินความยาว */
+            // white-space: normal;
+            /* ข้อความขึ้นบรรทัดใหม่เมื่อเกินความยาว */
+            display: flex;
+            align-items: center;
+
+
+        }
+    }
+
 }

@@ -27,17 +27,7 @@ const getBase64 = (img, callback) => {
     reader.addEventListener('load', () => callback(reader.result));
     reader.readAsDataURL(img);
 };
-const beforeUpload = (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-        message.error('You can only upload JPG/PNG file!');
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-        message.error('Image must smaller than 2MB!');
-    }
-    return isJpgOrPng && isLt2M;
-};
+
 
 export default function ManageArtwork() {
     const navigate = useNavigate();
@@ -45,6 +35,17 @@ export default function ManageArtwork() {
     const jwt_token = localStorage.getItem("token");
     const [isLoading, setLoading] = useState(false);
     const [topics, setTopics] = useState([]);
+    const beforeUpload = (file) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            message.error('อัปโหลดได้แค่ไฟล์ JPG/PNG เท่านั้น');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 5;
+        if (!isLt2M) {
+            message.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
+        }
+        // return isJpgOrPng && isLt2M ;
+    };
 
     //---------------------------------------------------------------------
     useEffect(() => {
@@ -109,13 +110,19 @@ export default function ManageArtwork() {
     const [imageUrl, setImageUrl] = useState();
     const [fileList, setFileList] = useState([]);
     const handleChange = (info) => {
-        setFileList(info.fileList);
-        getBase64(info.file.originFileObj, (url) => {
-            // setLoading(false);
-            setUploadModalOpen(false)
-            setImageUrl(url);
-        });
+        console.log(info.fileList[info.fileList.length - 1].size / 1024 / 1024)
+        if ((info.fileList[info.fileList.length - 1].type === 'image/jpeg' || info.fileList[info.fileList.length - 1].type === 'image/png') && (info.fileList[info.fileList.length - 1].size / 1024 / 1024 < 5)) {
+            setFileList(info.fileList);
+            getBase64(info.file.originFileObj, (url) => {
+                // setLoading(false);
+                
+                setImageUrl(url);
+            });
+        }
+        setUploadModalOpen(false)
+        
     };
+    
 
     function selectPic(ex_img_id, ex_img_path) {
         Swal.fire({
@@ -229,14 +236,30 @@ export default function ManageArtwork() {
                                 }}
                             >
                                 <Form.Item
-                                    label=""
+                                    label="ภาพงานวาด"
                                     name=""
+                                    rules={[
+                                {
+                                    required: true,
+                                    message:null
+                                },
+                                ({}) => ({
+                                    validator(_,value) {
+                                        if (fileList.length == 0 ) {
+                                            return Promise.reject(new Error('กรุณาแนบไฟล์ภาพ'));
+                                        } else {
+                                            return Promise.resolve();
+                                        }
+                                    },
+                                }),
+                                
+                            ]}
                                 >
                                     <div className="artwork-uploader" onClick={() => setUploadModalOpen(true)}>
                                         <Upload
                                             name="avatar"
                                             listType="picture-card"
-                                            className="avatar-uploader"
+                                            // className="avatar-uploader"
                                             showUploadList={false}
                                             beforeUpload={beforeUpload}
                                             // onChange={handleChange}
@@ -270,9 +293,12 @@ export default function ManageArtwork() {
                                     <Flex gap="small">
                                         <>
                                             <Upload
+                                                // listType="picture-card"
                                                 onChange={handleChange}
                                                 multiple={false}
                                                 showUploadList={false}
+                                                fileList={fileList}
+                                                beforeUpload={beforeUpload}
                                             >
                                                 <Button shape="round" size="large" icon={<UploadOutlined />}>อัปโหลดรูปภาพจากเครื่อง</Button>
                                             </Upload>

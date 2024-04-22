@@ -15,7 +15,7 @@ import "../../css/allbutton.css";
 import "../../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as ggIcon from '@mui/icons-material';
-import { Cascader, Input, Select, Flex, Tabs, Pagination } from 'antd';
+import { Cascader, Input, Select, Flex, Tabs, Pagination, Badge } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 
 // import Button from "react-bootstrap/Button";
@@ -31,31 +31,60 @@ export default function MyReq() {
     const token = localStorage.getItem("token");
 
 
+    const [countAll, setCountAll] = useState()
+    const [countWait, setCountWait] = useState()
+    const [countAccepted, setCountAccepted] = useState()
+    const [countCancel, setCountCancel] = useState()
+    const [countFinish, setCountFinish] = useState()
+
+
     const { userdata, socket } = useAuth();
     const menus = [
         {
             key: 'all',
-            label: "ทั้งหมด",
+            label:
+                <>
+                    <span>ทั้งหมด </span>
+                    <Badge count={countAll} showZero color="#faad14" />
+                </>,
             // children: <Foryou statusUserLogin={statusUserLogin} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
         },
         {
             key: 'wait',
-            label: "รอการตอบรับ",
+            label:
+
+                <>
+                    <span>รอการตอบรับ </span>
+                    <Badge count={countWait} showZero color="#faad14" />
+                </>
+            ,
             // children: <Commissions IFollowingIDs={IFollowingIDs} />,
         },
         {
             key: 'accepted',
-            label: "ยอมรับแล้ว",
+            label:
+                <>
+                    <span>ยอมรับแล้ว </span>
+                    <Badge count={countAccepted} showZero color="#faad14" />
+                </>,
             // children: <Gallery IFollowingIDs={IFollowingIDs} />,
         },
         {
-            key: '4',
-            label: "เสร็จสิ้น",
+            key: 'finish',
+            label:
+                <>
+                    <span>เสร็จสิ้น </span>
+                    <Badge count={countFinish} showZero color="#faad14" />
+                </>
             // children: <Artists IFollowingIDs={IFollowingIDs} />,
         },
         {
             key: 'cancel',
-            label: "ยกเลิกแล้ว",
+            label:
+                <>
+                    <span>ยกเลิกแล้ว </span>
+                    <Badge count={countCancel} showZero color="#faad14" />
+                </>,
             // children: <Artists IFollowingIDs={IFollowingIDs} />,
         },
 
@@ -86,34 +115,58 @@ export default function MyReq() {
     const [filteredData, setFilteredData] = useState()
     const [sortby, setsortby] = useState('เก่าสุด')
 
+
     useEffect(() => {
         const getData = async () => {
-            const allDataData = await axios.get(
+            const allData = await axios.get(
                 `${host}/getreq`,
                 {
                     headers: { Authorization: "Bearer " + token },
                 }
             )
-            // console.log(allDataData.data)
-            setAllData(allDataData.data)
-            setFilteredData(allDataData.data)
+            // console.log(allData.data)
+            setAllData(allData.data)
+            setFilteredData(allData.data)
+
+            const array0 = allData.data
+            setCountAll(array0.length == 0 ? '0' : array0.length)
+            const array1 = allData.data.filter(data => data?.step_name.includes('รับคำขอจ้าง') && data?.od_cancel_by == null)
+            setCountWait(array1.length == 0 ? '0' : array1.length)
+            const array3 = allData.data.filter(data => data?.od_cancel_by !== null)
+            setCountCancel(array3.length == 0 ? '0' : array3.length)
+            const array4 = allData.data.filter(data => data?.finished_at !== null)
+            setCountFinish(array4.length == 0 ? '0' : array4.length)
+            const array5 = allData.data.filter(data => data?.finished_at !== null && data?.od_cancel_by !== null)
+            setCountAccepted(array5.length == 0 ? '0' : array5.length)
+
+            // console.log(array3.length)
         }
         getData()
+
+
+
     }, [])
 
 
-
+    // const countAll = useRef()
+    // const countWait = useRef()
+    // const countCancel = useRef()
+    // const countFinish = useRef()
     function changeMenu(key) {
         // key == "all" && const aa = allData.filter(menu => menu.step_name == "")
-        var req;
+        let req;
         if (key == 'all') {
             req = allData
         } else if (key == 'wait') {
-            req = allData.filter(menu => menu?.step_name == "รับคำขอจ้าง")
-        } else if (key == 'accepted') {
-            req = allData.filter(menu => !menu.step_name?.includes('คำขอจ้าง') || !menu.step_name?.includes('แอดมินอนุมัติ'))
-        } else if (key == 'cencel') {
+            req = allData.filter(menu => menu?.step_name.includes('รับคำขอจ้าง') && menu?.od_cancel_by == null)
+        } else if (key == 'cancel') {
             req = allData.filter(menu => menu?.od_cancel_by !== null)
+        } else if (key == 'finish') {
+            req = allData.filter(menu => menu?.finished_at !== null)
+        }
+        else {
+            // กรณีแอกเซ็ป
+            req = allData.filter(menu => menu?.finished_at !== null && menu?.od_cancel_by !== null && menu?.step_name.includes('รับคำขอจ้าง'))
         }
         setFilteredData(req)
 
@@ -236,7 +289,12 @@ export default function MyReq() {
                                                 <td>{req.cms_name} : {req.pkg_name}</td>
                                                 <td>{req.od_price}</td>
                                                 <td>{req.artist_name}</td>
-                                                <td>{req.step_name}</td>
+                                                <td>
+                                                    {req.od_cancel_by == null && req.finished_at == null && req.step_name}
+                                                    {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
+                                                    {req.od_cancel_by == !null && 'ยกเลิกแล้ว'}
+
+                                                </td>
                                             </tr>
                                         )
                                     })
@@ -252,7 +310,11 @@ export default function MyReq() {
                                                 <td>{req.cms_name} : {req.pkg_name}</td>
                                                 <td>{req.od_price}</td>
                                                 <td>{req.artist_name}</td>
-                                                <td>{req.step_name}</td>
+                                                <td>
+                                                    {req.od_cancel_by == null && req.finished_at == null && req.step_name}
+                                                    {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
+                                                    {req.od_cancel_by !== null && 'ยกเลิกแล้ว'}
+                                                </td>
                                             </tr>
                                         )
                                     })
