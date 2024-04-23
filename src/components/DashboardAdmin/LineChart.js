@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import moment from 'moment'; 
+import moment from 'moment';
 import axios from 'axios';
 import {
   Chart as ChartJS,
@@ -16,6 +16,7 @@ import {
 import Dropdown from 'react-dropdown';
 import { Line } from "react-chartjs-2";
 import { host } from "../../utils/api";
+import { Flex, Select } from 'antd';
 
 ChartJS.register(
   CategoryScale,
@@ -39,34 +40,34 @@ const LineChart = () => {
         label: 'นักวาด',
         data: [],
         fill: false,
-        borderColor: 'red',
-        backgroundColor: 'red',
+        borderColor: '#7E9AFA',
+        backgroundColor: '#7E9AFA',
         tension: 0.1,
       },
       {
         label: 'ผู้ใช้งานทั่วไป',
         data: [],
-        borderColor: 'blue',
-        backgroundColor: 'blue',
+        borderColor: '#ebfa7e',
+        backgroundColor: '#ebfa7e',
         tension: 0.1,
       },
     ],
   });
 
-  const handleDateChange = (filterType) => {
+  const handleDateChange = () => {
     const currentDate = new Date();
     let newStartDate = new Date();
     let newEndDate = new Date();
     console.log(currentDate.getDate());
-  
-    switch (filterType) {
+
+    switch (filterBy) {
       case 'year':
         newStartDate = new Date(currentDate.getFullYear(), 0, 1);
         newEndDate = new Date(currentDate.getFullYear(), 11, 31);
         break;
       case 'today':
         newStartDate.setDate(currentDate.getDate() - 1);
-        newEndDate.setDate(currentDate.getDate()) ;
+        newEndDate.setDate(currentDate.getDate());
         break;
       case 'last7days':
         newStartDate.setDate(currentDate.getDate() - 6);
@@ -83,12 +84,12 @@ const LineChart = () => {
       default:
         break;
     }
-  
+
     setStartDate(newStartDate);
     setEndDate(newEndDate || currentDate);
-  
+
     // getYearData(newStartDate, newEndDate || currentDate);
-    if (filterType === 'year') {
+    if (filterBy === 'year') {
       setStutus(true)
     } else {
       setStutus(false)
@@ -141,15 +142,15 @@ const LineChart = () => {
           label: 'นักวาด',
           data: newData.map((item) => item.artist_count),
           fill: false,
-          borderColor: 'red',
-          backgroundColor: 'red',
+          borderColor: '#7E9AFA',
+          backgroundColor: '#7E9AFA',
           tension: 0.1,
         },
         {
           label: 'ผู้ใช้งานทั่วไป',
           data: newData.map((item) => item.customer_count),
-          borderColor: 'blue',
-          backgroundColor: 'blue',
+          borderColor: '#ebfa7e',
+          backgroundColor: '#ebfa7e',
           tension: 0.1,
         },
       ],
@@ -178,15 +179,15 @@ const LineChart = () => {
           label: 'นักวาด',
           data: newData.map((item) => item.artist_count),
           fill: false,
-          borderColor: 'red',
-          backgroundColor: 'red',
+          borderColor: '#7E9AFA',
+          backgroundColor: '#7E9AFA',
           tension: 0.1,
         },
         {
           label: 'ผู้ใช้งานทั่วไป',
           data: newData.map((item) => item.customer_count),
-          borderColor: 'blue',
-          backgroundColor: 'blue',
+          borderColor: '#ebfa7e',
+          backgroundColor: '#ebfa7e',
           tension: 0.1,
         },
       ],
@@ -205,12 +206,12 @@ const LineChart = () => {
       currentDate.setDate(startDate.getDate() + index);
       return currentDate.toISOString().split('T')[0];
     });
-  
+
     const newData = allDays.map((day) => {
       const dataIndex = data.findIndex((item) => item.date === day);
       return dataIndex !== -1 ? data[dataIndex] : { date: day, signup_count: 0, artist_count: 0, customer_count: 0 };
     });
-  
+
     return newData;
   };
 
@@ -223,9 +224,32 @@ const LineChart = () => {
     },
   };
 
+  const [filterBy, setFilterBy] = useState('year')
+
+  useEffect(() => {
+    handleDateChange()
+  }, [filterBy])
+
   return (
     <div>
-      <div style={{ marginTop: '20px' }}>
+      <Flex align="center" className="mt-4">
+        <p style={{ whiteSpace: 'nowrap' }}>กรองจาก : </p>
+        <Select
+          // value={{ value: sortby, label: sortby }}
+          style={{ width: 120 }}
+          // onChange={handlesortbyChange}
+          value={filterBy}
+          onChange={setFilterBy}
+          options={[
+            { value: 'year', label: 'ปีนี้' },
+            { value: 'today', label: 'วันนี้' },
+            { value: 'last7days', label: '7 วันที่แล้ว' },
+            { value: 'last30days', label: '30 วันที่แล้ว' },
+            { value: 'thisMonth', label: 'เดือนนี้' },
+          ]}
+        />
+      </Flex>
+      {/* <div style={{ marginTop: '20px' }}>
         <label>กรองจาก: </label>
         <select onChange={(e) => handleDateChange(e.target.value)}>
           <option value="year">ปีนี้</option>
@@ -234,8 +258,12 @@ const LineChart = () => {
           <option value="last30days">30 วันที่แล้ว</option>
           <option value="thisMonth">เดือนนี้</option>
         </select>
+      </div> */}
+      <div style={{
+        width: "100%",
+      }}>
+        <Line options={options} data={lineChartData} />
       </div>
-      <Line options={options} data={lineChartData} />
     </div>
   );
 };

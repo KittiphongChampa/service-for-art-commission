@@ -380,7 +380,7 @@ export default function AdminManageCmsProblem() {
 
               <div className="sim-pic-container">
                 {prototype.map((item, index) => (
-                  <Card className="pic-box" key={index}>
+                  <Card className="pic-box" key={index+item}>
                     {/* <p className="pic-detail">
                 <div className="cms-artist-box">
                   <Link to={`/profile/`}>

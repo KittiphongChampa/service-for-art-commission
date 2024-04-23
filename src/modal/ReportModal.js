@@ -107,13 +107,13 @@ export default function ReportModal(props) {
                                     >
                                         <Input />
                                     </Form.Item>
-                                    <Form.Item
+                                    {/* <Form.Item
                                         name="rp-email"
                                         label="อีเมลติดต่อกลับ"
                                         rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                                     >
                                         <Input />
-                                    </Form.Item>
+                                    </Form.Item> */}
                                     <Form.Item>
                                         <Space>
                                             {/* <Button type="primary" htmlType="submit">
@@ -154,13 +154,13 @@ export default function ReportModal(props) {
                                         >
                                             <Input.TextArea />
                                         </Form.Item>
-                                        <Form.Item
+                                        {/* <Form.Item
                                             name="rp-email"
                                             label="อีเมลติดต่อกลับ"
                                             rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                                         >
                                             <Input />
-                                        </Form.Item>
+                                        </Form.Item> */}
                                         <Form.Item>
                                             <Space>
                                                 {/* <Button type="primary" htmlType="submit">

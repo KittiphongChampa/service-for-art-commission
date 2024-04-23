@@ -21,7 +21,7 @@ export default function DefaultInput(props) {
 // const DefaultInput = forwardRef((props, ref) => {
 //   return (
 //     <>
-//       <p class="onInput">{props.headding}</p>
+//       <p className="onInput">{props.headding}</p>
 //       <input
 //         className="defInput"
 //         id={props.id}

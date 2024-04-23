@@ -12,7 +12,7 @@ import ImgFullscreen from './openFullPic'
 import ChatOrderDetail from '../components/ChatOrderDetail'
 import ChatAddModal from '../components/ChatAddModal'
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import { Modal, Button, Checkbox, Input, Select, Space, Upload, Switch, Flex, Radio, InputNumber, Form } from 'antd';
+import { Modal, Button, Checkbox, Input, Select, Space, Upload, message, Flex, Radio, InputNumber, Form } from 'antd';
 import OrderSystemMsg from "./OrderSystemMsg";
 import 'animate.css'
 import { isSameDay, format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
@@ -1355,6 +1355,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
   const handleCancel = () => {
     setIsModalOpen(false);
     setPage("0")
+    setPreviewUrl(null)
   };
 
   const [page, setPage] = useState("0")
@@ -1379,7 +1380,10 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
     setPreviewOpen(true);
     setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
   };
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const handleChange = ({ fileList: newFileList }) => {
+    let array = newFileList.filter(file => (file.type === 'image/jpeg' || file.type === 'image/png') && (file.size / 1024 / 1024 < 5))
+    setFileList(array)
+  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -1604,6 +1608,18 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
   const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
+  const beforeUpload = (file, { fileList: newFileList }) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('อัปโหลดได้แค่ไฟล์ JPG/PNG เท่านั้น');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 5;
+    if (!isLt2M) {
+      message.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
+    }
+    return isJpgOrPng && isLt2M && false;
+  };
+
   return (
     <>
       {/* <div>
@@ -1643,7 +1659,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onSubmit={(event) => sendChat(event)}
-                style={{ width: "100%", marginTop: "1rem" }}
+                style={{ width: "100%", marginTop: "1rem" ,display:"flex",flexDirection: "column",justifyContent: "center"}}
               >
                 <input
                   type="file"
@@ -1654,28 +1670,47 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                   onChange={({ target: { files } }) => {
                     files[0] && setFileName(files[0].name);
                     if (files) {
-                      setImage(files[0]);
-                      setPreviewUrl(URL.createObjectURL(files[0]));
+                      if (files[0].size / 1024 / 1024 > 5) {
+                        message.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
+                      } else{
+                        console.log(files[0])
+                        setImage(files[0]);
+                        setPreviewUrl(URL.createObjectURL(files[0]));
+                      }
                     }
                   }}
                 />
                 {previewUrl ? (
                   <img src={previewUrl} alt={fileName} className="imagePreview" />
                 ) : (
-                  <h4>Drop images here</h4>
+                  <Flex align="center" vertical>
+                    <PlusOutlined />
+                    <div
+                      style={{
+                        marginTop: 8,
+                      }}
+                    >
+                      Upload
+                    </div>
+                  </Flex>
                 )}
-              </form>
-              <Button variant="danger" onClick={handleCancel}>
-                ยกเลิก
-              </Button>
+            </form>
+            <Flex justify='flex-end' style={{ marginTop: '-1rem', color: 'gray', fontSize: '14px' }}>
+              *อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB
+            </Flex>
+            <Flex justify="center">
               <Button
                 type="primary"
+                shape="round"
+                size="large"
                 htmlType="submit"
                 form="sendImage"
                 onClick={handleCancel}
+                disabled={image == null}
               >
                 ส่งภาพ
               </Button>
+            </Flex>
 
             </>}
           {page == "2" &&
@@ -1716,11 +1751,15 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                   listType="picture-card"
                   fileList={fileList}
                   onPreview={handlePreview}
-                  onChange={handleChange}
+                onChange={handleChange}
+                beforeUpload={beforeUpload}
                   multiple
                 >
                   {fileList.length >= 8 ? null : uploadButton}
-                </Upload>
+              </Upload>
+              <Flex style={{ marginBottom: '1rem', color: 'gray', fontSize: '14px' }}>
+                *อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB
+              </Flex>
                 <Modal width={1000} open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancelPreview}>
                   <img
                     alt="example"
@@ -1730,7 +1769,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                     src={previewImage}
                   />
                 </Modal>
-                <Flex justify="flex-end">
+                <Flex justify="center">
                   <Button htmlType="submit" size="large" type="primary" shape="round" disabled={value == undefined} >ส่งความคืบหน้างาน</Button>
                 </Flex>
 

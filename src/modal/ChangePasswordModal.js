@@ -36,27 +36,27 @@ const ChangePasswordModal = (props, ref) => {
     formData.append("oldPassword", data.nowPassword);
     formData.append("newPassword", data.newPassword);
     Swal.fire({ ...alertData.changePassConfirm }).then((result) => {
-        if (result.isConfirmed) {
-            axios
-            .put(`${host}/profile/password/change`, formData,{
-              headers: {
-                Authorization: "Bearer " + token,
-              },
-            })
-            .then((response) => {
-              const data = response.data;
-              if (data.status === "ok") {
-                Swal.fire({ ...alertData.changePassIsConfirmed }).then(() => {
-                    window.location.reload(false);
-                })
-              } else {
+      if (result.isConfirmed) {
+        axios
+          .put(`${host}/profile/password/change`, formData, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          })
+          .then((response) => {
+            const data = response.data;
+            if (data.status === "ok") {
+              Swal.fire({ ...alertData.changePassIsConfirmed }).then(() => {
+                window.location.reload(false);
+              })
+            } else {
               //   toast.error(data.message, toastOptions);
-                Swal.fire({ ...alertData.changePassIsError }).then(() => {
-                    // window.location.reload(false);
-                })
-              }
-            });
-        }
+              Swal.fire({ ...alertData.changePassIsError }).then(() => {
+                // window.location.reload(false);
+              })
+            }
+          });
+      }
     })
   };
 
@@ -80,31 +80,29 @@ const ChangePasswordModal = (props, ref) => {
           <div className="form-area">
             <form onSubmit={handleSubmit(submitChangePassForm)}>
               <h2 className="text-align-center">เปลี่ยนรหัสผ่านใหม่</h2>
-              <label class="onInput">รหัสผ่านปัจจุบัน</label>
+              <label className="onInput">รหัสผ่านปัจจุบัน</label>
               <input
                 {...register("nowPassword", { required: true })}
                 type="password"
-                className={`defInput ${
-                  errors.nowPassword ? "border-danger" : ""
-                }`}
+                className={`defInput ${errors.nowPassword ? "border-danger" : ""
+                  }`}
               />
 
-              <label class="onInput">รหัสผ่านใหม่</label>
+              <label className="onInput">รหัสผ่านใหม่</label>
               <input
                 {...register("newPassword", { required: true, minLength: 8 })}
                 type="password"
-                className={`defInput ${
-                  errors.newPassword ? "border-danger" : ""
-                }`}
+                className={`defInput ${errors.newPassword ? "border-danger" : ""
+                  }`}
               />
               {errors.newPassword &&
                 errors.newPassword.type === "minLength" && (
-                  <p class="validate-input">
+                  <p className="validate-input">
                     รหัสผ่านใหม่ตัวอักษรไม่ต่ำกว่า 8 ตัว
                   </p>
                 )}
 
-              <label class="onInput">ยืนยันรหัสผ่านใหม่</label>
+              <label className="onInput">ยืนยันรหัสผ่านใหม่</label>
               <input
                 {...register("verifyPassword", {
                   required: true,
@@ -114,9 +112,8 @@ const ChangePasswordModal = (props, ref) => {
                   },
                 })}
                 type="password"
-                className={`defInput ${
-                  errors.verifyPassword ? "border-danger" : ""
-                }`}
+                className={`defInput ${errors.verifyPassword ? "border-danger" : ""
+                  }`}
               />
               {errors.verifyPassword &&
                 errors.verifyPassword.type === "passwordEqual" && (

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../../components/Navbar";
 import * as alertData from "../../alertdata/alertData";
-
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -43,7 +42,7 @@ import {
   InputNumber,
   Tabs,
   Col,
-  Row
+  message
 } from "antd";
 import * as Icon from "react-feather";
 import ReactQuill from "react-quill";
@@ -54,9 +53,6 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import { FreeMode, Navigation, Thumbs } from "swiper/modules";
-import { isString } from "antd/es/button";
-
 import { useAuth } from '../../context/AuthContext';
 import { host, phost } from "../../utils/api";
 
@@ -137,8 +133,9 @@ export default function ManageCommission() {
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
-  const handleChange = ({ fileList: newFileList }) => { 
-    setFileList(newFileList); 
+  const handleChange = ({ fileList: newFileList }) => {
+    let array = newFileList.filter(file => (file.type === 'image/jpeg' || file.type === 'image/png') && (file.size / 1024 / 1024 < 5))
+    setFileList(array)
   };
   const ref = useRef();
 
@@ -308,8 +305,8 @@ export default function ManageCommission() {
   const [cmsStatus, setCmsStatus] = useState('open')
   const bankName = useRef()
   const bankNum = useRef()
-  const [success,setSuccess] = useState(false)
-  
+  const [success, setSuccess] = useState(false)
+
   const getBankData = async () => {
     await axios.get(`${host}/getbank`, {
       headers: {
@@ -324,6 +321,18 @@ export default function ManageCommission() {
     })
   }
 
+
+  const beforeUpload = (file, { fileList: newFileList }) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('อัปโหลดได้แค่ไฟล์ JPG/PNG เท่านั้น');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 5;
+    if (!isLt2M) {
+      message.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
+    }
+    return isJpgOrPng && isLt2M && false;
+  };
   return (
     <div className="body-con">
       {contextHolder}
@@ -332,7 +341,7 @@ export default function ManageCommission() {
       </Helmet>
       <NavbarUser />
 
-      <div class="body-nopadding" style={{ backgroundColor: "white" }}>
+      <div className="body-nopadding" style={{ backgroundColor: "white" }}>
         <div className="container-xl">
           <div className="content-container">
             <div className="content-body preview-cms">
@@ -344,62 +353,79 @@ export default function ManageCommission() {
               {success &&
                 bankName.current && bankName.current &&
                 <>
-              <h3 className="content-header d-flex justify-content-center mt-4">
-                เพิ่มคอมมิชชัน
-              </h3>
-              <Form
-                form={form}
-                layout="vertical"
-                name="login"
-                onFinish={onFinish}
-                autoComplete="off"
-                initialValues={{
-                  final: 3,
-                  status: 'open'
-                }}
-              >
-                <Form.Item label="ภาพตัวอย่าง" name="">
-                  <Upload
-                    listType="picture-card"
-                    fileList={fileList}
-                    onPreview={handlePreview}
-                    onChange={handleChange}
-                    multiple={true}
+                  <h3 className="content-header d-flex justify-content-center">
+                    เพิ่มคอมมิชชัน
+                  </h3>
+                  <Form
+                    form={form}
+                    layout="vertical"
+                    name="login"
+                    onFinish={onFinish}
+                    autoComplete="off"
+                    initialValues={{
+                      final: 3,
+                      status: 'open'
+                    }}
                   >
-                    <div onClick={() => setUploadModalOpen(true)}>
-                      <PlusOutlined />
-                      <div
-                        style={{
-                          marginTop: 8,
-                        }}
+                    <Form.Item label="ภาพตัวอย่าง (อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB)" name=""
+                      rules={[
+                        {
+                          required: true,
+                          message: null
+                        },
+                        ({ }) => ({
+                          validator(_, value) {
+                            if (fileList.length == 0) {
+                              return Promise.reject(new Error('กรุณาแนบไฟล์ภาพ'));
+                            } else {
+                              return Promise.resolve();
+                            }
+                          },
+                        }),
+
+                      ]}>
+                      <Upload
+                        listType="picture-card"
+                        fileList={fileList}
+                        onPreview={handlePreview}
+                        onChange={handleChange}
+                        multiple={true}
+                        beforeUpload={beforeUpload}
                       >
-                        Upload
-                      </div>
-                    </div>
-                  </Upload>
+                        <div onClick={() => setUploadModalOpen(true)}>
+                          <PlusOutlined />
+                          <div
+                            style={{
+                              marginTop: 8,
+                            }}
+                          >
+                            Upload
+                          </div>
+                        </div>
+                      </Upload>
 
 
-                  <Modal
-                    open={previewOpen}
-                    title={previewTitle}
-                    footer={null}
-                    onCancel={handleCancel}
-                  >
-                    <img
-                      alt="example"
-                      style={{
-                        width: "100%",
-                      }}
-                      src={previewImage}
-                    />
-                  </Modal>
-                </Form.Item>
+                      <Modal
+                        open={previewOpen}
+                        title={previewTitle}
+                        footer={null}
+                        onCancel={handleCancel}
+                      >
+                        <img
+                          alt="example"
+                          style={{
+                            width: "100%",
+                          }}
+                          src={previewImage}
+                        />
+                      </Modal>
+                    </Form.Item>
 
 
 
 
-                {/* <Row> */}
-                  {/* <Col flex="auto" > */}
+                    {/* <Row> */}
+                    {/* <Col flex="auto" > */}
                     <Form.Item
                       label="ชื่อคอมมิชชัน"
                       name="cmsName"
@@ -407,6 +433,7 @@ export default function ManageCommission() {
                       rules={[
                         {
                           required: true,
+                          whitespace: true,
                           message: "กรุณาใส่ชื่อคอมมิชชัน",
                         },
                         { type: "text" },
@@ -414,8 +441,8 @@ export default function ManageCommission() {
                     >
                       <Input />
                     </Form.Item>
-                  {/* </Col> */}
-                  {/* <Col flex="100px" style={{ marginLeft: "10px" }}>
+                    {/* </Col> */}
+                    {/* <Col flex="100px" style={{ marginLeft: "10px" }}>
                     <Form.Item
                       name="status"
                       label="สถานะ"
@@ -437,369 +464,354 @@ export default function ManageCommission() {
                     </Form.Item>
                   </Col> */}
 
-                {/* </Row> */}
+                    {/* </Row> */}
 
 
-                <Form.Item
-                  name="cmsTou"
-                  label={
-                    <>
-                      ประเภทการใช้งานที่รับ
-                      <Tooltip
-                        title="1.Personal use : ใช้ส่วนตัว ไม่สามารถใช้เชิงพาณิชย์ได้ 2.License : สามารถนำไปทำบางอย่างได้ เช่น ใช้ในเชิงพาณิชย์ ทั้งนี้ทั้งนั้นขึ้นอยู่กับข้อตกลงว่าสามารถทำอะไรได้บ้าง 3.Exclusive right : สามารถนำผลงานไปทำอะไรก็ได้ ลิขสิทธิ์อยู่ที่ผู้ซื้อ แต่นักวาดยังมีเครดิตในผลงานอยู่"
-                        color="#2db7f5"
-                      >
-                        <Icon.Info />
-                      </Tooltip>
-                    </>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณาเลือกประเภทงานที่รับ",
-                    },
-                  ]}
-                >
-                  <Checkbox.Group
-                    value={selectedValues}
-                    onChange={(values) => setSelectedValues(values)}
-                  >
-                    <Checkbox
-                      value="1"
-                      style={{ lineHeight: "32px" }}
-                    >
-                      Personal use (ใช้ส่วนตัว)
-                    </Checkbox>
-                    <Checkbox
-                      value="2"
-                      style={{ lineHeight: "32px" }}
-                    >
-                      License (มีสิทธ์บางส่วน)
-                    </Checkbox>
-                    <Checkbox
-                      value="3"
-                      style={{ lineHeight: "32px" }}
-                    >
-                      Exclusive right (ซื้อขาด)
-                    </Checkbox>
-                  </Checkbox.Group>
-                </Form.Item>
-
-                <Form.Item
-                  label="รายละเอียดคอมมิชชัน"
-                  name="cmsDesc"
-                  id="cmsDesc"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณากรอกรายละเอียดคอมมิชชัน",
-                    },
-                    { type: "text" },
-                  ]}
-                >
-                  <ReactQuill
-                    theme="snow"
-                    modules={modules}
-                    formats={formats}
-                    value={editorValue}
-                    onChange={setEditorValue}
-                    placeholder="เขียนรายละเอียดคอมมิชชัน.."
-                  />
-                </Form.Item>
-                <Space
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    // backgroundColor: 'pink'
-                  }}
-                >
-                  <Form.Item
-                    label="จำนวนคิว"
-                    name={"cmsQ"}
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณาใส่จำนวนคิว",
-                      },
-                      // {
-                      //   min:1
-                      // },
-
-                      { type: "number" },
-                    ]}
-                  >
-                    <InputNumber suffix="คิว" className="inputnumber-css" min={1}/>
-                  </Form.Item>
-                </Space>
-
-                <Form.Item
-                  label="งานที่ถนัด"
-                  name="cmsGood"
-                  rules={[
-                    {
-                      required: true,
-                      // whitespace: true,
-                      message: "กรุณาใส่งานที่ถนัด",
-                    },
-                  ]}
-                >
-                  <TextArea
-                    placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
-                    showCount
-                    maxLength={200}
-                    autoSize={{
-                      minRows: 3,
-                      maxRows: 5,
-                    }}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label="งานที่ไม่ถนัด"
-                  name="cmsBad"
-                  rules={[
-                    {
-                      required: true,
-                      // whitespace: true,
-                      message: "กรุณาใส่งานที่ไม่ถนัด",
-                    },
-                  ]}
-                >
-                  <TextArea
-                    placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
-                    showCount
-                    maxLength={200}
-                    autoSize={{
-                      minRows: 3,
-                      maxRows: 5,
-                    }}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label="งานไม่รับ"
-                  name="cmsNo"
-                  rules={[
-                    {
-                      required: true,
-                      // whitespace: true,
-                      message: "กรุณาใส่งานที่ไม่รับ'",
-                    },
-                  ]}
-                >
-                  <TextArea
-                    placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
-                    showCount
-                    maxLength={200}
-                    autoSize={{
-                      minRows: 3,
-                      maxRows: 5,
-                    }}
-                  />
-                </Form.Item>
-
-                {/* <Button onClick={() => console.log(editorValue)}>เทส</Button> */}
-                <Form.Item name="" label="แพ็กเกจ">
-                  <Form.List name="pkgs">
-                    {(fields, { add, remove }, { errors }) => (
-                      <div
-                        style={{
-                          display: "flex",
-                          rowGap: 16,
-                          flexDirection: "column",
-                        }}
-                      >
-                        {fields.map((field) => (
-                          <Card
-                            size="small"
-                            title={`แพ็กเกจ ${field.name + 1}`}
-                            key={field.key}
-                            extra={
-                              field.name !== 0 && (
-                                <CloseOutlined
-                                  onClick={() => {
-                                    remove(field.name);
-                                  }}
-                                />
-                              )
-                            }
+                    <Form.Item
+                      name="cmsTou"
+                      label={
+                        <>
+                          ประเภทการใช้งานที่รับ
+                          <Tooltip
+                            title="1.Personal use : ใช้ส่วนตัว ไม่สามารถใช้เชิงพาณิชย์ได้ 2.License : สามารถนำไปทำบางอย่างได้ เช่น ใช้ในเชิงพาณิชย์ ทั้งนี้ทั้งนั้นขึ้นอยู่กับข้อตกลงว่าสามารถทำอะไรได้บ้าง 3.Exclusive right : สามารถนำผลงานไปทำอะไรก็ได้ ลิขสิทธิ์อยู่ที่ผู้ซื้อ แต่นักวาดยังมีเครดิตในผลงานอยู่"
+                            color="#2db7f5"
                           >
-                            <Form.Item
-                              label="ชื่อแพ็กเกจ"
-                              name={[field.name, "pkgName"]}
-                              rules={[
-                                {
-                                  required: true,
-                                  whitespace: true,
-                                  message: "กรุณาใส่ชื่อแพ็กเกจ",
-                                },
-                              ]}
-                            >
-                              <Input />
-                            </Form.Item>
-                            <Form.Item
-                              label="คำอธิบาย"
-                              name={[field.name, "pkgDesc"]}
-                              rules={[
-                                {
-                                  required: true,
-                                  whitespace: true,
-                                  message: "กรุณาใส่คำอธิบาย",
-                                },
-                              ]}
-                            >
-                              <TextArea
-                                showCount
-                                maxLength={200}
-                                autoSize={{
-                                  minRows: 3,
-                                  maxRows: 5,
-                                }}
-                              />
-                            </Form.Item>
+                            <Icon.Info />
+                          </Tooltip>
+                        </>
+                      }
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณาเลือกประเภทงานที่รับ",
+                        },
+                      ]}
+                    >
+                      <Checkbox.Group
+                        value={selectedValues}
+                        onChange={(values) => setSelectedValues(values)}
+                      >
+                        <Checkbox
+                          value="1"
+                          style={{ lineHeight: "32px" }}
+                        >
+                          Personal use (ใช้ส่วนตัว)
+                        </Checkbox>
+                        <Checkbox
+                          value="2"
+                          style={{ lineHeight: "32px" }}
+                        >
+                          License (มีสิทธ์บางส่วน)
+                        </Checkbox>
+                        <Checkbox
+                          value="3"
+                          style={{ lineHeight: "32px" }}
+                        >
+                          Exclusive right (ซื้อขาด)
+                        </Checkbox>
+                      </Checkbox.Group>
+                    </Form.Item>
 
-                            <Space
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                flexWrap: "wrap",
-                                // backgroundColor: 'pink'
-                              }}
-                            >
-                              <Form.Item
-                                label="จำนวนวัน"
-                                name={[field.name, "pkgDuration"]}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "กรุณาใส่คำอธิบาย",
-                                  },
-                                  // {
-                                  //   min:1
-                                  // },
-                                  { type: "number" },
-                                ]}
-                              >
-                                <InputNumber
-                                  suffix="วัน"
-                                  className="inputnumber-css"
-                                  min={1}
-                                />
-                              </Form.Item>
-                              <Form.Item
-                                label="จำนวนแก้ไข"
-                                name={[field.name, "pkgEdit"]}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "กรุณาใส่คำอธิบาย",
-                                  },
-                                  // {
-                                  //   min:0
-                                  // },
-                                  { type: "number" },
-                                ]}
-                              >
-                                <InputNumber
-                                  suffix="ครั้ง"
-                                  className="inputnumber-css"
-                                  min={1}
-                                />
-                              </Form.Item>
-                              <Form.Item
-                                label="ราคาเริ่มต้น"
-                                name={[field.name, "pkgPrice"]}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "กรุณาใส่คำอธิบาย",
-                                  },
-                                  { type: "number" },
-                                ]}
-                              >
-                                <InputNumber
-                                  suffix="บาท"
-                                  className="inputnumber-css"
-                                />
-                              </Form.Item>
-                            </Space>
+                    <Form.Item
+                      label="รายละเอียดคอมมิชชัน"
+                      name="cmsDesc"
+                      id="cmsDesc"
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message: "กรุณากรอกรายละเอียดคอมมิชชัน",
+                        },
+                        { type: "text" },
+                        ({ }) => ({
+                          validator(_, value) {
+                            if (editorValue == '<p><br></p>') {
+                              console.log('เข้า if' + editorValue)
+                              return Promise.reject(new Error("กรุณากรอกรายละเอียดคอมมิชชัน"));
+                            } else {
+                              console.log('ไม่เข้า if' + editorValue)
+                              return Promise.resolve();
+                            }
+                          },
+                        }),
+                      ]}
+                    >
+                      <ReactQuill
+                        theme="snow"
+                        modules={modules}
+                        formats={formats}
+                        value={editorValue}
+                        onChange={setEditorValue}
+                        placeholder="เขียนรายละเอียดคอมมิชชัน.."
+                      />
+                    </Form.Item>
+                    <Space
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        // backgroundColor: 'pink'
+                      }}
+                    >
+                      <Form.Item
+                        label="จำนวนคิว"
+                        name={"cmsQ"}
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณาใส่จำนวนคิว",
+                          },
+                          // {
+                          //   min:1
+                          // },
 
-                            <Form.Item
-                              label={
-                                <>
-                                  ขั้นตอนการทำงาน
-                                  <Tooltip
-                                    title="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งความคืบหน้าให้ลูกค้าดู"
-                                    color="#2db7f5"
-                                  >
-                                    <Icon.Info />
-                                  </Tooltip>
-                                </>
-                              }
-                              name=""
-                            >
-                              {field.name == 0 && (
-                                <Alert
-                                  style={{ marginBottom: "1rem" }}
-                                  message="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งความคืบหน้าให้ลูกค้าดู"
-                                  type="info"
-                                  closable
-                                  showIcon
-                                />
-                              )}
-                              <Form.List
-                                name={[field.name, "step"]}
-                                rules={[
-                                  {
-                                    validator: async (_, step) => {
-                                      if (!step || step.length === 0) {
-                                        console.log("ยังไม่เพิ่มการทำงาน");
-                                        return Promise.reject(
-                                          new Error(
-                                            "เพิ่มการทำงานอย่างน้อย 1 ขั้นตอน"
-                                          )
-                                        );
-                                      }
-                                    },
-                                  },
-                                ]}
-                              >
-                                {(subFields, subOpt, { errors }) => (
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      flexDirection: "column",
-                                    }}
-                                  >
-                                    <Space
-                                      style={{
-                                        display: "flex",
+                          { type: "number" },
+                        ]}
+                      >
+                        <InputNumber suffix="คิว" className="inputnumber-css" min={1} />
+                      </Form.Item>
+                    </Space>
+
+                    <Form.Item
+                      label="งานที่ถนัด"
+                      name="cmsGood"
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          // whitespace: true,
+                          message: "กรุณาใส่งานที่ถนัด",
+                        },
+                      ]}
+                    >
+                      <TextArea
+                        placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
+                        showCount
+                        maxLength={200}
+                        autoSize={{
+                          minRows: 3,
+                          maxRows: 5,
+                        }}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="งานที่ไม่ถนัด"
+                      name="cmsBad"
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message: "กรุณาใส่งานที่ไม่ถนัด",
+                        },
+                      ]}
+                    >
+                      <TextArea
+                        placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
+                        showCount
+                        maxLength={200}
+                        autoSize={{
+                          minRows: 3,
+                          maxRows: 5,
+                        }}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="งานไม่รับ"
+                      name="cmsNo"
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message: "กรุณาใส่งานที่ไม่รับ'",
+                        },
+                      ]}
+                    >
+                      <TextArea
+                        placeholder="เช่น ผู้หญิง ผู้ชาย เฟอร์นิเจอร์บางชิ้น"
+                        showCount
+                        maxLength={200}
+                        autoSize={{
+                          minRows: 3,
+                          maxRows: 5,
+                        }}
+                      />
+                    </Form.Item>
+
+                    {/* <Button onClick={() => console.log(editorValue)}>เทส</Button> */}
+                    <Form.Item name="" label="แพ็กเกจ">
+                      <Form.List name="pkgs">
+                        {(fields, { add, remove }, { errors }) => (
+                          <div
+                            style={{
+                              display: "flex",
+                              rowGap: 16,
+                              flexDirection: "column",
+                            }}
+                          >
+                            {fields.map((field) => (
+                              <Card
+                                size="small"
+                                title={`แพ็กเกจ ${field.name + 1}`}
+                                key={field.key}
+                                extra={
+                                  field.name !== 0 && (
+                                    <CloseOutlined
+                                      onClick={() => {
+                                        remove(field.name);
                                       }}
-                                      align="baseline"
-                                    >
+                                    />
+                                  )
+                                }
+                              >
+                                <Form.Item
+                                  label="ชื่อแพ็กเกจ"
+                                  name={[field.name, "pkgName"]}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      whitespace: true,
+                                      message: "กรุณาใส่ชื่อแพ็กเกจ",
+                                    },
+                                  ]}
+                                >
+                                  <Input />
+                                </Form.Item>
+                                <Form.Item
+                                  label="คำอธิบาย"
+                                  name={[field.name, "pkgDesc"]}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      whitespace: true,
+                                      message: "กรุณาใส่คำอธิบาย",
+                                    },
+                                  ]}
+                                >
+                                  <TextArea
+                                    showCount
+                                    maxLength={200}
+                                    autoSize={{
+                                      minRows: 3,
+                                      maxRows: 5,
+                                    }}
+                                  />
+                                </Form.Item>
+
+                                <Space
+                                  style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    flexWrap: "wrap",
+                                    // backgroundColor: 'pink'
+                                  }}
+                                >
+                                  <Form.Item
+                                    label="จำนวนวัน"
+                                    name={[field.name, "pkgDuration"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "กรุณาใส่จำนวนวัน",
+                                      },
+                                      // {
+                                      //   min:1
+                                      // },
+                                      { type: "number" },
+                                    ]}
+                                  >
+                                    <InputNumber
+                                      suffix="วัน"
+                                      className="inputnumber-css"
+                                      min={1}
+                                    />
+                                  </Form.Item>
+                                  <Form.Item
+                                    label="จำนวนแก้ไข"
+                                    name={[field.name, "pkgEdit"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "กรุณาใส่จำนวนแก้ไข",
+                                      },
+                                      // {
+                                      //   min:0
+                                      // },
+                                      { type: "number" },
+                                    ]}
+                                  >
+                                    <InputNumber
+                                      suffix="ครั้ง"
+                                      className="inputnumber-css"
+                                      min={1}
+                                    />
+                                  </Form.Item>
+                                  <Form.Item
+                                    label="ราคาเริ่มต้น"
+                                    name={[field.name, "pkgPrice"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "กรุณาใส่ราคาเริ่มต้น",
+                                      },
+                                      { type: "number" },
+                                    ]}
+                                  >
+                                    <InputNumber
+                                      suffix="บาท"
+                                      className="inputnumber-css"
+                                      min={1}
+                                    />
+                                  </Form.Item>
+                                </Space>
+
+                                <Form.Item
+                                  label={
+                                    <>
+                                      ขั้นตอนการทำงาน
+                                      <Tooltip
+                                        title="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งความคืบหน้าให้ลูกค้าดู"
+                                        color="#2db7f5"
+                                      >
+                                        <Icon.Info />
+                                      </Tooltip>
+                                    </>
+                                  }
+                                  name=""
+                                >
+                                  {field.name == 0 && (
+                                    <Alert
+                                      style={{ marginBottom: "1rem" }}
+                                      message="ขั้นตอนการทำงานคือภาพทั้งหมดที่จะส่งความคืบหน้าให้ลูกค้าดู"
+                                      type="info"
+                                      closable
+                                      showIcon
+                                    />
+                                  )}
+                                  <Form.List
+                                    name={[field.name, "step"]}
+                                    rules={[
+                                      {
+                                        validator: async (_, step) => {
+                                          if (!step || step.length === 0) {
+                                            console.log("ยังไม่เพิ่มการทำงาน");
+                                            return Promise.reject(
+                                              new Error(
+                                                "เพิ่มการทำงานอย่างน้อย 1 ขั้นตอน"
+                                              )
+                                            );
+                                          }
+                                        },
+                                      },
+                                    ]}
+                                  >
+                                    {(subFields, subOpt, { errors }) => (
                                       <div
                                         style={{
-                                          width: "1rem",
-                                          textAlign: "right",
+                                          display: "flex",
+                                          flexDirection: "column",
                                         }}
                                       >
-                                        1:{" "}
-                                      </div>
-                                      <Form.Item
-                                        name="draft"
-                                        validateTrigger={["onChange", "onBlur"]}
-                                      >
-                                        <Input
-                                          placeholder="ตัวอย่าง ภาพลงสี"
-                                          defaultValue="ร่าง"
-                                          prefix="ภาพ"
-                                          readOnly
-                                        />
-                                      </Form.Item>
-                                    </Space>
-                                    {subFields.map((subField) => (
-                                      <>
                                         <Space
-                                          key={subField.key}
                                           style={{
                                             display: "flex",
                                           }}
@@ -811,123 +823,152 @@ export default function ManageCommission() {
                                               textAlign: "right",
                                             }}
                                           >
-                                            {subField.name + 2}:{" "}
+                                            1:{" "}
                                           </div>
                                           <Form.Item
-                                            name={subField.name}
-                                            validateTrigger={[
-                                              "onChange",
-                                              "onBlur",
-                                            ]}
-                                            rules={[
-                                              {
-                                                required: true,
-                                                whitespace: true,
-                                                message:
-                                                  "กรุณาใส่ขั้นตอนการทำงาน",
-                                              },
-                                            ]}
+                                            name="draft"
+                                            validateTrigger={["onChange", "onBlur"]}
                                           >
-                                            <Input prefix="ภาพ" placeholder="ตัวอย่าง ภาพลงสี" />
+                                            <Input
+                                              placeholder="ตัวอย่าง ภาพลงสี"
+                                              defaultValue="ร่าง"
+                                              prefix="ภาพ"
+                                              readOnly
+                                            />
                                           </Form.Item>
-                                          <MinusCircleOutlined
-                                            onClick={() =>
-                                              subOpt.remove(subField.name)
-                                            }
-                                          />
                                         </Space>
-                                      </>
-                                    ))}
+                                        {subFields.map((subField) => (
+                                          <>
+                                            <Space
+                                              key={subField.key}
+                                              style={{
+                                                display: "flex",
+                                              }}
+                                              align="baseline"
+                                            >
+                                              <div
+                                                style={{
+                                                  width: "1rem",
+                                                  textAlign: "right",
+                                                }}
+                                              >
+                                                {subField.name + 2}:{" "}
+                                              </div>
+                                              <Form.Item
+                                                name={subField.name}
+                                                validateTrigger={[
+                                                  "onChange",
+                                                  "onBlur",
+                                                ]}
+                                                rules={[
+                                                  {
+                                                    required: true,
+                                                    whitespace: true,
+                                                    message:
+                                                      "กรุณาใส่ขั้นตอนการทำงาน",
+                                                  },
+                                                ]}
+                                              >
+                                                <Input prefix="ภาพ" placeholder="ตัวอย่าง ภาพลงสี" />
+                                              </Form.Item>
+                                              <MinusCircleOutlined
+                                                onClick={() =>
+                                                  subOpt.remove(subField.name)
+                                                }
+                                              />
+                                            </Space>
+                                          </>
+                                        ))}
 
-                                    <Form.Item
-                                      style={{
-                                        marginLeft: "1.5rem",
-                                      }}
-                                    >
-                                      <Button
-                                        type="dashed"
-                                        style={{
-                                          width: "fit-content",
-                                          // marginLeft: '1.5rem',
-                                        }}
-                                        onClick={() => subOpt.add()}
-                                        block
-                                      >
-                                        + เพิ่มขั้นตอนการทำงาน
-                                      </Button>
-                                    </Form.Item>
+                                        <Form.Item
+                                          style={{
+                                            marginLeft: "1.5rem",
+                                          }}
+                                        >
+                                          <Button
+                                            type="dashed"
+                                            style={{
+                                              width: "fit-content",
+                                              // marginLeft: '1.5rem',
+                                            }}
+                                            onClick={() => subOpt.add()}
+                                            block
+                                          >
+                                            + เพิ่มขั้นตอนการทำงาน
+                                          </Button>
+                                        </Form.Item>
 
-                                    <Space
-                                      style={{
-                                        display: "flex",
-                                      }}
-                                      align="baseline"
-                                    >
-                                      <div
-                                        style={{
-                                          width: "1rem",
-                                          textAlign: "right",
-                                        }}
-                                      >
-                                        {subFields.length + 2}:{" "}
-                                      </div>
-                                      <Form.Item name="final">
-                                        <Input
-                                          placeholder="ตัวอย่าง ภาพลงสี"
-                                          defaultValue="ไฟนัล"
-                                          prefix="ภาพ"
-                                          readOnly
+                                        <Space
+                                          style={{
+                                            display: "flex",
+                                          }}
+                                          align="baseline"
+                                        >
+                                          <div
+                                            style={{
+                                              width: "1rem",
+                                              textAlign: "right",
+                                            }}
+                                          >
+                                            {subFields.length + 2}:{" "}
+                                          </div>
+                                          <Form.Item name="final">
+                                            <Input
+                                              placeholder="ตัวอย่าง ภาพลงสี"
+                                              defaultValue="ไฟนัล"
+                                              prefix="ภาพ"
+                                              readOnly
+                                            />
+                                          </Form.Item>
+                                        </Space>
+                                        <Form.ErrorList
+                                          errors={errors}
+                                          style={{
+                                            marginLeft: "1.5rem",
+                                          }}
                                         />
-                                      </Form.Item>
-                                    </Space>
-                                    <Form.ErrorList
-                                      errors={errors}
-                                      style={{
-                                        marginLeft: "1.5rem",
-                                      }}
-                                    />
-                                  </div>
-                                )}
-                              </Form.List>
-                            </Form.Item>
-                          </Card>
-                        ))}
+                                      </div>
+                                    )}
+                                  </Form.List>
+                                </Form.Item>
+                              </Card>
+                            ))}
 
-                        <Button type="dashed" onClick={() => add()} block>
-                          + เพิ่มแพ็กเกจ
-                        </Button>
-                        {fields.length == 0 && add()}
-                      </div>
-                    )}
-                  </Form.List>
-                </Form.Item>
-                <Form.Item
-                  label="หัวข้อ"
-                  name="cmsTopic"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณาเลือกหัวข้อ",
-                    },
-                  ]}
-                >
-                  <Select
-                    mode="multiple"
-                    placeholder="เลือกหัวข้อ"
-                    value={topicValues}
-                    id="topicSelector"
-                    onChange={handleTopic}
-                    options={all_option}
-                    allowClear
-                  ></Select>
-                </Form.Item>
-                <Flex justify="flex-end">
-                  <Button size="large" type="primary" htmlType="submit" shape="round" loading={isLoading}>บันทึก</Button>
-                </Flex>
-              </Form>
-                <br />
+                            <Button type="dashed" onClick={() => add()} block>
+                              + เพิ่มแพ็กเกจ
+                            </Button>
+                            {fields.length == 0 && add()}
+                          </div>
+                        )}
+                      </Form.List>
+                    </Form.Item>
+                    <Form.Item
+                      label="หัวข้อ"
+                      name="cmsTopic"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณาเลือกหัวข้อ",
+                        },
+                      ]}
+                    >
+                      <Select
+                        mode="multiple"
+                        placeholder="เลือกหัวข้อ"
+                        value={topicValues}
+                        id="topicSelector"
+                        onChange={handleTopic}
+                        options={all_option}
+                        allowClear
+                      ></Select>
+                    </Form.Item>
+                    <Flex justify="flex-end">
+                      <Button size="large" type="primary" htmlType="submit" shape="round" loading={isLoading}>บันทึก</Button>
+                    </Flex>
+                  </Form>
+                  <br />
                 </>
-              
+
               }
 
 

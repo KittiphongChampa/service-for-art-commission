@@ -1,4 +1,5 @@
 import { Modal, Button, Input, Select, Space, Image, Upload, Rate, Flex, Tooltip, InputNumber, Form } from 'antd';
+import { message as msgAntd } from 'antd';
 import { useState, useRef } from 'react';
 import {
     InfoCircleOutlined, LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined, ZoomInOutlined,
@@ -54,7 +55,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
 
     const uploadButton = (
         <div>
-            {/* {loading ? <LoadingOutlined /> : <PlusOutlined />} */}
+            <PlusOutlined />
             <div
                 style={{
                     marginTop: 8,
@@ -139,17 +140,27 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
     const beforeUpload = (file) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         if (!isJpgOrPng) {
-          alert('You can only upload JPG/PNG file!');
+            msgAntd.error('อัปโหลดได้แค่ไฟล์ JPG/PNG เท่านั้น');
         }
-        setFileList([...fileList, file]);
-        return isJpgOrPng; 
+        const isLt2M = file.size / 1024 / 1024 < 5;
+        if (!isLt2M) {
+            msgAntd.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
+        }
+        return isJpgOrPng && isLt2M ;
     };
 
     const handleChange = (info) => {
-        setFileList(info.fileList);
-        getBase64(info.file.originFileObj, (url) => {
-            setImageUrl(url);
-        });
+        console.log(info.fileList[info.fileList.length - 1].size / 1024 / 1024)
+        if ((info.fileList[info.fileList.length - 1].type === 'image/jpeg' || info.fileList[info.fileList.length - 1].type === 'image/png') && (info.fileList[info.fileList.length - 1].size / 1024 / 1024 < 5)) {
+            setFileList(info.fileList);
+            getBase64(info.file.originFileObj, (url) => {
+                // setLoading(false);
+                setImageUrl(url);
+            });
+            // ModalToggle()
+        }
+        
+
     };
 
     const onSubmitImage = async (values) => {
@@ -485,7 +496,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
 
 
             <Modal title="แนบใบเสร็จชำระเงิน" open={IsModalOpen} footer="" onCancel={ModalToggle} style={{ maxWidth: "1000px" }}>
-                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="big-uploader">
+                <Flex wrap='wrap' gap="small" justify="center" align="center" vertical className="slip-uploader">
 
                     {/* เกี่ยวกับการอัพโหลดรูปภาพ */}
                     <Form
@@ -517,8 +528,12 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                                 uploadButton
                             )}
                         </Upload>
-                        {/* <Button icon={<UploadOutlined />} >อัปโหลดสลิป</Button> */}
-                        <Button htmlType="submit" icon={<UploadOutlined />} disabled={imageUrl === null} >อัปโหลดสลิป</Button>
+                        <Flex justify='flex-end' style={{ marginBottom: '1rem', color: 'gray', fontSize: '14px' }}>
+                            *อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB
+                        </Flex>
+                        <Flex justify='center'>
+                            <Button shape='round' size='large' type='primary' htmlType="submit" icon={<UploadOutlined />} disabled={imageUrl === null} >อัปโหลดสลิป</Button>
+                        </Flex>
                     </Form>
 
                 </Flex>

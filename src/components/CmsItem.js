@@ -4,10 +4,10 @@ import { Rate } from "antd";
 
 export default function CmsItem(props) {
   return (
-    <div class="cms-card">
-      <div class="cms-card-grid">
+    <div className="cms-card">
+      <div className="cms-card-grid">
         <div
-          class="cms-card-img col"
+          className="cms-card-img col"
           style={{ backgroundImage: `url("${props.src}")` }}
         >
           <div className="status-wrapper">
@@ -15,10 +15,10 @@ export default function CmsItem(props) {
             {/* ถ้าปิดเป็น classname close */}
           </div>
         </div>
-        <div class="cms-card-text-box">
+        <div className="cms-card-text-box">
           <div>
-            <p class="cms-card-headding text-center">{props.headding}</p>
-            <p class="cms-card-price">{props.price}+ THB</p>
+            <p className="cms-card-headding text-center">{props.headding}</p>
+            <p className="cms-card-price">{props.price}+ THB</p>
           </div>
           <div>
             <Rate disabled defaultValue={2} className="one-star" />

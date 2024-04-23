@@ -43,7 +43,7 @@ export default function ChatAddModal(props) {
             <p className="h4">เปลี่ยนแปลงประเภทการใช้และราคา</p>
             <div><p>ประเภทการใช้งานปัจจุบัน : Personal use</p>
                 <p>ราคาปัจจุบัน : 200 บาท</p>
-            <p>ราคาขั้นต่ำ: xxxx</p></div>
+                <p>ราคาขั้นต่ำ: xxxx</p></div>
             <form action="/action_page.php">
                 <div className="form-item">
                     <div>
@@ -160,9 +160,9 @@ function ProgressPage() {
             <div><input type="radio" id="Exclusive" name="type-of-use" value="Exclusive" />
                 <label className="ms-1" for="Exclusive">ภาพไฟนัล</label></div>
         </div>
-        {/* <div class="input-group mb-1 mt-5">
+        {/* <div className="input-group mb-1 mt-5">
                 <input
-                    type="file" class="form-control" id="inputGroupFile02" />
+                    type="file" className="form-control" id="inputGroupFile02" />
             </div> */}
 
         <div className="selected-img">

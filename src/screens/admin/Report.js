@@ -13,7 +13,7 @@ import {
   Empty,
   Flex,
   Tabs,
-  Card,Form,Badge
+  Card, Form, Badge
 } from "antd";
 import React, { useState, useEffect, useRef } from "react";
 import ReportItem from "../../components/ReportItem";
@@ -33,11 +33,12 @@ import * as ggIcon from "@mui/icons-material";
 import { Helmet } from "react-helmet";
 import { useAuth } from "../../context/AuthContext";
 import { host } from "../../utils/api";
-import { isSameDay, format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
+import { isSameDay, format, isToday, isYesterday, parseISO, isThisMonth, isThisYear } from 'date-fns';
 
 const title = "รายงาน";
 
 export default function Report(props) {
+  // const history = useHistory();
   const navigate = useNavigate();
   const type = localStorage.getItem("type");
   const jwt_token = localStorage.getItem("token");
@@ -52,7 +53,7 @@ export default function Report(props) {
 
   const [reportDetail, setReportDetail] = useState([]);
   console.log(reportDetail);
-  
+
   const [relatedTo, setRelatedTo] = useState([]);
 
   const [artistDetail, setArtistDetail] = useState([]);
@@ -62,9 +63,8 @@ export default function Report(props) {
 
   const time = workDetail.created_at;
   const date = new Date(time);
-  const thaiDate = `${date.getDate()}/${date.getMonth() + 1}/${
-    date.getFullYear() + 543
-  }`;
+  const thaiDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear() + 543
+    }`;
 
   useEffect(() => {
     if (jwt_token && type === "admin") {
@@ -97,14 +97,14 @@ export default function Report(props) {
         if (data.status === "ok") {
           const array0 = data.results.filter(data => data?.status == null || data?.status == undefined)
           setFilteredUser(array0)
-          
+
           setCountAll(array0.length == 0 ? '0' : array0.length) //เช็คสเตตัสที่ว่างเปล่า
           const array1 = data.results.filter(data => data?.status?.includes('ap'))
           setCountKept(array1.length == 0 ? '0' : array1.length) //เช็คสเตตัสที่กดเก็บ
           const array3 = data.results.filter(data => data?.status?.includes('de'))
           setCountDeleted(array3.length == 0 ? '0' : array3.length) //เช็คสเตตัสที่ลบแล้ว
           setReportAll(data.results);
-          
+
         }
       });
   };
@@ -126,8 +126,8 @@ export default function Report(props) {
     });
   };
 
-  const [deleteModal,setDeleteModal] = useState(false)
-  
+  const [deleteModal, setDeleteModal] = useState(false)
+
   function openDelModal() {
     setDeleteModal(!deleteModal)
   }
@@ -162,11 +162,11 @@ export default function Report(props) {
             });
           }
         })
-        
+
       }
     })
   }
-  
+
   const [form] = Form.useForm();
 
   function deleteReport(values) {
@@ -182,7 +182,7 @@ export default function Report(props) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axios.post(`${host}/report/delete/${reportid}`, postData, {
-          headers: {Authorization: "Bearer " + jwt_token}
+          headers: { Authorization: "Bearer " + jwt_token }
         }).then((response) => {
           const data = response.data;
           if (data.status === "ok") {
@@ -369,7 +369,7 @@ export default function Report(props) {
     setFilteredUser(rep);
     // console.log(filteredData)
     // console.log(nowKey.current)
-    
+
   }
 
   const [searchQuery, setSearchQuery] = useState()
@@ -407,15 +407,15 @@ export default function Report(props) {
     if (!Number.isNaN(formatDate.getTime())) {
       formatDate = format(formatDate, 'dd/MM/yyyy HH:mm น.');
       if (isToday(formatDate)) {
-          formatDate = format(formatDate, 'วันนี้ HH:mm น.');
+        formatDate = format(formatDate, 'วันนี้ HH:mm น.');
       } else if (isYesterday(formatDate)) {
-          formatDate = format(formatDate, 'เมื่อวานนี้ HH:mm น.');
+        formatDate = format(formatDate, 'เมื่อวานนี้ HH:mm น.');
       }
     }
     return formatDate
   }
-  
-  
+
+
 
 
 
@@ -427,43 +427,46 @@ export default function Report(props) {
       {!reportid ? (
         <>
           <h1 className="h3">การรายงาน</h1>
-          <Tabs defaultActiveKey='1' items={menus} onChange={changeMenu}/>
+          <Tabs defaultActiveKey='1' items={menus} onChange={changeMenu} />
 
           <div className="all-user-head">
             {/* <h2 className="h4">จำนวนทั้งหมด ({reportAll.length})</h2> */}
             <div className="submenu-filter">
 
-              เรียงตาม :
-              <Select
-                // value={{ value: sortBy, label: sortBy }}
-                style={{ width: 120 }}
-                // onChange={handleSortByChange}
-                value={sortby}
-                onChange={setsortby}
-                options={[
-                  { value: 'ล่าสุด', label: 'ล่าสุด' },
-                  { value: 'เก่าสุด', label: 'เก่าสุด' },
-                ]}
-              />
-
-              ประเภท : <Select
-                mode="multiple"
-                style={{ minWidth: '10rem', maxWidth: 'fit-content' }}
-                placeholder="Please select"
-                value={typeValues}
-                id="topicSelector"
-                onChange={changeType}
-                // maxTagCount='responsive'
-                options={[
-                  // { value: 'ทั้งหมด', label: 'ทั้งหมด' },
-                  { value: 'Artwork', label: 'งานวาด' },
-                  { value: 'Commission', label: 'คอมมิชชัน' },
-                  { value: 'Order', label: 'ออเดอร์' },
-                ]}
-                allowClear
-              >
-                {/* {children} */}
-              </Select>
+              <Flex align="center">
+                เรียงตาม :
+                <Select
+                  // value={{ value: sortBy, label: sortBy }}
+                  style={{ width: 120 }}
+                  // onChange={handleSortByChange}
+                  value={sortby}
+                  onChange={setsortby}
+                  options={[
+                    { value: 'ล่าสุด', label: 'ล่าสุด' },
+                    { value: 'เก่าสุด', label: 'เก่าสุด' },
+                  ]}
+                />
+              </Flex>
+              <Flex align="center">
+                ประเภท : <Select
+                  mode="multiple"
+                  style={{ minWidth: '10rem', maxWidth: 'fit-content' }}
+                  placeholder="Please select"
+                  value={typeValues}
+                  id="topicSelector"
+                  onChange={changeType}
+                  // maxTagCount='responsive'
+                  options={[
+                    // { value: 'ทั้งหมด', label: 'ทั้งหมด' },
+                    { value: 'Artwork', label: 'งานวาด' },
+                    { value: 'Commission', label: 'คอมมิชชัน' },
+                    { value: 'Order', label: 'ออเดอร์' },
+                  ]}
+                  allowClear
+                >
+                  {/* {children} */}
+                </Select>
+              </Flex>
 
 
             </div>
@@ -474,15 +477,15 @@ export default function Report(props) {
 
           <table className="table is-striped is-fullwidth">
             <thead>
-                <tr>
-                  <th>ลำดับ</th>
-                  <th>ผู้รายงาน</th>
-                  <th>ผู้ถูกรายงาน</th>
-                  <th>หัวข้อ</th>
-                  <th>ประเภท</th>
-                  <th>เวลา</th>
-                  <th>Action</th>
-                </tr>
+              <tr>
+                <th>ลำดับ</th>
+                <th>ผู้รายงาน</th>
+                <th>ผู้ถูกรายงาน</th>
+                <th>หัวข้อ</th>
+                <th>ประเภท</th>
+                <th>เวลา</th>
+                <th>Action</th>
+              </tr>
             </thead>
             <tbody>
               {searchQuery && searchValue != '' ?
@@ -537,7 +540,7 @@ export default function Report(props) {
               icon={<LeftOutlined />}
               onClick={(e) => {
                 e.stopPropagation();
-                window.location.href = "/admin/adminmanage/report";
+                navigate('/admin/adminmanage/report')
               }}
             ></Button>
             รายละเอียดการรายงาน
@@ -557,25 +560,25 @@ export default function Report(props) {
             </div>
             <ImgSlide imgDetail={imgDetail} />
 
-              
+
 
             <Flex justify="center" gap="small" className="mt-3">
-              {!reportDetail.status?
-                  <>
-                    <Button size="large" shape="round" onClick={keep}>
-                      เก็บไว้ {reportDetail.status}
-                    </Button>
-                    <Button size="large" shape="round" danger onClick={openDelModal}>
-                      ลบ
-                    </Button>
-                
-                  </>
-              :
-                  <>
-                    <p>{reportDetail.status == 'deleted' ? 'ลบ':'เก็บไว้'}แล้ว</p>
-            </>
+              {!reportDetail.status ?
+                <>
+                  <Button size="large" shape="round" onClick={keep}>
+                    เก็บไว้ {reportDetail.status}
+                  </Button>
+                  <Button size="large" shape="round" danger onClick={openDelModal}>
+                    ลบ
+                  </Button>
 
-                }
+                </>
+                :
+                <>
+                  <p>{reportDetail.status == 'deleted' ? 'ลบ' : 'เก็บไว้'}แล้ว</p>
+                </>
+
+              }
               {/* <Button size="large" shape="round" onClick={keep}>
                 เก็บไว้
               </Button>
@@ -612,79 +615,79 @@ export default function Report(props) {
 
                   <div>
                     <p className="h6">อีเมลติดต่อกลับ</p>
-                    <p>{reportDetail.sendrp_email}</p>
+                    <p>{reportDetail.urs_email}</p>
                   </div>
                 </Flex>
               </div>
             </Card>
 
-            {reportOrder != true ? ( <>
+            {reportOrder != true ? (<>
               <h5 className="h4 mt-4 mb-4">รายงานที่เกี่ยวข้อง</h5>
-                  {relatedTo.length != 0 ?
-                    
+              {relatedTo.length != 0 ?
 
-<div className="report-grid">
 
-                    {relatedTo.map((data) => (
-                  <Card key={data.id}>
-                    <div className="report-content">
+                <div className="report-grid">
+
+                  {relatedTo.map((data) => (
+                    <Card key={data.id}>
+                      <div className="report-content">
                         <Flex gap="1rem" vertical wrap="wrap">
-                            <Link to={`/profile/${data.id}`}>
-                                <div id="cms-artist-profile">
-                                    <img src={data.urs_profile_img} alt="" />
-                                    <p>แจ้งโดย {data.urs_name}</p>
-                                </div>
-                            </Link>
-                            <div>
-                                <p className="h6">หัวข้อที่มีการละเมิด: {data.sendrp_header}</p>
+                          <Link to={`/profile/${data.id}`}>
+                            <div id="cms-artist-profile">
+                              <img src={data.urs_profile_img} alt="" />
+                              <p>แจ้งโดย {data.urs_name}</p>
                             </div>
+                          </Link>
+                          <div>
+                            <p className="h6">หัวข้อที่มีการละเมิด: {data.sendrp_header}</p>
+                          </div>
+                          <div>
+                            <p className="h6">รายละเอียดที่มีการแจ้ง</p>
+                            <p>{data.sendrp_detail}</p>
+                          </div>
+                          {data.sendrp_link != null && (
                             <div>
-                                <p className="h6">รายละเอียดที่มีการแจ้ง</p>
-                                <p>{data.sendrp_detail}</p>
+                              <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
+                              <p>{data.sendrp_link}</p>
                             </div>
-                            {data.sendrp_link != null && (
-                              <div>
-                                  <p className="h6">ลิ้งค์ผลงานที่มีการลงมาก่อน</p>
-                                  <p>{data.sendrp_link}</p>
-                              </div>
-                            )}
-                            <div>
-                                <p className="h6">อีเมลติดต่อกลับ</p>
-                                <p>{data.sendrp_email}</p>
-                            </div>
+                          )}
+                          <div>
+                            <p className="h6">อีเมลติดต่อกลับ</p>
+                            <p>{data.urs_email}</p>
+                          </div>
 
-                            {data.status !== null ? (
-                              <div>
-                                  <p className="h6">สถานะ : {data.status === "approve" ? "อนุมัติแล้ว" : (data.status === "delete" ? "ไม่อนุมัติ" : "ยังไม่ได้ตรวจสอบ")}</p>
-                              </div>
-                            ) : (
-                              <div>
-                                  <p className="h6">สถานะ : ยังไม่ได้ตรวจสอบ</p>
-                              </div>
-                            )}
+                          {data.status !== null ? (
+                            <div>
+                              <p className="h6">สถานะ : {data.status === "approve" ? "อนุมัติแล้ว" : (data.status === "delete" ? "ไม่อนุมัติ" : "ยังไม่ได้ตรวจสอบ")}</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="h6">สถานะ : ยังไม่ได้ตรวจสอบ</p>
+                            </div>
+                          )}
 
-                          </Flex>
+                        </Flex>
                       </div>
-                  </Card>
-                ))}
-                
-                
-                
+                    </Card>
+                  ))}
+
+
+
                 </div>
-                
-                    : 
-                    
-                   <Flex justify="center" align="center" style={{ width: "100%", height: "fit-content", padding: '5rem 1rem' }}>
-            <Empty description={
-              <span>
-                ไม่มีรายงานที่เกี่ยวข้อง
-              </span>
-            } />
-          </Flex>
-                }
-              </> 
+
+                :
+
+                <Flex justify="center" align="center" style={{ width: "100%", height: "fit-content", padding: '5rem 1rem' }}>
+                  <Empty description={
+                    <span>
+                      ไม่มีรายงานที่เกี่ยวข้อง
+                    </span>
+                  } />
+                </Flex>
+              }
+            </>
             )
-            : (<></>)}
+              : (<></>)}
           </div>
 
           <Modal title="ระบุเหตุผลการลบ" open={deleteModal} onCancel={openDelModal} footer="">
@@ -705,9 +708,9 @@ export default function Report(props) {
                   <Button shape="round" size="large" htmlType="submit" danger>ยืนยัน</Button>
                   <Button shape="round" size="large" onClick={openDelModal}>ยกเลิก</Button>
                 </Flex>
-            
-                </Flex>
-              </Form>
+
+              </Flex>
+            </Form>
           </Modal>
         </>
       )}

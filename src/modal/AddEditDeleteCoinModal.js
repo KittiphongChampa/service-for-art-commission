@@ -74,7 +74,7 @@ const AddEditDeleteCoinModal = (props) => {
         })
         .then((response) => {
           const data = response.data;
-          
+
           if (data.status === "ok") {
             // alert(data.message);
             // window.location = "/editcoin";
@@ -100,13 +100,13 @@ const AddEditDeleteCoinModal = (props) => {
     // props.setShowModal(null);
     // reset();
     // setTimeout(() => {
-        //     props.setModal(null);
-        //     cancleBtn.remove("closing")
-        // }, 1000);
+    //     props.setModal(null);
+    //     cancleBtn.remove("closing")
+    // }, 1000);
     setTimeout(() => {
-            props.setShowModal(null);
-            cancleBtn.remove("closing")
-        }, 300);
+      props.setShowModal(null);
+      cancleBtn.remove("closing")
+    }, 300);
   };
   return (
     <div className="modal-area" id="modalArea" >
@@ -140,7 +140,7 @@ const AddEditDeleteCoinModal = (props) => {
                 {...func}
                 defaultValue={props.priceValue}
               /> */}
-              <label class="onInput">coin ที่ได้</label>
+              <label className="onInput">coin ที่ได้</label>
               <input
                 type="number"
                 // value={coinValue}
@@ -149,9 +149,9 @@ const AddEditDeleteCoinModal = (props) => {
                 className={`defInput ${errors.coins ? "border-danger" : ""}`}
               />
               {errors.coins && errors.coins.type === "required" && (
-                <p class="validate-input"> กรุณากรอกฟิลด์นี้</p>
+                <p className="validate-input"> กรุณากรอกฟิลด์นี้</p>
               )}
-              <label class="onInput">ราคา</label>
+              <label className="onInput">ราคา</label>
               <input
                 type="number"
                 // value={priceValue}
@@ -160,7 +160,7 @@ const AddEditDeleteCoinModal = (props) => {
                 className={`defInput ${errors.coins ? "border-danger" : ""}`}
               />
               {errors.coins && errors.coins.type === "required" && (
-                <p class="validate-input"> กรุณากรอกฟิลด์นี้</p>
+                <p className="validate-input"> กรุณากรอกฟิลด์นี้</p>
               )}
 
               <div className="text-align-center">
