@@ -59,7 +59,7 @@ export default function CmsDetail() {
   const cmsID = useParams();
   const [artistDetail, setArtistDetail] = useState([]);
   const [cmsDetail, setCmsDetail] = useState([]);
-  
+
   const [imgDetail, setImgDetail] = useState([]);
   const [pkgDetail, setPkgDetail] = useState([]);
   const [touDetail, setTouDetail] = useState([]);
@@ -584,12 +584,12 @@ export default function CmsDetail() {
     {
       key: '2',
       label: "รีวิว",
-      children: <Review cmsID={cmsID.id}/>,
+      children: <Review cmsID={cmsID.id} />,
     },
     {
       key: '3',
       label: "คิว",
-      children: <Queue cmsID={cmsID.id} cms_amount_q={cmsDetail.cms_amount_q} allqueueData={allqueueData}  />,
+      children: <Queue cmsID={cmsID.id} cms_amount_q={cmsDetail.cms_amount_q} allqueueData={allqueueData} />,
     },
   ];
 
@@ -666,7 +666,7 @@ export default function CmsDetail() {
               </Button>
 
             </Flex>
-            
+
             {/* </Flex> */}
           </Form>
 
@@ -687,7 +687,7 @@ export default function CmsDetail() {
 
       <div className="background-blur" style={body}></div>
 
-      <div class="body-lesspadding">
+      <div className="body-lesspadding">
         <div className="container-xl">
           <div className="content-card">
             {
@@ -697,40 +697,40 @@ export default function CmsDetail() {
                   {/* กรณีไม่กดแก้ไข */}
                   <div className="cms-overview">
                     <h1 className="h3 me-3">{cmsDetail.cms_name}
-                      
-                      
-                      { !cmsDetail.deleted_by &&
-                        <span className={cmsDetail.cms_status === "open" ? "cms-status-detail open" : "cms-status-detail"}>
-                      {cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}
-                    </span>}
 
-                      { cmsDetail.deleted_by &&
+
+                      {!cmsDetail.deleted_by &&
+                        <span className={cmsDetail.cms_status === "open" ? "cms-status-detail open" : "cms-status-detail"}>
+                          {cmsDetail.cms_status == "open" ? 'เปิด' : 'ปิด'}
+                        </span>}
+
+                      {cmsDetail.deleted_by &&
                         <span className="cms-status-detail close">
                           ถูกลบโดยแอดมิน เนื่องจาก {cmsDetail.delete_reason}
-                    </span>}
-                    
-                    
+                        </span>}
+
+
                     </h1>
                     {isLoggedIn &&
                       <Flex gap="small" justify="flex-end" flex={1}>
 
                         {!cmsDetail.deleted_by ?
 
-                        <Dropdown
-                          menu={{
-                            items,
-                          }}
-                          trigger={['click']}
-                        >
-                          <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
-                          </Button>
+                          <Dropdown
+                            menu={{
+                              items,
+                            }}
+                            trigger={['click']}
+                          >
+                            <Button className="icon-btn" type="text" icon={<MoreOutlined />} onClick={(e) => e.preventDefault()}>
+                            </Button>
                           </Dropdown>
                           :
                           <></>
 
                         }
-                        
-                        
+
+
                       </Flex>
                     }
 
@@ -749,9 +749,9 @@ export default function CmsDetail() {
                       </div>
                     </Link>
                     <p id="cms-price">โพสต์เมื่อ {thaiDate}</p>
-         
+
                   </div>
-           
+
                   <ImgSlide imgDetail={imgDetail} />
 
                   <div
@@ -763,14 +763,14 @@ export default function CmsDetail() {
                       <ul>
                         <p>ถนัด</p>
                         <p style={{ fontWeight: "300" }}>{cmsDetail.cms_good_at}</p>
-                     
+
                       </ul>
                     </div>
                     <div className="bad-at">
                       <ul>
                         <p>ไม่ถนัด</p>
                         <p style={{ fontWeight: "300" }}>{cmsDetail.cms_bad_at}</p>
-                
+
                       </ul>
                     </div>
 
@@ -780,11 +780,11 @@ export default function CmsDetail() {
                         <p style={{ fontWeight: "300" }}>
                           {cmsDetail.cms_no_talking}
                         </p>
-       
+
                       </ul>
                     </div>
                   </div>
-      
+
                   <div className="mt-3 mb-3">
                     <Tabs defaultActiveKey="1" items={menus} />
                   </div>
@@ -1158,13 +1158,13 @@ export default function CmsDetail() {
                 >
                   <Input />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                   name="rp-email"
                   label="อีเมลติดต่อกลับ"
                   rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                 >
                   <Input />
-                </Form.Item>
+                </Form.Item> */}
 
                 <Flex gap="small" justify="flex-end">
                   <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
@@ -1183,13 +1183,13 @@ export default function CmsDetail() {
                 >
                   <Input.TextArea />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                   name="rp-email"
                   label="อีเมลติดต่อกลับ"
                   rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                 >
                   <Input />
-                </Form.Item>
+                </Form.Item> */}
 
                 <Flex gap="small" justify="flex-end">
                   <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
@@ -1264,11 +1264,11 @@ function Package(props) {
 
 function Review(props) {
   const cmsID = props.cmsID;
-  const [ cms_review, setReviewCms]  = useState([]);
-  const [ Average_cms_review, setReviewCmsAverage] = useState([]);
+  const [cms_review, setReviewCms] = useState([]);
+  const [Average_cms_review, setReviewCmsAverage] = useState([]);
   const total_review = cms_review.length;
 
-  
+
   const queryReview = () => {
     axios.get(`${host}/get/cms/review/${cmsID}`, {}).then((response) => {
       setReviewCms(response.data)
@@ -1283,31 +1283,31 @@ function Review(props) {
   useEffect(() => {
     queryReview();
     queryAllReview();
-  },[])
+  }, [])
 
   return (
     <>
       <h2 className="h3">คะแนนรีวิว เฉลี่ย {Average_cms_review == null ? 0 : Average_cms_review}<Rate disabled defaultValue={2} className="one-star" />  (จาก {total_review} รีวิว)</h2>
       {cms_review.length != 0 ? (cms_review.map(review => (
         <div className="review-box">
-        <div className="reviewer-box">
-          <div>
-            <img src={review.urs_profile_img} />
+          <div className="reviewer-box">
+            <div>
+              <img src={review.urs_profile_img} />
+            </div>
+            <div>
+              <p>{review.urs_name}</p>
+              <p>{new Date(review.created_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</p>
+            </div>
           </div>
-          <div>
-            <p>{review.urs_name}</p>
-            <p>{new Date(review.created_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</p>
-          </div>
+          <p style={{ fontWeight: "500" }}>แพ็กเกจ : {review.pkg_name}</p>
+          <p>
+            {[...Array(review.rw_score)].map((_, index) => (
+              <ggIcon.Star key={index} className="fill-icon" />
+            ))}
+          </p>
+          <p>{review.rw_comment}</p>
         </div>
-        <p style={{ fontWeight: "500" }}>แพ็กเกจ : {review.pkg_name}</p>
-        <p>
-          {[...Array(review.rw_score)].map((_, index) => (
-            <ggIcon.Star key={index} className="fill-icon" />
-          ))}
-        </p>
-        <p>{review.rw_comment}</p>
-      </div>
-      ))) : 
+      ))) :
         <Flex justify="center">
           <Empty description={
             <span>
@@ -1324,11 +1324,11 @@ function Queue(props) {
   const cmsID = props.cmsID;
   const cms_amount_q = props.cms_amount_q;
   const allqueueData = props.allqueueData; //"ไม่มีค่า"
- 
+
   return (
     <>
       <h2 className='h3'>คิว ({allqueueData.length}/{cms_amount_q})</h2>
-      {allqueueData.length == 0 ? 
+      {allqueueData.length == 0 ?
         (
           <Flex justify="center">
             <Empty description={
@@ -1338,7 +1338,7 @@ function Queue(props) {
             } />
           </Flex>
         )
-          :
+        :
         (<table className="queue-table">
           <tr>
             <th className="q">ลำดับ</th>
@@ -1347,16 +1347,16 @@ function Queue(props) {
             <th>วันที่จ้าง</th>
             <th>ความคืบหน้า</th>
           </tr>
-      
-            {allqueueData.map((data, index) => (
-              <tr key={data.od_id}>
-                <td>{index + 1}</td>
-                <td>{data.cms_name} : {data.pkg_name}</td>
-                <td>{data.urs_name}</td>
-                <td>{data.ordered_at}</td>
-                <td>{data.step_name}</td>
-              </tr>
-            ))}
+
+          {allqueueData.map((data, index) => (
+            <tr key={data.od_id}>
+              <td>{index + 1}</td>
+              <td>{data.cms_name} : {data.pkg_name}</td>
+              <td>{data.urs_name}</td>
+              <td>{data.ordered_at}</td>
+              <td>{data.step_name}</td>
+            </tr>
+          ))}
         </table>)
       }
     </>

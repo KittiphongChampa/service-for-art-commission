@@ -211,7 +211,7 @@ p {
 .setting-menu div.active {
     color: #000000;
     background: #F4F1F9;
-    box-shadow: 0px 0px 11px #CDACFC;
+    /* box-shadow: 0px 0px 11px #CDACFC; */
     border-radius: 20px;
 }
 
@@ -785,8 +785,12 @@ input[type="color"]::-webkit-color-swatch {
     display: grid;
     grid-template-columns: 1fr;
     height: fit-content;
-    box-sizing: border-box;
+    max-width: 100%;
     /* background-color: #F4F1F9; */
+}
+
+.cover-grid > *{
+    min-width: 0;
 }
 
 
@@ -881,6 +885,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .user-col-profile {
+    min-width: 10rem;
     box-sizing: border-box;
     padding-top: 3.1rem;
     padding-bottom: 3.1rem;

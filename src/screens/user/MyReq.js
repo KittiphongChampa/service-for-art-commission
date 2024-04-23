@@ -15,7 +15,7 @@ import "../../css/allbutton.css";
 import "../../css/profileimg.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as ggIcon from '@mui/icons-material';
-import { Cascader, Input, Badge,Select, Flex, Tabs, Pagination } from 'antd';
+import { Cascader, Input, Badge, Select, Flex, Tabs, Pagination } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 
 // import Button from "react-bootstrap/Button";
@@ -26,7 +26,7 @@ import * as alertData from "../../alertdata/alertData";
 import { host } from "../../utils/api";
 import _ from 'lodash';
 
-const title = "ตั้งค่าโปรไฟล์";
+const title = "รายการจ้างของฉัน";
 export default function MyReq() {
     const token = localStorage.getItem("token");
 
@@ -132,11 +132,11 @@ export default function MyReq() {
             setCountAll(array0.length == 0 ? '0' : array0.length)
             const array1 = allData.data.filter(data => data?.step_name?.includes('รับคำขอจ้าง') && data?.od_cancel_by == null)
             setCountWait(array1.length == 0 ? '0' : array1.length)
-            const array3 = allData.data.filter(data => data?.od_cancel_by !== null)
+            const array3 = allData.data.filter(data => data?.od_cancel_by != null)
             setCountCancel(array3.length == 0 ? '0' : array3.length)
-            const array4 = allData.data.filter(data => data?.finished_at !== null)
+            const array4 = allData.data.filter(data => data?.finished_at != null)
             setCountFinish(array4.length == 0 ? '0' : array4.length)
-            const array5 = allData.data.filter(data => data?.finished_at !== null && data?.od_cancel_by !== null)
+            const array5 = allData.data.filter(data => data?.finished_at != null && data?.od_cancel_by != null)
             setCountAccepted(array5.length == 0 ? '0' : array5.length)
 
             // console.log(array3.length)
@@ -224,7 +224,85 @@ export default function MyReq() {
 
     }
 
+    const [windowSize, setWindowSize] = useState(window.innerWidth <= 767 ? 'small' : 'big')
 
+    window.onresize = reportWindowSize;
+    function reportWindowSize() {
+        // console.log(window.innerHeight, window.innerWidth)
+        if (window.innerWidth <= 767) {
+            setWindowSize('small')
+        } else {
+            setWindowSize('big')
+
+        }
+        console.log(windowSize)
+    }
+
+
+    const tableData = (data) => {
+        if (windowSize != 'small') {
+            return data?.map((req, index) => (
+                <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+                    <td>{req.od_id}</td>
+                    <td>{req.cms_name} : {req.pkg_name}</td>
+                    <td>{req.od_price}</td>
+                    <td>{req.artist_name}</td>
+                    <td>
+                        {req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
+                        {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
+                        {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}
+                    </td>
+                </tr>
+            ));
+        } else {
+            return data?.map((req, index) => (
+                <>
+                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ไอดีออเดอร์</p>
+                                <p>{req.od_id}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>คอมมิชชัน : แพ็กเกจ</p>
+                                <p>{req.cms_name} : {req.pkg_name}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ราคา</p>
+                                <p>{req.od_price}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ชื่อนักวาด</p>
+                                <p>{req.artist_name}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row last">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ความคืบหน้า</p>
+                                <p>{req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
+                                    {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
+                                    {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                </>
+            ));
+        }
+    };
 
     return (
         <div className="body-con">
@@ -245,22 +323,25 @@ export default function MyReq() {
                         </div>
                         <Flex justify="space-between" align="center" wrap="wrap">
                             <div className="filter" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-                                เรียงตาม :
-                                <Select
-                                    // value={{ value: sortBy, label: sortBy }}
-                                    style={{ width: 120 }}
-                                    // onChange={handleSortByChange}
-                                    value={sortby}
-                                    onChange={setsortby}
-                                    options={[
-                                        { value: 'เก่าสุด', label: 'เก่าสุด' },
-                                        { value: 'ล่าสุด', label: 'ล่าสุด' },
-                                        { value: 'ราคา ↑', label: 'ราคา ↑' },
-                                        { value: 'ราคา ↓', label: 'ราคา ↓' },
-                                        // { value: 'คะแนนรีวิว ↑', label: 'คะแนนรีวิว ↑' },
-                                        // { value: 'คะแนนรีวิว ↓', label: 'คะแนนรีวิว ↓' },
-                                    ]}
-                                />
+
+                                <Flex align="center">
+                                    เรียงตาม :
+                                    <Select
+                                        // value={{ value: sortBy, label: sortBy }}
+                                        style={{ width: 120 }}
+                                        // onChange={handleSortByChange}
+                                        value={sortby}
+                                        onChange={setsortby}
+                                        options={[
+                                            { value: 'เก่าสุด', label: 'เก่าสุด' },
+                                            { value: 'ล่าสุด', label: 'ล่าสุด' },
+                                            { value: 'ราคา ↑', label: 'ราคา ↑' },
+                                            { value: 'ราคา ↓', label: 'ราคา ↓' },
+                                            // { value: 'คะแนนรีวิว ↑', label: 'คะแนนรีวิว ↑' },
+                                            // { value: 'คะแนนรีวิว ↓', label: 'คะแนนรีวิว ↓' },
+                                        ]}
+                                    />
+                                </Flex>
                             </div>
                             <div>
                                 <Input type="search" placeholder=" ค้นหา..." value={searchValue} onChange={handleSearch} />
@@ -269,65 +350,30 @@ export default function MyReq() {
                         </Flex>
 
                         <table className="overview-order-table">
-                            <tr className="table-head">
-                                <th>ไอดีออเดอร์</th>
-                                <th>คอมมิชชัน:แพ็กเกจ</th>
-                                <th>ราคาคมช.</th>
-                                <th>นักวาด</th>
-                                <th>ความคืบหน้า</th>
-                            </tr>
+                            {windowSize != 'small' &&
+                                <tr className="table-head">
+                                    <th>ไอดีออเดอร์</th>
+                                    <th>คอมมิชชัน:แพ็กเกจ</th>
+                                    <th>ราคาคมช.</th>
+                                    <th>นักวาด</th>
+                                    <th>ความคืบหน้า</th>
+                                </tr>}
 
 
 
-                            {searchQuery && searchValue != '' ?
-                                <>
-                                    {searchQuery.map((req, index) => {
-                                        //ถ้าช่องค้นหาไม่ว่างให้แสดงอีกตัวแทน
-                                        return (
-                                            <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-                                                <td>{req.od_id}</td>
-                                                <td>{req.cms_name} : {req.pkg_name}</td>
-                                                <td>{req.od_price}</td>
-                                                <td>{req.artist_name}</td>
-                                                <td>
-                                                    {req.od_cancel_by == null && req.finished_at == null && req.step_name}
-                                                    {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
-                                                    {req.od_cancel_by == !null && 'ยกเลิกแล้ว'}
 
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                    }
-                                </>
-                                :
-                                <>
-                                    {filteredData && filteredData.map((req, index) => {
-                                        //ถ้าช่องค้นหาไม่ว่างให้แสดงอีกตัวแทน
-                                        return (
-                                            <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-                                                <td>{req.od_id}</td>
-                                                <td>{req.cms_name} : {req.pkg_name}</td>
-                                                <td>{req.od_price}</td>
-                                                <td>{req.artist_name}</td>
-                                                <td>
-                                                    {req.od_cancel_by == null && req.finished_at == null && req.step_name}
-                                                    {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
-                                                    {req.od_cancel_by !== null && 'ยกเลิกแล้ว'}
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                    }
-                                </>
-                            }
+                            {searchQuery && searchValue !== '' ? (
+                                tableData(searchQuery)
+                            ) : (
+                                tableData(filteredData)
+                            )}
                         </table>
 
                         <Pagination
                             total={filteredData == undefined ? 0 : filteredData.length}
                             showQuickJumper
                             showTotal={(total) => `จำนวน ${total} รายการ`}
-                            defaultPageSize={10}
+                            defaultPageSize={itemsPerPage}
                             current={activePage}
                             responsive
                             onChange={setActivePage}

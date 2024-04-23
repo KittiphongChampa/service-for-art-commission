@@ -111,7 +111,7 @@ export default function Contacts({ contacts, contacts_order, changeChat, Toggled
                               display: "flex",
                             }}>
                             <span className="oneline-textoverflow" style={{ flex: 1 }}>{contact_order.message_text}</span>
-                            <span style={{ width: "fit-content" }}> {new Date(contact_order.last_message_time).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit", })} น.</span>
+                                <span style={{ width: "fit-content" }}> ‧{new Date(contact_order.last_message_time).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit", })} น.</span>
                           </p>
                       )}
                     </Flex>

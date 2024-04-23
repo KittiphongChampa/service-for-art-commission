@@ -455,13 +455,13 @@ export default function ArtworkDetail() {
                                     >
                                         <Input />
                                     </Form.Item>
-                                    <Form.Item
+                                    {/* <Form.Item
                                         name="rp-email"
                                         label="อีเมลติดต่อกลับ"
                                         rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                                     >
                                         <Input />
-                                    </Form.Item>
+                                    </Form.Item> */}
 
                                     <Flex gap="small" justify="flex-end">
                                         <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
@@ -479,13 +479,13 @@ export default function ArtworkDetail() {
                                     >
                                         <TextArea />
                                     </Form.Item>
-                                    <Form.Item
+                                    {/* <Form.Item
                                         name="rp-email"
                                         label="อีเมลติดต่อกลับ"
                                         rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                                     >
                                         <Input />
-                                    </Form.Item>
+                                    </Form.Item> */}
                                 <Flex gap="small" justify="flex-end">
                                     <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button>
                                     <Button shape="round" size="large" type="primary" htmlType="submit" >รายงาน</Button>

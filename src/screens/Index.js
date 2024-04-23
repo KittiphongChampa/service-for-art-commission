@@ -123,8 +123,8 @@ export default function Index() {
   }
 
   const getTopTenArtist = async () => {
-    await axios .get(`${host}/artist/top`).then((response) => {
-      if (response.status == 200){
+    await axios.get(`${host}/artist/top`).then((response) => {
+      if (response.status == 200) {
         setTopTenArtist(response.data.results)
       } else {
         setTopTenArtist('')
@@ -135,24 +135,6 @@ export default function Index() {
   const { Search } = Input;
   const { submenu } = useParams();
 
-
-  // useEffect(() => {
-  //   // console.log(submenu)
-  //   const oldSelected = document?.getElementsByClassName("selected")
-  //   oldSelected[0]?.classList.remove("selected")
-  //   if (submenu == null) {
-  //     const menuSelected = document?.getElementById("explore")
-  //     menuSelected?.classList.add("selected")
-  //   } else {
-  //     if (document.getElementById(submenu)) {
-  //       document.getElementById(submenu).classList.add("selected")
-  //     } else {
-  //       if (submenu !== 'search') {
-  //         window.location.href = `${host}/`;
-  //       }
-  //     }
-  //   }
-  // }, [submenu])
 
   useEffect(() => {
     setActivateKey(submenu)
@@ -166,7 +148,7 @@ export default function Index() {
     {
       key: 'explore',
       label: <Link to="/" id="explore" >สำรวจ</Link>,
-      children: <Explore type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} topTenArtist={topTenArtist}/>,
+      children: <Explore type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} topTenArtist={topTenArtist} />,
     },
     {
       key: 'commissions',
@@ -192,6 +174,7 @@ export default function Index() {
   const [art_SearchResult, setArtSearchResults] = useState([]);
 
   const handleSearch = async () => {
+
     // e.preventDefault();
     try {
       const response = await axios.get(`${host}/search?search=${search}`).then((response) => {
@@ -199,6 +182,7 @@ export default function Index() {
         setUserSearchResults(data.users)
         setCmsSearchResults(data.cms_uniqueResults)
         setArtSearchResults(data.artwork)
+
       })
 
     } catch (error) {
@@ -217,17 +201,17 @@ export default function Index() {
       ) : (
         <NavbarGuest />
       )}
-      <div class="body-nopadding">
+      <div className="body-nopadding">
         <div className="cover-index" style={{ backgroundImage: "url('images/seamoon_index.jpg')" }}>
           <div className="container-xl">
-            <div class="search-container">
+            <div className="search-container">
               <div className="search-box">
                 {/* <Form
                 onFinish={handleSearch}
               >
 
               </Form> */}
-                <Link to="/search" id="search" >
+                <Link to={submenu?.includes('search') ? "#" : '/search'} id="search" >
                   <Search placeholder="ค้นหา.."
                     type="text"
                     value={search}
@@ -246,13 +230,13 @@ export default function Index() {
 
 
           <div className=" content-container user-profile-contentCard" >
-            {submenu !== 'search' ? <>
-              <div>
-                <Tabs activeKey={activateKey} defaultActiveKey="explore" onChange={setActivateKey} items={menus} />
-              </div>
-              {submenu == null
-                ? null : submenu == "search" && <Search />}
-            </> :
+            {!submenu?.includes('search') ?
+              <>
+                <div>
+                  <Tabs activeKey={activateKey} defaultActiveKey="explore" onChange={setActivateKey} items={menus} />
+                </div>
+                {/* {submenu == null? null : submenu == "search" && <Search />} */}
+              </> :
               <SearchResults search={search} user_SearchResult={user_SearchResult} cms_SearchResult={cms_SearchResult} art_SearchResult={art_SearchResult} />}
           </div>
         </div>
@@ -264,14 +248,35 @@ export default function Index() {
 
 function Commissions({ IFollowingIDs }) {
 
+  const queryParams = new URLSearchParams(window.location.search);
+  const sortby_params = queryParams.get("sort");
+  const filterby_params = queryParams.get("filter");
   const [Message, setMessage] = useState('');
-  const [sortBy, setSortBy] = useState('ล่าสุด');
-  const [filterBy, setFilterBy] = useState('all');
   const [cmsStatus, setCmsStatus] = useState('open');
   const [topicValues, setTopicValues] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
   const [topics, setTopics] = useState([]); //หัวข้อที่ดึงจาก DB
   const [commission, setCommission] = useState([]);
   const [filteredCms, setFilteredCms] = useState([])
+  const [sortBy, setSortBy] = useState(sortby_params ? sortby_params : 'ล่าสุด');
+  const [filterBy, setFilterBy] = useState(filterby_params ? filterby_params : 'all');
+  //
+
+  useEffect(() => {
+    if (filterby_params) {
+      setFilterBy(filterby_params)
+    } else {
+      setFilterBy('all')
+    }
+  }, [filterby_params]);
+
+  useEffect(() => {
+    if (sortby_params) {
+      setSortBy(sortby_params)
+    } else {
+      setSortBy('ล่าสุด')
+    }
+  }, [sortby_params]);
+
 
   useEffect(() => {
     topic();
@@ -290,7 +295,7 @@ function Commissions({ IFollowingIDs }) {
 
   const all_option = [
     { value: 0, label: 'เลือกทั้งหมด' },
-    ...topics.map((data) => ({
+    ...topics?.map((data) => ({
       value: data.tp_id,
       label: data.tp_name,
     })),
@@ -300,11 +305,7 @@ function Commissions({ IFollowingIDs }) {
 
   const children = [];
 
-  // all_option.map((item, index) => (
-  //   index === "0" ? <button>เลือกทั้งหมด</button> : children.push(<Option key={index}>{item}</Option>)
-  // ))
-
-  all_option.map((item) => (
+  all_option?.map((item) => (
     item.value === 0 ? (
       <button key={item.key}>เลือกทั้งหมด</button>
     ) : (
@@ -317,11 +318,11 @@ function Commissions({ IFollowingIDs }) {
 
   // value is topicValues
   function handleChange(value) {
-    // console.log(topicValues[topicValues.length - 1])
+    // console.log(topicValues[topicValues?.length - 1])
     if (value.includes(0)) {
-      if (value[value.length - 1] === 0) {
+      if (value[value?.length - 1] === 0) {
         // console.log("เลือกทั้งหมด = เพิ่งเพิ่มเข้ามา")
-        all_option.map((item) => {
+        all_option?.map((item) => {
           newTopicValues.push(item.value);
         });
 
@@ -409,9 +410,10 @@ function Commissions({ IFollowingIDs }) {
           {/* <p>ดูทั้งหมด&gt;</p> */}
           <div className="submenu-filter">
 
+            <Flex align="center"></Flex>
             เรียงตาม :
             <Select
-              value={{ value: sortBy, label: sortBy }}
+              value={sortBy}
               style={{ width: 120 }}
               onChange={handleSortByChange}
               options={[
@@ -424,68 +426,64 @@ function Commissions({ IFollowingIDs }) {
               ]}
             />
 
+            <Flex align="center">
+              สถานะ :<Select
+                defaultValue="open"
+                style={{ width: 100 }}
+                onChange={handleCmsStatusChange}
+                options={[
+                  { value: 'open', label: 'เปิด' },
+                  { value: 'close', label: 'ปิด' },
+                  { value: 'all', label: 'ทั้งหมด' },
+                ]}
+              />
+            </Flex>
 
-            สถานะ :<Select
-              defaultValue="open"
-              style={{ width: 100 }}
-              onChange={handleCmsStatusChange}
-              options={[
-                { value: 'open', label: 'เปิด' },
-                { value: 'close', label: 'ปิด' },
-                { value: 'all', label: 'ทั้งหมด' },
-              ]}
-            />
+            <Flex align="center">
+              หัวข้อ : <Select
+                mode="multiple"
+                style={{ width: '10rem' }}
+                placeholder="Please select"
+                value={topicValues}
+                id="topicSelector"
+                onChange={handleChange}
+                maxTagCount='responsive'
+                options={all_option}
+                allowClear
+              >
+                {/* {children} */}
+              </Select>
+            </Flex>
 
-            หัวข้อ : <Select
-              mode="multiple"
-              style={{ width: '10rem' }}
-              placeholder="Please select"
-              value={topicValues}
-              id="topicSelector"
-              onChange={handleChange}
-              maxTagCount='responsive'
-              options={all_option}
-              allowClear
-            >
-              {/* {children} */}
-            </Select>
-
-            กรองจาก :
-            <Select
-              value={{ value: filterBy, label: filterBy === 'all' ? 'นักวาดทั้งหมด' : 'นักวาดที่ติดตาม' }}
-              onChange={(selectedOption) => setFilterBy(selectedOption)}
-              options={[
-                { value: 'all', label: 'นักวาดทั้งหมด' },
-                { value: 'follow', label: 'นักวาดที่ติดตาม' },
-              ]}
-            />
+            <Flex align="center">
+              กรองจาก :
+              <Select
+                value={filterBy}
+                onChange={(selectedOption) => setFilterBy(selectedOption)}
+                options={[
+                  { value: 'all', label: 'นักวาดทั้งหมด' },
+                  { value: 'follow', label: 'นักวาดที่ติดตาม' },
+                ]}
+              />
+            </Flex>
 
           </div>
         </div>
 
 
-        {Message == '' ? (
+
+
+        {Message == '' && filteredCms?.length != 0 ? (
+          filteredCms?.length != 0 &&
           <div className="content-items">
-            {filteredCms.length != 0 ? 
-              (filteredCms?.map((cms) => (
-                <Link to={`/cmsdetail/${cms.cms_id}`}>
-                  <CmsItem src={cms.ex_img_path} headding={cms.cms_name} price={cms.pkg_min_price} desc={cms.cms_desc} total_reviews={cms.total_reviews} cms_all_review={cms.cms_all_review} status={cms.cms_status}/>
-                </Link>
-              ))) 
-              : 
-              <>
-              <Flex justify="center">
-                <Empty description={
-                  <span>
-                    ยังไม่มีข้อมูล
-                  </span>
-                } />
-              </Flex>
-              </>
-            }
+            {(filteredCms?.map((cms) => (
+              <Link to={`/cmsdetail/${cms.cms_id}`}>
+                <CmsItem src={cms.ex_img_path} headding={cms.cms_name} price={cms.pkg_min_price} desc={cms.cms_desc} total_reviews={cms.total_reviews} cms_all_review={cms.cms_all_review} status={cms.cms_status} />
+              </Link>
+            )))}
           </div>
         ) : (
-          <Flex justify="center">
+          <Flex justify="center" style={{ padding: '3rem 0' }}>
             <Empty description={
               <span>
                 ยังไม่มีข้อมูล
@@ -495,7 +493,7 @@ function Commissions({ IFollowingIDs }) {
         )}
 
         <Pagination
-          total={commission == undefined ? 0 : commission.length}
+          total={commission == undefined ? 0 : commission?.length}
           showQuickJumper
           showTotal={(total) => `จำนวน ${total} รายการ`}
           defaultPageSize={itemsPerPage}
@@ -512,7 +510,7 @@ function Commissions({ IFollowingIDs }) {
 function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gallerylatest, galleryIfollow, topTenArtist }) {
   return (
     <>
-          <div className="content-box">
+      <div className="content-box">
         <div className="content-top">
           <p className="h3">TOP 10 นักวาดประจำสัปดาห์ (การจ้าง)</p>
         </div>
@@ -525,20 +523,20 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
           modules={[Navigation]}
           className="artistbox-swiper"
         >
-          
-          { topTenArtist.length != 0 ? topTenArtist.map(data => (
+
+          {topTenArtist?.length != 0 ? topTenArtist?.map(data => (
             <SwiperSlide>
               <a key={data.id} href={`/profile/${data.id}`}>
-                <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
+                <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
               </a>
             </SwiperSlide>
           )) : <p>ไม่มีข้อมูลมากพอ</p>}
-          
+
         </Swiper>
       </div>
 
-      <div class="content-box">
-        <div class="content-top">
+      <div className="content-box">
+        <div className="content-top">
           <p className="h3">คอมมิชชันล่าสุด</p>
           <Link to="/commissions"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
@@ -576,8 +574,8 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
         }
       </Swiper >
 
-      <div class="content-box">
-        <div class="content-top">
+      <div className="content-box">
+        <div className="content-top">
           <p className="h3">ผลงานล่าสุด</p>
           <Link to="/gallery"><p>ดูทั้งหมด&gt;</p></Link>
         </div>
@@ -596,12 +594,12 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
           className="gall-item-swiper"
         >
           {
-            gallerylatest.length != 0 ?
-            (gallerylatest.map(data => (
-              <SwiperSlide key={data.artw_id}>
-                <Link to={`/artworkdetail/${data.artw_id}`}><img src={data.ex_img_path} /></Link>
-              </SwiperSlide>
-            ))) : <p>ยังไม่มีผลงานวาด</p>
+            gallerylatest?.length != 0 ?
+              (gallerylatest?.map(data => (
+                <SwiperSlide key={data.artw_id}>
+                  <Link to={`/artworkdetail/${data.artw_id}`}><img src={data.ex_img_path} /></Link>
+                </SwiperSlide>
+              ))) : <p>ยังไม่มีผลงานวาด</p>
           }
         </Swiper>
 
@@ -609,83 +607,83 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
 
       {isLoggedIn === true && type === "user" ? (
         <>
-            <div className="content-box">
-              <div className="content-top">
-                <p className="h3">นักวาดที่คุณกำลังติดตาม</p>
-                <Link to="/artists"><p>ดูทั้งหมด&gt;</p></Link>
-              </div>
+          <div className="content-box">
+            <div className="content-top">
+              <p className="h3">นักวาดที่คุณกำลังติดตาม</p>
+              <Link to="/artists?filter=follow"><p>ดูทั้งหมด&gt;</p></Link>
+            </div>
 
-              <Swiper
-                slidesPerView="auto"
-                centeredSlides={false}
-                slidesPerGroupSkip={1}
-                spaceBetween={10}
-                modules={[Navigation]}
-                className="artistbox-swiper"
-              >
-                {
-                  IFollowerData != "คุณไม่มีนักวาดที่ติดตาม" ? 
-                  (IFollowerData.map(data => (
+            <Swiper
+              slidesPerView="auto"
+              centeredSlides={false}
+              slidesPerGroupSkip={1}
+              spaceBetween={10}
+              modules={[Navigation]}
+              className="artistbox-swiper"
+            >
+              {
+                IFollowerData != "คุณไม่มีนักวาดที่ติดตาม" ?
+                  (IFollowerData?.map(data => (
                     <SwiperSlide>
                       <a key={data.id} href={`/profile/${data.id}`}>
-                        <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
+                        <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
                       </a>
                     </SwiperSlide>
                   ))) : <p>คุณไม่มีนักวาดที่ติดตาม</p>
-                }
-                
-              </Swiper>
-            </div>
+              }
 
-            <div className="content-box">
-              <div className="content-top">
-                <p className="h3">คอมมิชชันของนักวาดที่ติดตาม</p>
-                <Link to="/commissions"><p>ดูทั้งหมด&gt;</p></Link>
-              </div>
-              <Swiper
-                slidesPerView="auto"
-                centeredSlides={false}
-                slidesPerGroupSkip={1}
-                spaceBetween={10}
-                grabCursor={true}
-                keyboard={{
-                  enabled: true,
-                }}
-                scrollbar={false}
-                navigation={true}
-                modules={[Keyboard, Scrollbar, Navigation]}
-                className="cms-item-swiper"
-              >
-                {
-                  cmsArtists !== "คุณไม่มีนักวาดที่ติดตาม" ? (
-                    cmsArtists.length !== 0 ? (
-                      <Swiper>
-                        {cmsArtists.map(cmsArtstdata => (
-                          <SwiperSlide key={cmsArtstdata.cms_id}>
-                            <Link to={`/cmsdetail/${cmsArtstdata.cms_id}`}>
-                              <CmsItem
-                                src={cmsArtstdata.ex_img_path}
-                                headding={cmsArtstdata.cms_name}
-                                price={cmsArtstdata.pkg_min_price}
-                                desc={cmsArtstdata.cms_desc}
-                                cms_all_review={cmsArtstdata.cms_all_review}
-                                total_reviews={cmsArtstdata.total_reviews}
-                                status={cmsArtstdata.cms_status}
-                              />
-                            </Link>
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
-                    ) : (
-                      <p>ยังไม่มีคอมมิชชัน</p>
-                    )
+            </Swiper>
+          </div>
+
+          <div className="content-box">
+            <div className="content-top">
+              <p className="h3">คอมมิชชันของนักวาดที่ติดตาม</p>
+              <Link to="/commissions?filter=follow"><p>ดูทั้งหมด&gt;</p></Link>
+            </div>
+            <Swiper
+              slidesPerView="auto"
+              centeredSlides={false}
+              slidesPerGroupSkip={1}
+              spaceBetween={10}
+              grabCursor={true}
+              keyboard={{
+                enabled: true,
+              }}
+              scrollbar={false}
+              navigation={true}
+              modules={[Keyboard, Scrollbar, Navigation]}
+              className="cms-item-swiper"
+            >
+              {
+                cmsArtists !== "คุณไม่มีนักวาดที่ติดตาม" ? (
+                  cmsArtists?.length !== 0 ? (
+                    <Swiper>
+                      {cmsArtists?.map(cmsArtstdata => (
+                        <SwiperSlide key={cmsArtstdata.cms_id}>
+                          <Link to={`/cmsdetail/${cmsArtstdata.cms_id}`}>
+                            <CmsItem
+                              src={cmsArtstdata.ex_img_path}
+                              headding={cmsArtstdata.cms_name}
+                              price={cmsArtstdata.pkg_min_price}
+                              desc={cmsArtstdata.cms_desc}
+                              total_reviews={cmsArtstdata.total_reviews}
+                              cms_all_review={cmsArtstdata.cms_all_review}
+                              status={cmsArtstdata.cms_status}
+                            />
+                          </Link>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
                   ) : (
-                    <p>คุณไม่มีนักวาดที่ติดตาม</p>
+                    <p>ยังไม่มีคอมมิชชัน</p>
                   )
-                }
+                ) : (
+                  <p>คุณไม่มีนักวาดที่ติดตาม</p>
+                )
+              }
 
-              </Swiper >
-            </div>
+            </Swiper >
+          </div>
         </>
       ) : (
         <></>
@@ -695,9 +693,13 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
 }
 
 function Gallery({ IFollowingIDs }) {
+  const queryParams = new URLSearchParams(window.location.search);
+  const sortby_params = queryParams.get("sort");
+  const filterby_params = queryParams.get("filter");
+
   const [Message, setMessage] = useState('');
-  const [sortBy, setSortBy] = useState('ล่าสุด'); //เรียงตาม
-  const [filterBy, setFilterBy] = useState('all'); //กรองจาก
+  const [sortBy, setSortBy] = useState(sortby_params ? sortby_params : 'ล่าสุด'); //เรียงตาม
+  const [filterBy, setFilterBy] = useState(filterby_params ? filterby_params : 'all'); //กรองจาก
   const [topicValues, setTopicValues] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
   const [topics, setTopics] = useState([]); //หัวข้อที่ดึงจาก DB
   const [allGallery, setAllGallery] = useState([]);
@@ -707,9 +709,24 @@ function Gallery({ IFollowingIDs }) {
   const children = [];
 
   useEffect(() => {
+    if (filterby_params) {
+      setFilterBy(filterby_params)
+    } else {
+      setFilterBy('all')
+    }
+  }, [filterby_params]);
+
+  useEffect(() => {
+    if (sortby_params) {
+      setSortBy(sortby_params)
+    } else {
+      setSortBy('ล่าสุด')
+    }
+  }, [sortby_params]);
+
+  useEffect(() => {
     topic();
   }, []);
-
   useEffect(() => {
     fetchData();
   }, [sortBy, filterBy, topicValues]);
@@ -723,13 +740,13 @@ function Gallery({ IFollowingIDs }) {
 
   const all_option = [
     { value: 0, label: 'เลือกทั้งหมด' },
-    ...topics.map((data) => ({
+    ...topics?.map((data) => ({
       value: data.tp_id,
       label: data.tp_name,
     })),
   ]
-  
-  all_option.map((item) => (
+
+  all_option?.map((item) => (
     item.value === 0 ? (
       <button key={item.key}>เลือกทั้งหมด</button>
     ) : (
@@ -738,11 +755,11 @@ function Gallery({ IFollowingIDs }) {
   ));
 
   function handleChange(value) {
-    // console.log(topicValues[topicValues.length - 1])
+    // console.log(topicValues[topicValues?.length - 1])
     if (value.includes(0)) {
-      if (value[value.length - 1] === 0) {
+      if (value[value?.length - 1] === 0) {
         // console.log("เลือกทั้งหมด = เพิ่งเพิ่มเข้ามา")
-        all_option.map((item) => {
+        all_option?.map((item) => {
           newTopicValues.push(item.value);
         });
         setTopicValues(newTopicValues)
@@ -821,29 +838,29 @@ function Gallery({ IFollowingIDs }) {
             onChange={handleTopicChange}
             options={[
               { value: 'เลือกทั้งหมด', label: 'เลือกทั้งหมด' },
-              ...topics.map((data) => ({
+              ...topics?.map((data) => ({
                 value: data.tp_id,
                 label: data.tp_name,
               })),
             ]}
           /> */}
           หัวข้อ : <Select
-              mode="multiple"
-              style={{ width: '10rem' }}
-              placeholder="Please select"
-              value={topicValues}
-              id="topicSelector"
-              onChange={handleChange}
-              maxTagCount='responsive'
-              options={all_option}
-              allowClear
-            >
-              {/* {children} */}
-            </Select>
+            mode="multiple"
+            style={{ width: '10rem' }}
+            placeholder="Please select"
+            value={topicValues}
+            id="topicSelector"
+            onChange={handleChange}
+            maxTagCount='responsive'
+            options={all_option}
+            allowClear
+          >
+            {/* {children} */}
+          </Select>
 
           กรองจาก :
           <Select
-            value={{ value: filterBy, label: filterBy === 'all' ? 'นักวาดทั้งหมด' : 'นักวาดที่ติดตาม' }}
+            value={filterBy}
             onChange={(selectedOption) => setFilterBy(selectedOption)}
             options={[
               { value: 'all', label: 'นักวาดทั้งหมด' },
@@ -855,26 +872,19 @@ function Gallery({ IFollowingIDs }) {
 
       </div>
       {Message == '' ? (
-
+        allGallery?.length != 0 &&
         <div className="content-items">
-          {allGallery.length != 0 ? 
-            (allGallery.map((data) => (
+          {(allGallery?.map((data) => (
+            <div className="artwork">
               <Link key={data.artw_id} to={`/artworkdetail/${data.artw_id}`}>
-                <div className="artwork"><img src={data.ex_img_path} /></div>
-              </Link>
-            ))) : (<>
-              <Flex justify="center">
-                <Empty description={
-                  <span>
-                    ยังไม่มีข้อมูล
-                  </span>
-                } />
-              </Flex>
-            </>)
-          }
+                <img src={data.ex_img_path} />
+                </Link>
+              </div>
+            
+          )))}
         </div>
       ) : (
-        <Flex justify="center">
+        <Flex justify="center" style={{ padding: '3rem 0' }}>
           <Empty description={
             <span>
               ยังไม่มีข้อมูล
@@ -889,10 +899,29 @@ function Gallery({ IFollowingIDs }) {
 }
 
 function Artists({ IFollowingIDs }) {
+  const queryParams = new URLSearchParams(window.location.search);
+  const sortby_params = queryParams.get("sort");
+  const filterby_params = queryParams.get("filter");
   const [allartist, setAllArtist] = useState([]);
   const [Message, setMessage] = useState('');
-  const [sortBy, setSortBy] = useState('ล่าสุด');
-  const [filterBy, setFilterBy] = useState('all');
+  const [sortBy, setSortBy] = useState(sortby_params ? sortby_params : 'ล่าสุด');
+  const [filterBy, setFilterBy] = useState(filterby_params ? filterby_params : 'all');
+
+  useEffect(() => {
+    if (filterby_params) {
+      setFilterBy(filterby_params)
+    } else {
+      setFilterBy('all')
+    }
+  }, [filterby_params]);
+
+  useEffect(() => {
+    if (sortby_params) {
+      setSortBy(sortby_params)
+    } else {
+      setSortBy('ล่าสุด')
+    }
+  }, [sortby_params]);
 
   useEffect(() => {
     if (filterBy === 'all') {
@@ -935,7 +964,7 @@ function Artists({ IFollowingIDs }) {
 
           เรียงตาม :
           <Select
-            value={{ value: sortBy, label: sortBy }}
+            value={sortBy}
             style={{ width: 120 }}
             onChange={handleSortByChange}
             options={[
@@ -946,7 +975,7 @@ function Artists({ IFollowingIDs }) {
 
           กรองจาก :
           <Select
-            value={{ value: filterBy, label: filterBy === 'all' ? 'นักวาดทั้งหมด' : 'นักวาดที่ติดตาม' }}
+            value={filterBy}
             onChange={(selectedOption) => setFilterBy(selectedOption)}
             options={[
               { value: 'all', label: 'นักวาดทั้งหมด' },
@@ -958,14 +987,14 @@ function Artists({ IFollowingIDs }) {
       </div>
       {Message == '' ? (
         <div className="artistbox-items">
-          {allartist.map(data => (
+          {allartist?.map(data => (
             <a key={data.id} href={`/profile/${data.id}`}>
-              <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
+              <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
             </a>
           ))}
         </div>
       ) : (
-        <Flex justify="center">
+        <Flex justify="center" style={{ padding: '3rem 0' }}>
           <Empty description={
             <span>
               ยังไม่มีข้อมูล
@@ -978,160 +1007,277 @@ function Artists({ IFollowingIDs }) {
 }
 
 function SearchResults({ search, user_SearchResult, cms_SearchResult, art_SearchResult }) {
+  const { submenu } = useParams();
+  const [activateKey, setActivateKey] = useState('search')
 
-  // const [search, setSearch] = useState('');
-  // const [user_SearchResult, setUserSearchResults] = useState([]);
-  // const [cms_SearchResult, setCmsSearchResults] = useState([]);
-  // const [art_SearchResult, setArtSearchResults] = useState([]);
+  useEffect(() => {
+    setActivateKey(submenu)
+  }, [submenu])
 
-  // const handleSearch = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await axios.get(`${host}/search?search=${search}`).then((response) => {
-  //       const data = response.data;
-  //       setUserSearchResults(data.users)
-  //       setCmsSearchResults(data.cms_uniqueResults)
-  //       setArtSearchResults(data.artwork)
-  //     })
-
-  //   } catch (error) {
-  //     console.error('Error searching:', error);
-  //   }
-  // };
-  const menus = [
+  const menuss = [
     {
-      key: '1',
-      label: <Link to="/" id="explore" >ทั้งหมด</Link>,
+      key: 'search',
+      label: <Link to="/search" id="explore" >ทั้งหมด</Link>,
       // children: <explore type={type} isLoggedIn={isLoggedIn} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
     },
     {
-      key: '2',
-      label: <Link to="/commissions" id="commissions">คอมมิชชัน</Link>,
-      // children: <Commissions IFollowingIDs={IFollowingIDs} />,
+      key: 'searchcommissions',
+      label: <Link to="/searchcommissions" >คอมมิชชัน</Link>,
+      children: <SearchCommission cms_SearchResult={cms_SearchResult} search={search} />,
     },
     {
-      key: '3',
-      label: <Link to="/gallery" id="gallery">งานวาด</Link>,
-      // children: <Gallery IFollowingIDs={IFollowingIDs} />,
+      key: 'searchgallery',
+      label: <Link to="/searchgallery" >งานวาด</Link>,
+      children: <SearchArtwork art_SearchResult={art_SearchResult} search={search} />,
     },
     {
-      key: '4',
-      label: <Link to="/artists" id="artists" >นักวาด</Link>,
-      // children: <Artists IFollowingIDs={IFollowingIDs} />,
+      key: 'searchartists',
+      label: <Link to="/searchartists" >นักวาด</Link>,
+      children: <SearchArtist user_SearchResult={user_SearchResult} search={search} />,
     },
   ];
 
+
+
   return (
     <>
-      {/* <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="ค้นหาา..."
-        />
-        <button type="submit">Search</button>
-      </form> */}
-
       <div>
-        <Tabs defaultActiveKey="1" items={menus} />
+        <Tabs activeKey={activateKey} defaultActiveKey="search" onChange={setActivateKey} items={menuss} />
       </div>
-      <h3>ผลการค้นหาของ {search}</h3>
-      <div className="content-box">
+      {activateKey == 'search' &&
+        <>
+          <h1 className='h3'>ผลการค้นหาของ {search}</h1>
+          <div className="content-box">
 
-        <div className="content-top">
-          <p className="h3">นักวาด</p>
-          <Link to="/artists"><p>ดูทั้งหมด&gt;</p></Link>
-        </div>
+            <div className="content-top">
+              <p className="h3">นักวาด</p>
+              <Link to="/searchartists"><p>ดูทั้งหมด&gt;</p></Link>
+            </div>
 
-        <Swiper
-          slidesPerView="auto"
-          centeredSlides={false}
-          slidesPerGroupSkip={1}
-          spaceBetween={10}
+            <Swiper
+              slidesPerView="auto"
+              centeredSlides={false}
+              slidesPerGroupSkip={1}
+              spaceBetween={10}
 
-          // scrollbar={true}
-          // navigation={true}
-          modules={[Navigation]}
-          className="artistbox-swiper"
-        >
-          {user_SearchResult.length != 0 ? (user_SearchResult.map(data => (
-            <SwiperSlide>
-              <a key={data.id} href={`/profile/${data.id}`}>
-                <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
-              </a>
-            </SwiperSlide>
-          ))) : (<>ไม่เจอผลลัพธ์</>)
-          }
-        </Swiper>
+              // scrollbar={true}
+              // navigation={true}
+              modules={[Navigation]}
+              className="artistbox-swiper"
+            >
+              {user_SearchResult?.length != 0 ? (user_SearchResult?.map(data => (
+                <SwiperSlide>
+                  <a key={data.id} href={`/profile/${data.id}`}>
+                    <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
+                  </a>
+                </SwiperSlide>
+              ))) : (<>ไม่เจอผลลัพธ์</>)
+              }
+            </Swiper>
 
-      </div>
+          </div>
 
-      <div className="content-box">
-        <div className="content-top">
-          <p className="h3">คอมมิชชัน</p>
-          <Link to="/commissions"><p>ดูทั้งหมด&gt;</p></Link>
-        </div>
-      </div>
-      <Swiper
-        slidesPerView="auto"
-        centeredSlides={false}
-        slidesPerGroupSkip={1}
-        spaceBetween={10}
-        grabCursor={true}
-        keyboard={{
-          enabled: true,
-        }}
-        scrollbar={false}
-        navigation={true}
-        modules={[Keyboard, Scrollbar, Navigation]}
-        className="cms-item-swiper"
-      >
-        {/* <SwiperSlide >
+          <div className="content-box">
+            <div className="content-top">
+              <p className="h3">คอมมิชชัน</p>
+              <Link to="/searchcommissions"><p>ดูทั้งหมด&gt;</p></Link>
+            </div>
+          </div>
+          <Swiper
+            slidesPerView="auto"
+            centeredSlides={false}
+            slidesPerGroupSkip={1}
+            spaceBetween={10}
+            grabCursor={true}
+            keyboard={{
+              enabled: true,
+            }}
+            scrollbar={false}
+            navigation={true}
+            modules={[Keyboard, Scrollbar, Navigation]}
+            className="cms-item-swiper"
+          >
+            {/* <SwiperSlide >
         <CmsItem src="/monlan.png" headding="คอมมิชชัน SD" price="100" desc="คมช.เส้นเปล่า-ลงสีรับทุกสเกล สามารถเพิ่มตัวละครหรือเพิ่มพร็อพได้ โดยราคาขึ้นอยู่กับรายละเอียดที่เพิ่มเข้ามา" />
       </SwiperSlide> */}
-        {cms_SearchResult.length != 0 ? (cms_SearchResult.map(data => (
-          <SwiperSlide key={data.cms_id}>
-            <Link to={`/cmsdetail/${data.cms_id}`}>
-              <CmsItem src={data.ex_img_path} headding={data.cms_name} price={data.pkg_min_price} desc={data.cms_desc} total_reviews={data.total_reviews} cms_all_review={data.cms_all_review} status={data.cms_status}/>
-            </Link>
-          </SwiperSlide>
-        ))) : (<>ไม่เจอผลลัพธ์</>)
-        }
-      </Swiper >
+            {cms_SearchResult?.length != 0 ? (cms_SearchResult?.map(data => (
+              <SwiperSlide key={data.cms_id}>
+                <Link to={`/cmsdetail/${data.cms_id}`}>
+                  <CmsItem src={data.ex_img_path} headding={data.cms_name} price={data.pkg_min_price} desc={data.cms_desc} total_reviews={data.total_reviews} cms_all_review={data.cms_all_review} status={data.cms_status} />
+                </Link>
+              </SwiperSlide>
+            ))) : (<>ไม่เจอผลลัพธ์</>)
+            }
+          </Swiper >
 
-      <div class="content-box">
-        <div class="content-top">
-          <p className="h3">ผลงาน</p>
-          <Link to="/gallery"><p>ดูทั้งหมด&gt;</p></Link>
-        </div>
-        <div class="content-items">
-        </div>
-      </div>
-      <Swiper
-        slidesPerView="auto"
-        centeredSlides={false}
-        slidesPerGroupSkip={1}
-        spaceBetween={10}
-        grabCursor={true}
-        keyboard={{
-          enabled: true,
-        }}
-        scrollbar={false}
-        navigation={true}
-        modules={[Keyboard, Scrollbar, Navigation]}
-        className="gall-item-swiper"
-      >
-        {art_SearchResult.length != 0 ? (art_SearchResult.map((data, index) => (
-          <SwiperSlide >
-            <Link to={`/artworkdetail/${data.artw2_id}`}><img src={data.ex_img_path} /></Link>
-          </SwiperSlide>
-        ))) : (<>ไม่เจอผลลัพธ์</>)
-        }
-      </Swiper>
+          <div className="content-box">
+            <div className="content-top">
+              <p className="h3">ผลงาน</p>
+              <Link to="/searchgallery"><p>ดูทั้งหมด&gt;</p></Link>
+            </div>
+            <div className="content-items">
+            </div>
+          </div>
+          <Swiper
+            slidesPerView="auto"
+            centeredSlides={false}
+            slidesPerGroupSkip={1}
+            spaceBetween={10}
+            grabCursor={true}
+            keyboard={{
+              enabled: true,
+            }}
+            scrollbar={false}
+            navigation={true}
+            modules={[Keyboard, Scrollbar, Navigation]}
+            className="gall-item-swiper"
+          >
+            {art_SearchResult?.length != 0 ? (art_SearchResult?.map((data, index) => (
+              <SwiperSlide >
+                <Link to={`/artworkdetail/${data.artw2_id}`}><img src={data.ex_img_path} /></Link>
+              </SwiperSlide>
+            ))) : (<>ไม่เจอผลลัพธ์</>)
+            }
+          </Swiper>
+        </>}
 
 
     </>
   )
+}
+
+
+function SearchCommission({ cms_SearchResult, search }) {
+
+  return (
+    <>
+      <div className="content-box">
+        <div className="content-top">
+          <p className="h3">คอมมิชชัน</p>
+          {/* <p>ดูทั้งหมด&gt;</p> */}
+
+        </div>
+        {cms_SearchResult?.length != 0 ? (
+          cms_SearchResult?.length != 0 &&
+          <div className="content-items">
+            {(cms_SearchResult?.map((cms) => (
+              <Link to={`/cmsdetail/${cms.cms_id}`}>
+                <CmsItem src={cms.ex_img_path} headding={cms.cms_name} price={cms.pkg_min_price} desc={cms.cms_desc} total_reviews={cms.total_reviews} cms_all_review={cms.cms_all_review} status={cms.cms_status} />
+              </Link>
+            )))}
+          </div>
+        ) : (
+          <Flex justify="center" style={{ padding: '3rem 0' }}>
+            <Empty description={
+              <span>
+                ไม่เจอผลลัพธ์ของ '{search}'
+              </span>
+            } />
+          </Flex>
+        )}
+
+        {/* <Pagination
+          total={commission == undefined ? 0 : commission?.length}
+          showQuickJumper
+          showTotal={(total) => `จำนวน ${total} รายการ`}
+          defaultPageSize={itemsPerPage}
+          current={activePage}
+          responsive
+          onChange={setActivePage}
+        /> */}
+      </div>
+    </>
+  )
+
+}
+
+function SearchArtwork({ art_SearchResult, search }) {
+
+  return (
+    <>
+      <div className="content-box">
+        <div className="content-top">
+          <p className="h3">งานวาด</p>
+          {/* <p>ดูทั้งหมด&gt;</p> */}
+
+        </div>
+        {art_SearchResult?.length != 0 ? (
+          art_SearchResult?.length != 0 &&
+          <div className="content-items">
+            {(art_SearchResult?.map((data) => (
+              <div className="artwork">
+                <Link key={data.artw_id} to={`/artworkdetail/${data.artw_id}`}>
+                  <img src={data.ex_img_path} />
+                  </Link>
+                </div>
+            )))}
+          </div>
+        ) : (
+          <Flex justify="center" style={{ padding: '3rem 0' }}>
+            <Empty description={
+              <span>
+                ไม่เจอผลลัพธ์ของ '{search}'
+              </span>
+            } />
+          </Flex>
+        )}
+
+        {/* <Pagination
+          total={commission == undefined ? 0 : commission?.length}
+          showQuickJumper
+          showTotal={(total) => `จำนวน ${total} รายการ`}
+          defaultPageSize={itemsPerPage}
+          current={activePage}
+          responsive
+          onChange={setActivePage}
+        /> */}
+      </div>
+    </>
+  )
+
+}
+
+function SearchArtist({ user_SearchResult, search }) {
+
+  return (
+    <>
+      <div className="content-box">
+        <div className="content-top">
+          <p className="h3">นักวาด</p>
+          {/* <p>ดูทั้งหมด&gt;</p> */}
+
+        </div>
+        {user_SearchResult?.length != 0 ? (
+          user_SearchResult?.length != 0 &&
+          <div className="artistbox-items">
+            {(user_SearchResult?.map((data) => (
+              <a key={data.id} href={`/profile/${data.id}`}>
+                <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
+              </a>
+            )))}
+          </div>
+        ) : (
+          <Flex justify="center" style={{ padding: '3rem 0' }}>
+            <Empty description={
+              <span>
+                ไม่เจอผลลัพธ์ของ '{search}'
+              </span>
+            } />
+          </Flex>
+        )}
+
+        {/* <Pagination
+          total={commission == undefined ? 0 : commission?.length}
+          showQuickJumper
+          showTotal={(total) => `จำนวน ${total} รายการ`}
+          defaultPageSize={itemsPerPage}
+          current={activePage}
+          responsive
+          onChange={setActivePage}
+        /> */}
+      </div>
+    </>
+  )
+
 }
 

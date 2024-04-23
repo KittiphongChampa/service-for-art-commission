@@ -524,7 +524,11 @@ button {
   }
 }
 @media (min-width: 0px) and (max-width: 767px) {
+  .top-menu {
+    display: flex !important;
+  }
   .aside-panel {
+    display: none;
     flex-basis: 4rem !important;
   }
   .aside-panel .setting-menu {
@@ -540,6 +544,8 @@ button {
   }
   .aside-main-card {
     flex: 1 1 auto;
+    border-radius: 0 !important;
+    padding: 1rem !important;
   }
 }
 @media (min-width: 768px) and (max-width: 1200px) {
@@ -639,6 +645,20 @@ button {
   }
   .chat-room .backdrop-modal-area {
     width: 100% !important;
+  }
+}
+@media (min-width: 0px) and (max-width: 767px) {
+  .order-data-row:not(.last) {
+    border-bottom: none !important;
+  }
+  .order-data-row {
+    width: 100% !important;
+  }
+  .order-data-row td {
+    padding: 0.3rem 0.5rem !important;
+  }
+  .order-data-row td p:first-child {
+    font-weight: 400 !important;
   }
 }
 /* *-------Navbar---------- */
@@ -918,23 +938,65 @@ a:visited {
   font-weight: 300;
 }
 
+.color-font {
+  color: #525764 !important;
+}
+
+.color-font td {
+  color: #525764 !important;
+}
+.color-font th {
+  color: #525764 !important;
+}
+
+.overview-order-table .ant-collapse-header {
+  padding: 4.8px 0 !important;
+}
+
+.badge-status.ant-badge.ant-badge-not-a-wrapper .ant-scroll-number-custom-component,
+.badge-status.ant-badge.ant-badge-not-a-wrapper .ant-scroll-number {
+  padding: 3px 11px !important;
+  height: -moz-fit-content !important;
+  height: fit-content !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  border-radius: 50px !important;
+  font-size: 15px !important;
+}
+
+.ant-pagination {
+  margin: 2rem 0 !important;
+}
+
 .setting-content-box .ant-form-item .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
   display: none !important;
+}
+
+.ant-select-multiple .ant-select-selector {
+  flex-wrap: nowrap !important;
 }
 
 .ant-input {
   font-size: 16px !important;
 }
 
+.artwork-uploader .ant-form,
+.slip-uploader .ant-form {
+  width: 100% !important;
+}
 .artwork-uploader .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
-.artwork-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+.artwork-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select,
+.slip-uploader .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
+.slip-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
   width: 100% !important;
   height: 30rem !important;
   -o-object-fit: contain;
      object-fit: contain;
 }
 .artwork-uploader .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select img,
-.artwork-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select img {
+.artwork-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select img,
+.slip-uploader .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select img,
+.slip-uploader .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select img {
   width: 100% !important;
   height: 100% !important;
   -o-object-fit: contain;
@@ -1644,6 +1706,10 @@ p.time-sent {
   font-size: 0.8rem;
 }
 
+.top-menu {
+  display: none;
+}
+
 .chatbox-container {
   display: flex;
   flex: 1;
@@ -1748,6 +1814,7 @@ p.time-sent {
 .chatbox-container .chat-list .chat-item div {
   /*แก้ปัญหา p ทะลุddiv*/
   min-width: 0;
+  width: 100%;
 }
 .chatbox-container .chat-list .chat-item div p.order {
   min-width: 0;
@@ -2355,7 +2422,7 @@ table.overview-order-table {
   width: 100%;
 }
 table.overview-order-table tr.tr-detail {
-  background-color: #F2F1F7;
+  background-color: rgba(242, 241, 247, 0.5098039216);
   border-bottom: 1px solid #d9d9d9;
 }
 table.overview-order-table tr.tr-detail td div {
@@ -2379,7 +2446,7 @@ table.overview-order-table tr.order-data-row {
   cursor: pointer;
 }
 table.overview-order-table tr.order-data-row:hover {
-  background-color: #F2F1F7;
+  background-color: rgba(242, 241, 247, 0.5098039216);
 }
 table.overview-order-table tr.order-data-row td {
   font-weight: 300;
@@ -2509,6 +2576,8 @@ table.overview-order-table th.number, table.overview-order-table th.q {
 .all-admin-head {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
 }
 .all-user-head div:not(.submenu-filter) > *,
 .all-admin-head div:not(.submenu-filter) > * {
@@ -2683,7 +2752,6 @@ table.overview-order-table th.number, table.overview-order-table th.q {
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   grid-template-rows: min-content;
   gap: 0.6rem;
-  min-height: 50rem;
 }
 .content-items div.artwork {
   overflow: hidden;

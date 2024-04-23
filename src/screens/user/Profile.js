@@ -223,9 +223,9 @@ export default function Profile() {
 
   const menus = [
     {
-        key: "5",
-        label: "กำลังติดตาม",
-        children: <Followings IFollowerData={IFollowerData} />,
+      key: "5",
+      label: "กำลังติดตาม",
+      children: <Followings IFollowerData={IFollowerData} />,
     },
     // {
     //   key: "1",
@@ -234,7 +234,7 @@ export default function Profile() {
     // },
   ];
 
-  function changeMenu() {}
+  function changeMenu() { }
 
   function openCoverModal() {
     setShowCoverModal(!showCoverModal);
@@ -331,7 +331,7 @@ export default function Profile() {
             {showProfileModal} */}
       {/* <Navbar /> */}
       <NavbarUser />
-      <div class="body-nopadding" style={body}>
+      <div className="body-nopadding" style={body}>
         <div className="cover-grid">
           <div className="cover" onClick={openCoverModal}>
             <div
@@ -469,25 +469,28 @@ export default function Profile() {
             basedProfile={userdata.urs_profile_img}
           />
           {/* <ProfileImg src={previewUrl} onPress={addProfileImg}/> */}
-          <div class="input-group mb-1 mt-5">
+          <div className="input-group mb-1 mt-5">
             <input
               {...register("profileImg", { required: true })}
               accept="image/png, image/jpeg"
               onChange={handleFileChange}
               type="file"
-              class="form-control"
+              className="form-control"
               id="inputGroupFile02"
             />
-            {/* <label class="input-group-text" for="inputGroupFile02">Upload</label> */}
+            {/* <label className="input-group-text" for="inputGroupFile02">Upload</label> */}
           </div>
           <div className="text-align-right">
             {errors.profileImg && errors.profileImg.type === "required" && (
-              <p class="validate-input"> กรุณาเลือกไฟล์ภาพ</p>
+              <p className="validate-input"> กรุณาเลือกไฟล์ภาพ</p>
             )}
             {errors.profileImg && errors.profileImg.type === "accept" && (
-              <p class="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>
+              <p className="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>
             )}
           </div>
+          <Flex justify='flex-end' style={{marginBottom:'1rem',color:'gray',fontSize:'14px'}}>
+            *อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB
+          </Flex>
           <Flex gap="small" justify="center">
             <Button type="primary" shape="round" size="large" htmlType="submit">
               บันทึก
@@ -560,7 +563,7 @@ function AllCms(props) {
   return (
     <>
       <p className="h3 mt-3 mb-2">คอมมิชชัน</p>
-      <div class="content-items">
+      <div className="content-items">
         {myCommission.length != 0 ? (
           myCommission.map((mycms) => (
             <div key={mycms.cms_id}>

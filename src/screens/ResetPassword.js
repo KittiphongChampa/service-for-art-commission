@@ -94,17 +94,17 @@ export default function ResetPassword() {
           <title>{title}</title>
         </Helmet>
         <NavbarGuest />
-        <div class="body" style={body}>
-          <div class="container-xl">
-            <div class="login-soloCard">
+        <div className="body" style={body}>
+          <div className="container-xl">
+            <div className="login-soloCard">
               <div className="login-col-img">
                 <img className="login-img" src="images/ภาพตัด.png" alt="" />
               </div>
-              <div class="login-col-text">
-                <div class="input-login-box">
+              <div className="login-col-text">
+                <div className="input-login-box">
                   <h1>{title} </h1>
                   {/* <form onSubmit={handleSubmit(changePassword)}>
-                    <label class="onInput">รหัสผ่านใหม่</label>
+                    <label className="onInput">รหัสผ่านใหม่</label>
                     <input
                       {...register("newPassword", { required: true, minLength: 8 })}
                       type="password"
@@ -113,12 +113,12 @@ export default function ResetPassword() {
                     />
                     {errors.newPassword &&
                       errors.newPassword.type === "minLength" && (
-                        <p class="validate-input">
+                        <p className="validate-input">
                           รหัสผ่านใหม่ตัวอักษรไม่ต่ำกว่า 8 ตัว
                         </p>
                       )}
 
-                    <label class="onInput">ยืนยันรหัสผ่านใหม่</label>
+                    <label className="onInput">ยืนยันรหัสผ่านใหม่</label>
                     <input
                       {...register("verifyPassword", {
                         required: true,

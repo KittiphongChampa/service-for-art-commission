@@ -533,13 +533,13 @@ export default function ChatOrderDetail({socket, userdata , myId, cancelReq2, is
                             />
                         </Modal>
 
-                        <Form.Item
+                        {/* <Form.Item
                             name="email"
                             label="อีเมลติดต่อกลับ"
                             rules={[{ required: true, message: "กรุณากรอกฟิลด์นี้" }, { type: 'email', max: 100 }]}
                         >
                             <Input />
-                        </Form.Item>
+                        </Form.Item> */}
                         
                         <Flex gap="small" justify="flex-end">
                             {/* <Button shape="round" size="large" onClick={handleNext}>ย้อนกลับ</Button> */}

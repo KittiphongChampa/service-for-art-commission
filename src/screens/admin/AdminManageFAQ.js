@@ -268,7 +268,6 @@ export default function AdminManageFAQ() {
                         backgroundColor: "transparent",
                     }} />
             </Space>
-            <p>{faqID} {question} {answer}</p>
 
             <Modal
                 title="แก้ไขคำถามที่พบบ่อย"

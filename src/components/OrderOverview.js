@@ -17,7 +17,7 @@ import Scrollbars from 'react-scrollbars-custom';
 // import { Pagination } from 'rsuite';
 import { Link } from 'react-router-dom';
 // import { DateRangePicker } from 'rsuite';
-import { Pagination, Input, Select, Space, Tabs, Flex, DatePicker, Table,Badge} from 'antd';
+import { Pagination, Input, Select, Space, Tabs, Flex, DatePicker, Collapse, Badge } from 'antd';
 import axios from "axios";
 import { host } from "../utils/api";
 import { format, isToday, isYesterday, isThisWeek, isThisMonth, isThisYear, addDays, isAfter, isBefore } from 'date-fns';
@@ -44,8 +44,6 @@ export default function OrderOverview() {
 
     let layout = ['total', '-', 'pager', 'skip']
 
-
-    // const dataa = [
     //     { q: 1, od_id: "OD123420011", cms: "XXXXXXX", during_time: 2, left_time: "02:01:12 น.", price: "500", edit: "4/3", edit_price: "+100", amount_price: "600", customer: "Boobi", progress: "ภาพ final" },
     //     { q: 2, od_id: "OD123420011", cms: "XXXXXXX", during_time: 2, left_time: "-", price: "-", edit: "0/3", edit_price: "-", amount_price: "-", customer: "babi", progress: "รับรีเควสแล้ว" },
     //     { q: 3, od_id: "OD123420011", cms: "XXXXXXX", during_time: 2, left_time: "-", price: "-", edit: "0/3", edit_price: "-", amount_price: "-", customer: "ณัฐนันท์", progress: "รับรีเควสแล้ว" },
@@ -89,7 +87,7 @@ export default function OrderOverview() {
     const [startIndex, setStartIndex] = useState(0);
     const [endIndex, setEndIndex] = useState(9);
     const [dateSelected, setDateSelected] = useState("ทั้งหมด")
-    
+
     const [countAll, setCountAll] = useState(0)
     const [countWait, setCountWait] = useState(0)
     const [countAccepted, setCountAccepted] = useState(0)
@@ -113,11 +111,11 @@ export default function OrderOverview() {
             setCountAll(array0.length)
             const array1 = allreqData.data.filter(data => data?.step_name?.includes('รับคำขอจ้าง') && data?.od_cancel_by == null)
             setCountWait(array1.length)
-            const array3 = allreqData.data.filter(data => data?.od_cancel_by !== null)
+            const array3 = allreqData.data.filter(data => data?.od_cancel_by != null)
             setCountCancel(array3.length)
-            const array4 = allreqData.data.filter(data => data?.finished_at !== null)
+            const array4 = allreqData.data.filter(data => data?.finished_at != null)
             setCountFinish(array4.length)
-            const array5 = allreqData.data.filter(data => data?.finished_at !== null && data?.od_cancel_by !== null)
+            const array5 = allreqData.data.filter(data => data?.finished_at != null && data?.od_cancel_by != null)
             setCountAccepted(array5.length)
         }
 
@@ -261,13 +259,13 @@ export default function OrderOverview() {
         } else if (key == 'wait') {
             req = allData.filter(menu => menu?.step_name?.includes('รับคำขอจ้าง') && menu?.od_cancel_by == null)
         } else if (key == 'cancel') {
-            req = allData.filter(menu => menu?.od_cancel_by !== null)
+            req = allData.filter(menu => menu?.od_cancel_by != null)
         } else if (key == 'finish') {
-            req = allData.filter(menu => menu?.finished_at !== null)
+            req = allData.filter(menu => menu?.finished_at != null)
         }
         else {
             // กรณีแอกเซ็ป
-            req = allData.filter(menu => menu?.finished_at !== null && menu?.od_cancel_by !== null && menu?.step_name?.includes('รับคำขอจ้าง'))
+            req = allData.filter(menu => menu?.finished_at != null && menu?.od_cancel_by != null && menu?.step_name?.includes('รับคำขอจ้าง'))
         }
         setFilterCmsReq(req)
         if (searchValue) {
@@ -300,6 +298,140 @@ export default function OrderOverview() {
         setSearchQuery(filtered);
     }
 
+    const [windowSize, setWindowSize] = useState(window.innerWidth <= 767 ? 'small' : 'big')
+
+    window.onresize = reportWindowSize;
+    function reportWindowSize() {
+        // console.log(window.innerHeight, window.innerWidth)
+        if (window.innerWidth <= 767) {
+            setWindowSize('small')
+        } else {
+            setWindowSize('big')
+
+        }
+        console.log(windowSize)
+    }
+
+
+    function formatDate(date) {
+        let currentDate = new Date(date)
+        if (!Number.isNaN(currentDate.getTime())) {
+            currentDate = format(currentDate, 'dd/MM/yyyy HH:mm น.');
+            if (isToday(currentDate)) {
+                currentDate = format(currentDate, 'วันนี้ HH:mm น.');
+            } else if (isYesterday(currentDate)) {
+                currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
+            }
+        }
+        return currentDate;
+    }
+
+    const tableData = (data) => {
+
+        if (windowSize != 'small') {
+
+            return data?.map((req, index) => (
+                <>
+                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
+                        <td>{req.od_q_number ? req.od_q_number : '-'}</td>
+                        <td>{req.od_id}</td>
+                        <td>{req.cms_name} : {req.pkg_name}</td>
+                        <td>{req.od_price}</td>
+                        <td>{req.customer_name}</td>
+                        <td>
+                            {req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + (req.step_name.includes('ภาพ') ? 'อนุมัติ'+ req.step_name : req.step_name)} showZero color="#7E9AFA" />}
+                            {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
+                            {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}
+                        </td>
+                    </tr>
+                    {showDetail === index + 1 + startIndex && <tr className="tr-detail">
+                        <td colSpan="12">
+                            <Flex>
+                                <p>ส่งคำขอจ้างเมื่อ : <span>{formatDate(req.ordered_at)}</span></p>
+                                <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
+                                <p>กำหนดส่ง : <span>{formatDate(req.od_deadline)}</span></p>
+                                <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
+                                <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at ? req.finished_at : '-'}</span></p>
+                            </Flex>
+                        </td>
+                    </tr>}
+                </>
+            ));
+        } else {
+            return data?.map((req, index) => (
+                <>
+
+                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+                        <td>
+                            <Flex justify="space-between">
+                                <p>คิว</p>
+                                <p>{req.od_q_number ? req.od_q_number : '-'}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ไอดีออเดอร์</p>
+                                <p>{req.od_id}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>คอมมิชชัน : แพ็กเกจ</p>
+                                <p>{req.cms_name} : {req.pkg_name}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ราคา</p>
+                                <p>{req.od_price}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ผู้จ้าง</p>
+                                <p>{req.customer_name}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+                    <tr className="order-data-row">
+                        <td>
+                            <Flex justify="space-between">
+                                <p>ความคืบหน้า</p>
+                                <p>{req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
+                                    {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
+                                    {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}</p>
+                            </Flex>
+                        </td>
+                    </tr>
+
+                    <tr className="order-data-row last">
+                        <Collapse ghost className="" items={
+                            [{
+                                key: '1',
+                                label: 'ดูเพิ่มเติม',
+                                children: <div>
+                                    <p>ส่งคำขอจ้างเมื่อ : <span>{formatDate(req.ordered_at)}</span></p>
+                                    <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
+                                    <p>กำหนดส่ง : <span>{formatDate(req.od_deadline)}</span></p>
+                                    <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
+                                    <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at ? req.finished_at : '-'}</span></p>
+                                </div>,
+                            },]
+                        } />
+                    </tr>
+                </>
+            ));
+        }
+    };
+
     return (
         <>
 
@@ -307,44 +439,87 @@ export default function OrderOverview() {
                 {/* <title>{title}</title> */}
             </Helmet>
             {/* <div className="artist-mn-container"> */}
+            {/* <Segmented
+                size="large"
+                options={[
+                    {
+                        label: 'ภาพรวมระบบ',
+                        value: 'List',
+                        icon: <ggIcon.GridView />,
+                    },
+                    {
+                        label: 'การรายงาน',
+                        value: 'Kanban',
+                        icon: <Icon.Flag />,
+                    },
+                    {
+                        label: 'จัดการแอดมิน',
+                        value: 'List',
+                        icon: '',
+                    },
+                    {
+                        label: 'จัดการผู้ใช้งาน',
+                        value: 'Kanban',
+                        icon: <Icon.User />,
+                    },
+                    {
+                        label: 'การตรวจสอบรูปภาพ',
+                        value: 'List',
+                        icon: <Icon.Image />,
+                    },
+                    {
+                        label: 'คำถามที่พบบ่อย',
+                        value: 'Kanban',
+                        icon: <Icon.HelpCircle />,
+                    },
+                ]}
+                onChange={(value) => {
+                    console.log(value); // string
+                }}
+            /> */}
             <div className="headding">
                 <h1 className="h3">รายการคอมมิชชัน</h1>
             </div>
             {/* <div className="artist-mn-card"> */}
             <Tabs defaultActiveKey="1" items={menus} onChange={changeMenu} />
             <Flex justify="space-between" align="center" wrap="wrap">
-                <div className="filter" style={{ display: "flex", alignItems: "center" }}>
-                    เรียงตาม :
-                    <Select
-                        // value={{ value: sortby, label: sortby }}
-                        style={{ width: 120 }}
-                        // onChange={handlesortbyChange}
-                        value={sortby}
-                        onChange={setsortby}
-                        options={[
-                            { value: 'คิว', label: 'คิว' },
-                            { value: 'ล่าสุด', label: 'ล่าสุด' },
-                            { value: 'เก่าสุด', label: 'เก่าสุด' },
-                            { value: 'ราคา ↑', label: 'ราคา ↑' },
-                            { value: 'ราคา ↓', label: 'ราคา ↓' },
-                        ]}
-                    />
+                <div className="filter" style={{ display: "flex", alignItems: "center", flexWrap: 'wrap' }}>
+                    <Flex align="center">
+                        <p style={{ whiteSpace: 'nowrap' }}>เรียงตาม : </p>
+                        <Select
+                            // value={{ value: sortby, label: sortby }}
+                            style={{ width: 120 }}
+                            // onChange={handlesortbyChange}
+                            value={sortby}
+                            onChange={setsortby}
+                            options={[
+                                { value: 'คิว', label: 'คิว' },
+                                { value: 'ล่าสุด', label: 'ล่าสุด' },
+                                { value: 'เก่าสุด', label: 'เก่าสุด' },
+                                { value: 'ราคา ↑', label: 'ราคา ↑' },
+                                { value: 'ราคา ↓', label: 'ราคา ↓' },
+                            ]}
+                        />
+                    </Flex>
 
-                    ระยะเวลา :
-                    <Select
-                        value={dateSelected}
-                        style={{ width: 120 }}
-                        onChange={setDateSelected}
-                        options={[
-                            { value: 'ทั้งหมด', label: 'ทั้งหมด' },
-                            { value: 'วันนี้', label: 'วันนี้' },
-                            { value: 'สัปดาห์นี้', label: 'สัปดาห์นี้' },
-                            { value: 'เดือนนี้', label: 'เดือนนี้' },
-                            { value: 'ปีนี้', label: 'ปีนี้' },
-                            { value: 'กำหนดเอง', label: 'กำหนดเอง' },
+                    <Flex align="center">
+                        <p style={{ whiteSpace: 'nowrap' }}>ระยะเวลา : </p>
 
-                        ]}
-                    />
+                        <Select
+                            value={dateSelected}
+                            style={{ width: 120 }}
+                            onChange={setDateSelected}
+                            options={[
+                                { value: 'ทั้งหมด', label: 'ทั้งหมด' },
+                                { value: 'วันนี้', label: 'วันนี้' },
+                                { value: 'สัปดาห์นี้', label: 'สัปดาห์นี้' },
+                                { value: 'เดือนนี้', label: 'เดือนนี้' },
+                                { value: 'ปีนี้', label: 'ปีนี้' },
+                                { value: 'กำหนดเอง', label: 'กำหนดเอง' },
+
+                            ]}
+                        />
+                    </Flex>
                     {dateSelected == 'กำหนดเอง' &&
                         <RangePicker onChange={filterRangeDate} />}
 
@@ -354,129 +529,132 @@ export default function OrderOverview() {
                 </div>
 
             </Flex>
-            <Scrollbars>
 
+            <table className="overview-order-table">
+                {windowSize != 'small' && <tr className="table-head">
+                    <th className="number">คิว</th>
+                    <th>ไอดีออเดอร์</th>
+                    <th>คอมมิชชัน:แพ็กเกจ</th>
+                    <th>ราคา</th>
+                    <th>ผู้จ้าง</th>
+                    <th>ความคืบหน้า</th>
+                </tr>}
 
+                {searchQuery && searchValue !== '' ? (
+                    tableData(searchQuery)
+                ) : (
+                    tableData(filterCmsReq)
+                )}
 
-                <table className="overview-order-table">
-                    <tr className="table-head">
-                        <th className="number">คิว</th>
-                        <th>ไอดีออเดอร์</th>
-                        <th>คอมมิชชัน:แพ็กเกจ</th>
-                        <th>ราคา</th>
-                        <th>ผู้จ้าง</th>
-                        <th>ความคืบหน้า</th>
-                    </tr>
+                {/* {searchQuery && searchValue != '' ?
+                    // <ShowData filteredArray={searchQuery} />
+                    <>
+                        {searchQuery.map((req, index) => {
+                            let currentDate = new Date(req.ordered_at)
+                            let deadline = new Date(req.od_deadline)
 
-                    {searchQuery && searchValue != '' ?
-                        // <ShowData filteredArray={searchQuery} />
-                        <>
-                            {searchQuery.map((req, index) => {
-                                let currentDate = new Date(req.ordered_at)
-                                let deadline = new Date(req.od_deadline)
-
-                                if (!Number.isNaN(currentDate.getTime())) {
-                                    currentDate = format(currentDate, 'dd/MM HH:mm น.');
-                                    if (isToday(currentDate)) {
-                                        currentDate = format(currentDate, 'วันนี้ HH:mm น.');
-                                    } else if (isYesterday(currentDate)) {
-                                        currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
-                                    }
+                            if (!Number.isNaN(currentDate.getTime())) {
+                                currentDate = format(currentDate, 'dd/MM HH:mm น.');
+                                if (isToday(currentDate)) {
+                                    currentDate = format(currentDate, 'วันนี้ HH:mm น.');
+                                } else if (isYesterday(currentDate)) {
+                                    currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
                                 }
+                            }
 
-                                if (!Number.isNaN(deadline.getTime())) {
-                                    deadline = format(deadline, 'dd/MM HH:mm น.');
-                                    if (isToday(deadline)) {
-                                        deadline = format(deadline, 'วันนี้ HH:mm น.');
-                                    } else if (isYesterday(deadline)) {
-                                        deadline = format(deadline, 'เมื่อวานนี้ HH:mm น.');
-                                    }
+                            if (!Number.isNaN(deadline.getTime())) {
+                                deadline = format(deadline, 'dd/MM HH:mm น.');
+                                if (isToday(deadline)) {
+                                    deadline = format(deadline, 'วันนี้ HH:mm น.');
+                                } else if (isYesterday(deadline)) {
+                                    deadline = format(deadline, 'เมื่อวานนี้ HH:mm น.');
                                 }
+                            }
 
-                                return (
-                                    <>
-                                        <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
-                                            <td>{req.od_q_number}</td>
-                                            <td>{req.od_id}</td>
-                                            <td>{req.cms_name} : {req.pkg_name}</td>
-                                            <td>{req.od_price}</td>
-                                            <td>{req.customer_name}</td>
-                                            <td>{req.od_cancel_by == null && req.finished_at == null && req.step_name}
-                                                    {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
-                                                    {req.od_cancel_by !=  null && 'ยกเลิกแล้ว'}</td>
-                                        </tr>
-                                        {showDetail === index + 1 + startIndex && <tr className="tr-detail">
-                                            <td colSpan="12">
-                                                <div>
-                                                    <p>ส่งคำขอจ้างเมื่อ : <span>{currentDate}</span></p>
-                                                    <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
-                                                    <p>กำหนดส่ง : <span>{deadline}</span></p>
-                                                    <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                                    <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at}</span></p>
-                                                </div>
-                                            </td>
-                                        </tr>}
-                                    </>
-                                );
-                            })}
-                        </>
-                        :
-                        // <ShowData filteredArray={filterCmsReq} />
+                            return (
+                                <>
+                                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
+                                        <td>{req.od_q_number}</td>
+                                        <td>{req.od_id}</td>
+                                        <td>{req.cms_name} : {req.pkg_name}</td>
+                                        <td>{req.od_price}</td>
+                                        <td>{req.customer_name}</td>
+                                        <td>{req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
+                                            {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color="#52c41a" />}
+                                            {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}</td>
+                                    </tr>
+                                    {showDetail === index + 1 + startIndex && <tr className="tr-detail">
+                                        <td colSpan="12">
+                                            <div>
+                                                <p>ส่งคำขอจ้างเมื่อ : <span>{currentDate}</span></p>
+                                                <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
+                                                <p>กำหนดส่ง : <span>{deadline}</span></p>
+                                                <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
+                                                <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at}</span></p>
+                                            </div>
+                                        </td>
+                                    </tr>}
+                                </>
+                            );
+                        })}
+                    </>
+                    :
+                    // <ShowData filteredArray={filterCmsReq} />
 
-                        <>
-                            {filterCmsReq && filterCmsReq.map((req, index) => {
-                                let currentDate = new Date(req.ordered_at)
-                                let deadline = new Date(req.od_deadline)
+                    <>
+                        {filterCmsReq && filterCmsReq.map((req, index) => {
+                            let currentDate = new Date(req.ordered_at)
+                            let deadline = new Date(req.od_deadline)
 
-                                if (!Number.isNaN(currentDate.getTime())) {
-                                    currentDate = format(currentDate, 'dd/MM HH:mm น.');
-                                    if (isToday(currentDate)) {
-                                        currentDate = format(currentDate, 'วันนี้ HH:mm น.');
-                                    } else if (isYesterday(currentDate)) {
-                                        currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
-                                    }
+                            if (!Number.isNaN(currentDate.getTime())) {
+                                currentDate = format(currentDate, 'dd/MM HH:mm น.');
+                                if (isToday(currentDate)) {
+                                    currentDate = format(currentDate, 'วันนี้ HH:mm น.');
+                                } else if (isYesterday(currentDate)) {
+                                    currentDate = format(currentDate, 'เมื่อวานนี้ HH:mm น.');
                                 }
+                            }
 
-                                if (!Number.isNaN(deadline.getTime())) {
-                                    deadline = format(deadline, 'dd/MM HH:mm น.');
-                                    if (isToday(deadline)) {
-                                        deadline = format(deadline, 'วันนี้ HH:mm น.');
-                                    } else if (isYesterday(deadline)) {
-                                        deadline = format(deadline, 'เมื่อวานนี้ HH:mm น.');
-                                    }
+                            if (!Number.isNaN(deadline.getTime())) {
+                                deadline = format(deadline, 'dd/MM HH:mm น.');
+                                if (isToday(deadline)) {
+                                    deadline = format(deadline, 'วันนี้ HH:mm น.');
+                                } else if (isYesterday(deadline)) {
+                                    deadline = format(deadline, 'เมื่อวานนี้ HH:mm น.');
                                 }
+                            }
 
-                                return (
-                                    <>
-                                        <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
-                                            <td>{req.od_q_number}</td>
-                                            <td>{req.od_id}</td>
-                                            <td>{req.cms_name} : {req.pkg_name}</td>
-                                            <td>{req.od_price}</td>
-                                            <td>{req.customer_name}</td>
-                                            <td>{req.od_cancel_by == null && req.finished_at == null && req.step_name}
-                                                    {req.finished_at != null && 'เสร็จสิ้นแล้ว'}
-                                                    {req.od_cancel_by != null && 'ยกเลิกแล้ว'}</td>
-                                        </tr>
-                                        {showDetail === index + 1 + startIndex && <tr className="tr-detail">
-                                            <td colSpan="12">
-                                                <div>
-                                                    <p>ส่งคำขอจ้างเมื่อ : <span>{currentDate}</span></p>
-                                                    <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
-                                                    <p>กำหนดส่ง : <span>{deadline}</span></p>
-                                                    <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
-                                                    <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at}</span></p>
-                                                </div>
-                                            </td>
-                                        </tr>}
-                                    </>
-                                );
-                            })}
-                        </>
-                    }
-                </table>
+                            return (
+                                <>
+                                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex} onClick={() => openDetail(index + 1 + startIndex)}>
+                                        <td>{req.od_q_number}</td>
+                                        <td>{req.od_id}</td>
+                                        <td>{req.cms_name} : {req.pkg_name}</td>
+                                        <td>{req.od_price}</td>
+                                        <td>{req.customer_name}</td>
+                                        <td>{req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
+                                            {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color="#52c41a" />}
+                                            {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}</td>
+                                    </tr>
+                                    {showDetail === index + 1 + startIndex && <tr className="tr-detail">
+                                        <td colSpan="12">
+                                            <div>
+                                                <p>ส่งคำขอจ้างเมื่อ : <span>{currentDate}</span></p>
+                                                <p>ระยะเวลา : <span>{req.pkg_duration} วัน</span></p>
+                                                <p>กำหนดส่ง : <span>{deadline}</span></p>
+                                                <p>แก้ไข(ครั้ง) : <span>{req.od_number_of_edit}</span></p>
+                                                <p>เสร็จสิ้นเมื่อ : <span>{req.finished_at}</span></p>
+                                            </div>
+                                        </td>
+                                    </tr>}
+                                </>
+                            );
+                        })}
+                    </>
+                } */}
+            </table>
 
-                {/* {searchQuery ?
+            {/* {searchQuery ?
                     <Table
                         showSizeChanger={false}
                         columns={[
@@ -612,12 +790,6 @@ export default function OrderOverview() {
 
                 } */}
 
-
-
-
-
-
-            </Scrollbars>
             {/* <Pagination
                 layout={layout}
                 size='md'

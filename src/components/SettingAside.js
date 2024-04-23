@@ -24,7 +24,7 @@ const SettingAside = (props) => {
   }
 
   return (
-    <div class="setting-menu">
+    <div className="setting-menu">
       {/* <h2>การตั้งค่า</h2> */}
       <h1 style={{ fontWeight: "200", color: "white", marginBottom: "1rem" }}>
         การตั้งค่าและความเป็นส่วนตัว

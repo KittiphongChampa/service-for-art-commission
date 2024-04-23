@@ -17,7 +17,7 @@ const AdminMenuAside = (props) => {
     return (
         <div className="setting-menu">
             <h1 className="h3" style={{ fontWeight: "200", color: "white", marginBottom: "1rem" }}>admin panel</h1>
-            <Link to="/admin"><div className={props.onActive==null && 'active'}><ggIcon.GridView /><p>ภาพรวมระบบ</p></div></Link>
+            <Link to="/admin"><div className={props.onActive==null? 'active' : ''}><ggIcon.GridView /><p>ภาพรวมระบบ</p></div></Link>
             <Link to="/admin/adminmanage/report"><div className={activeCheck('report')}><Icon.Flag /><p>การรายงาน</p></div></Link >
             <Link to="/admin/adminmanage/alladmin" ><div className={activeCheck('alladmin')}><AdminPanelSettingsOutlinedIcon /><p>จัดการแอดมิน</p></div></Link >
             <Link to="/admin/adminmanage/alluser" ><div className={activeCheck('alluser')}><Icon.User /><p>จัดการผู้ใช้งาน</p></div></Link >

@@ -156,7 +156,7 @@ export default function SettingProfile() {
             window.location.reload(false);
           });
         } else {
-            toast.error(data.message, toastOptions);
+          toast.error(data.message, toastOptions);
         }
       });
   };
@@ -187,7 +187,7 @@ export default function SettingProfile() {
             window.location.reload(false);
           });
         } else {
-            toast.error(data.message, toastOptions);
+          toast.error(data.message, toastOptions);
         }
       });
   };
@@ -315,21 +315,21 @@ export default function SettingProfile() {
     const formData = new FormData();
     formData.append("cover_color", selectedColor);
     // Swal.fire({ ...alertData.changeProfileImgConfirm }).then((result) => {
-      // if (result.isConfirmed) {
-        axios.patch(`${host}/cover_color/update`, formData, {
-          headers: {
-            Authorization: "Bearer " + token,
-          }
-        }).then((response) => {
-          if (response.data.status === "ok") {
-            Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
-              window.location.reload(false);
-            })
-          } else {
-            Swal.fire({ ...alertData.changeCoverIsError })
-          }
+    // if (result.isConfirmed) {
+    axios.patch(`${host}/cover_color/update`, formData, {
+      headers: {
+        Authorization: "Bearer " + token,
+      }
+    }).then((response) => {
+      if (response.data.status === "ok") {
+        Swal.fire({ ...alertData.changeCoverColorIsConfirmed }).then(() => {
+          window.location.reload(false);
         })
-      // }
+      } else {
+        Swal.fire({ ...alertData.changeCoverIsError })
+      }
+    })
+    // }
     // })
   }
 
@@ -360,7 +360,7 @@ export default function SettingProfile() {
         }
       });
   };
-  
+
   const [form] = Form.useForm();
   const [form_two] = Form.useForm();
 
@@ -449,12 +449,12 @@ export default function SettingProfile() {
                       ]}
 
                     >
-                      {editProfileBtn ? 
+                      {editProfileBtn ?
                         <p>{name}</p>
-                      :
-                        <Input/>
+                        :
+                        <Input />
                       }
-                      
+
 
                     </Form.Item>
 
@@ -489,22 +489,22 @@ export default function SettingProfile() {
                 </div>
                 <div className="in-setting-page">
 
-                    <Form.Item label='อีเมล' name='email'>
-                      <p>{userdata.urs_email}</p>
-                      {/* <Input style={{ border: 'none', pointerEvents:'none' }} /> */}
+                  <Form.Item label='อีเมล' name='email'>
+                    <p>{userdata.urs_email}</p>
+                    {/* <Input style={{ border: 'none', pointerEvents:'none' }} /> */}
 
-                    </Form.Item>
+                  </Form.Item>
 
-                    <Form.Item label='รหัสผ่าน'>
-                      <Button
-                        // className="change-pass gradient-border-btn"
-                        onClick={handleModalPass}
-                        shape="round"
-                      >
-                        <p>เปลี่ยนรหัสผ่าน</p>
-                      </Button>
+                  <Form.Item label='รหัสผ่าน'>
+                    <Button
+                      // className="change-pass gradient-border-btn"
+                      onClick={handleModalPass}
+                      shape="round"
+                    >
+                      <p>เปลี่ยนรหัสผ่าน</p>
+                    </Button>
 
-                    </Form.Item>
+                  </Form.Item>
 
                   {/* <div>
                     <label>รหัสผ่าน</label>
@@ -533,7 +533,7 @@ export default function SettingProfile() {
                   >
                     <Form.Item label='ชื่อบัญชีพร้อมเพย์' name='bankAccName'
                       rules={[
-                       {
+                        {
                           required: true,
                           message: "กรุณากรอกชื่อบัญชีพร้อมเพย์",
                         },
@@ -548,7 +548,7 @@ export default function SettingProfile() {
                     </Form.Item>
                     <Form.Item label='เลขพร้อมเพย์' name='ppNumber'
                       rules={[
-                       {
+                        {
                           required: true,
                           message: "กรุณากรอกชื่อผู้ใช้",
                         },
@@ -558,10 +558,10 @@ export default function SettingProfile() {
                         },
                         { type: "text" },
                       ]}>
-                      {editPromptpayBtn ? 
+                      {editPromptpayBtn ?
                         <p>{ppNumber}</p>
-                      :
-                        <Input/>}
+                        :
+                        <Input />}
 
                     </Form.Item>
 
@@ -582,8 +582,8 @@ export default function SettingProfile() {
                     </Flex>
 
                   </Form>
-                  
-                  
+
+
                 </div>
               </div>
 
@@ -696,16 +696,19 @@ export default function SettingProfile() {
               {/* <h2 style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>เปลี่ยนภาพโปรไฟล์</h2> */}
               <ProfileImg type="only-show" src={previewUrl} basedProfile={userdata.urs_profile_img} />
               {/* <ProfileImg src={previewUrl} onPress={addProfileImg}/> */}
-              <div class="input-group mb-1 mt-5">
+              <div className="input-group mb-1 mt-5">
                 <input {...register("profileImg", { required: true })} accept="image/png, image/jpeg" onChange={handleFileChange}
-                  type="file" class="form-control" id="inputGroupFile02" />
-                {/* <label class="input-group-text" for="inputGroupFile02">Upload</label> */}
+                  type="file" className="form-control" id="inputGroupFile02" />
+                {/* <label className="input-group-text" for="inputGroupFile02">Upload</label> */}
 
               </div>
               <div className="text-align-right">
-                {errors.profileImg && errors.profileImg.type === "required" && (<p class="validate-input"> กรุณาเลือกไฟล์ภาพ</p>)}
-                {errors.profileImg && errors.profileImg.type === "accept" && (<p class="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>)}
+                {errors.profileImg && errors.profileImg.type === "required" && (<p className="validate-input"> กรุณาเลือกไฟล์ภาพ</p>)}
+                {errors.profileImg && errors.profileImg.type === "accept" && (<p className="validate-input">อัปโหลดได้แค่ไฟล์ภาพเท่านั้น</p>)}
               </div>
+              <Flex justify='flex-end' style={{ marginBottom: '1rem', color: 'gray', fontSize: '14px' }}>
+                *อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB
+              </Flex>
               <Flex gap="small" justify="center">
                 <Button type="primary" shape="round" size="large" htmlType="submit">บันทึก</Button>
                 <Button shape="round" size="large" onClick={openProfileModal}>ยกเลิก</Button>

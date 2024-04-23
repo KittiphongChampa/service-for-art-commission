@@ -55,7 +55,7 @@ export default function ViewProfile() {
 
   const [myCommission, setMyCms] = useState([]);
   const [myGallery, setMyGallery] = useState([]);
-  const [all_review, setAllReview]  = useState([]);
+  const [all_review, setAllReview] = useState([]);
 
 
   const [profileMenuSelected, setprofileMenuSelected] = useState("cms");
@@ -134,14 +134,14 @@ export default function ViewProfile() {
 
   const getUserGallerry = async () => {
     await axios.get(`${host}/userGallery/${id}`).then((response) => {
-        const data = response.data;
-        setMyGallery(data.myGallery);
+      const data = response.data;
+      setMyGallery(data.myGallery);
     })
   }
 
   const getAllReview = async () => {
     await axios.get(`${host}/userReview/all/${id}`).then((response) => {
-        setAllReview(response.data);
+      setAllReview(response.data);
     })
   }
 
@@ -245,30 +245,30 @@ export default function ViewProfile() {
     {
       key: '2',
       label: "งานวาด",
-      children: <AllArtworks myGallery={myGallery}/>,
+      children: <AllArtworks myGallery={myGallery} />,
     },
     {
       key: '3',
       label: "รีวิว",
-      children: <AllReviews all_review={all_review}/>,
+      children: <AllReviews all_review={all_review} />,
     },
     {
-        key: '4',
-        label: "ผู้ติดตาม",
-        children: <Followers myFollowerData={myFollowerData} />,
+      key: '4',
+      label: "ผู้ติดตาม",
+      children: <Followers myFollowerData={myFollowerData} />,
     },
     {
-        key: '5',
-        label: "กำลังติดตาม",
-        children: <Followings IFollowerData={IFollowerData} />,
+      key: '5',
+      label: "กำลังติดตาม",
+      children: <Followings IFollowerData={IFollowerData} />,
     }
   ];
 
   const menus = [
     {
-        key: "5",
-        label: "กำลังติดตาม",
-        children: <Followings IFollowerData={IFollowerData} />,
+      key: "5",
+      label: "กำลังติดตาม",
+      children: <Followings IFollowerData={IFollowerData} />,
     },
     // {
     //   key: "1",
@@ -307,7 +307,7 @@ export default function ViewProfile() {
           <NavbarHomepage />
         )}
 
-        <div class="body-nopadding" style={body}>
+        <div className="body-nopadding" style={body}>
           <div className="cover-grid">
             <div
               className="cover"
@@ -317,47 +317,47 @@ export default function ViewProfile() {
                 style={{ backgroundColor: userInfo.urs_cover_color }}
               ></div>
             </div>
-          <div className="container-xl profile-page">
-            <div className="user-profile-area">
-              <div className="user-col-profile">
+            <div className="container-xl profile-page">
+              <div className="user-profile-area">
+                <div className="user-col-profile">
 
-                <ProfileImg
-                  src={userInfo.urs_profile_img}
-                  type="only-show"
-                // onPress={() => openModal("profile")}
-                />
+                  <ProfileImg
+                    src={userInfo.urs_profile_img}
+                    type="only-show"
+                  // onPress={() => openModal("profile")}
+                  />
 
-                {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
-                <p className="username-profile fs-5">{userInfo.urs_name}</p>
-                {/* <p className="follower-profile">follower</p> */}
-               
-                {type != "admin" ? (
-                  <div className="group-btn-area">
-                    {follow === "no_follow" ? (
-                      <Button shape="round" onClick={eventfollow}>
-                        ติดตาม
-                      </Button>
-                    ) : (
-                      <Button shape="round" onClick={eventUnfollow}>
-                        เลิกติดตาม
-                      </Button>
-                    )}
+                  {/* <ProfileImg src="b3.png" type="show" onPress={() => openModal("profile")} /> */}
+                  <p className="username-profile fs-5">{userInfo.urs_name}</p>
+                  {/* <p className="follower-profile">follower</p> */}
 
-                    {isLoggedIn ? (
-                      <a href={`/chatbox?id=${userInfo.id}&od_id=0`}>
-                        <Button shape="round">
+                  {type != "admin" ? (
+                    <div className="group-btn-area">
+                      {follow === "no_follow" ? (
+                        <Button shape="round" onClick={eventfollow}>
+                          ติดตาม
+                        </Button>
+                      ) : (
+                        <Button shape="round" onClick={eventUnfollow}>
+                          เลิกติดตาม
+                        </Button>
+                      )}
+
+                      {isLoggedIn ? (
+                        <a href={`/chatbox?id=${userInfo.id}&od_id=0`}>
+                          <Button shape="round">
+                            แชท
+                          </Button>
+                        </a>
+                      ) : (
+                        <Button shape="round" onClick={openModal}>
                           แชท
                         </Button>
-                      </a>
-                    ) : (
-                      <Button shape="round" onClick={openModal}>
-                        แชท
-                      </Button>
-                    )}
+                      )}
 
-                  </div>
-                ) : (
-                  <>
+                    </div>
+                  ) : (
+                    <>
                       <div className="group-btn-area">
                         <Button shape="round" danger onClick={() => setpopup(true)}>ระงับบัญชีผู้ใช้</Button>
                       </div>
@@ -388,54 +388,54 @@ export default function ViewProfile() {
                         </Modal.Footer>
                       </Modal>
                     </>
-                )}
-                <p className="bio-profile">{userInfo.urs_bio}</p>
-              </div>
-              <div className="user-col-about">
-     
-                <div className="user-about-content">
-                  <div className="user-about-review mb-4"><p className="fs-3">{userInfo.urs_all_review ? userInfo.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userInfo.rw_number ? userInfo.rw_number : 0} รีวิว</p></div>
-                  <div className="user-about-text">
-                    {userInfo.urs_type == 1 ? 
-                      <>
+                  )}
+                  <p className="bio-profile">{userInfo.urs_bio}</p>
+                </div>
+                <div className="user-col-about">
+
+                  <div className="user-about-content">
+                    <div className="user-about-review mb-4"><p className="fs-3">{userInfo.urs_all_review ? userInfo.urs_all_review : 0}<Rate disabled defaultValue={1} className="one-star profile" /></p> <p>จาก {userInfo.rw_number ? userInfo.rw_number : 0} รีวิว</p></div>
+                    <div className="user-about-text">
+                      {userInfo.urs_type == 1 ?
+                        <>
+                          <Flex gap="small" vertical>
+                            <p>ผู้ติดตาม {myFollowerData.length} คน</p>
+                            <p>กำลังติดตาม {IFollowerData.length} คน </p>
+                            <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
+                            <p>เป็นสมาชิกเมื่อ {currentDate}</p>
+                          </Flex>
+                          <Flex gap="small" vertical>
+                            <p>คอมมิชชันทั้งหมด</p>
+                            <p>คิวว่าง 5 คิว</p>
+                          </Flex>
+                        </>
+                        :
                         <Flex gap="small" vertical>
                           <p>ผู้ติดตาม {myFollowerData.length} คน</p>
                           <p>กำลังติดตาม {IFollowerData.length} คน </p>
-                          <p>งานสำเร็จแล้ว {userInfo.success} งาน</p>
                           <p>เป็นสมาชิกเมื่อ {currentDate}</p>
                         </Flex>
-                        <Flex gap="small" vertical>
-                          <p>คอมมิชชันทั้งหมด</p>
-                          <p>คิวว่าง 5 คิว</p>
-                        </Flex>
-                      </>
-                      :
-                      <Flex gap="small" vertical>
-                        <p>ผู้ติดตาม {myFollowerData.length} คน</p>
-                        <p>กำลังติดตาม {IFollowerData.length} คน </p>
-                        <p>เป็นสมาชิกเมื่อ {currentDate}</p>
-                      </Flex>
-                    }
+                      }
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="user-profile-contentCard">
-              <div>
-                {userInfo.urs_type == 1 ? (
-                  <>
-                    <Tabs defaultActiveKey="1" items={menusArtist} />
-                  </>
-                ) : (
-                  <>
-                    <Tabs defaultActiveKey="1" items={menus} />
-                  </>
-                )}
+              <div className="user-profile-contentCard">
+                <div>
+                  {userInfo.urs_type == 1 ? (
+                    <>
+                      <Tabs defaultActiveKey="1" items={menusArtist} />
+                    </>
+                  ) : (
+                    <>
+                      <Tabs defaultActiveKey="1" items={menus} />
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
       <Modal
         title="คุณยังไม่ได้เข้าสู่ระบบ"
@@ -462,7 +462,7 @@ function AllCms(props) {
   return (
     <>
       <p className="h3 mt-3 mb-2">คอมมิชชัน</p>
-      <div class="content-items">
+      <div className="content-items">
         {type != "admin" ? (
           <>
             {myCommission.length != 0 ? (myCommission.map((mycms) => (
@@ -473,13 +473,13 @@ function AllCms(props) {
                     headding={mycms.cms_name}
                     price={mycms.pkg_min_price}
                     desc={mycms.cms_desc}
-                    total_reviews={mycms.total_reviews} 
-                    cms_all_review={mycms.cms_all_review} 
+                    total_reviews={mycms.total_reviews}
+                    cms_all_review={mycms.cms_all_review}
                     status={mycms.cms_status}
                   />
                 </Link>
               </div>
-            ))): (<p>ยังไม่มีข้อมูล</p>)}
+            ))) : (<p>ยังไม่มีข้อมูล</p>)}
           </>
         ) : (
           <>
@@ -509,11 +509,11 @@ function AllArtworks(props) {
       <p className="h3 mt-3 mb-2">งานวาด</p>
       <div className="profile-gallery-container">
         {myGallery.length != 0 ? (myGallery.map((data) => (
-            <Link to={`/artworkdetail/` + data.artw_id}>
-                <div className="profile-gallery" key={data.artw_id}>
-                    <img key={data.artw_id} src={data.ex_img_path} />
-                </div>
-            </Link>
+          <Link to={`/artworkdetail/` + data.artw_id}>
+            <div className="profile-gallery" key={data.artw_id}>
+              <img key={data.artw_id} src={data.ex_img_path} />
+            </div>
+          </Link>
         ))) : (<p>ยังไม่มีข้อมูล</p>)}
       </div>
     </>
@@ -527,23 +527,23 @@ function AllReviews(props) {
       <p className="h3 mt-3 mb-2">รีวิว</p>
       {all_review.length != 0 ? (all_review.map(review => (
         <div className="review-box">
-        <div className="reviewer-box">
-          <div>
-            <img src={review.urs_profile_img} />
+          <div className="reviewer-box">
+            <div>
+              <img src={review.urs_profile_img} />
+            </div>
+            <div>
+              <p>{review.urs_name}</p>
+              <p>{new Date(review.created_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</p>
+            </div>
           </div>
-          <div>
-            <p>{review.urs_name}</p>
-            <p>{new Date(review.created_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</p>
-          </div>
+          {/* <p style={{ fontWeight: "500" }}>แพ็กเกจ : {review.pkg_name}</p> */}
+          <p>
+            {[...Array(review.rw_score)].map((_, index) => (
+              <ggIcon.Star key={index} className="fill-icon" />
+            ))}
+          </p>
+          <p>{review.rw_comment}</p>
         </div>
-        {/* <p style={{ fontWeight: "500" }}>แพ็กเกจ : {review.pkg_name}</p> */}
-        <p>
-          {[...Array(review.rw_score)].map((_, index) => (
-            <ggIcon.Star key={index} className="fill-icon" />
-          ))}
-        </p>
-        <p>{review.rw_comment}</p>
-      </div>
       ))) : (<p>ไม่มีข้อมูล</p>)}
     </>
   );
@@ -553,16 +553,16 @@ function Followers(props) {
   const { myFollowerData } = props
 
   return <>
-      <p className="h3 mt-3 mb-2">ผู้ติดตาม</p>
-      <div className="artistbox-items">
-          {myFollowerData.length != 0 ? myFollowerData.map(data => (
-              <a key={data.id} href={`/profile/${data.id}`}>
-                  
-                      <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
-                  
-              </a>
-          )) : (<p>ยังไม่มีข้อมูล</p>)}
-      </div>
+    <p className="h3 mt-3 mb-2">ผู้ติดตาม</p>
+    <div className="artistbox-items">
+      {myFollowerData.length != 0 ? myFollowerData.map(data => (
+        <a key={data.id} href={`/profile/${data.id}`}>
+
+          <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
+
+        </a>
+      )) : (<p>ยังไม่มีข้อมูล</p>)}
+    </div>
   </>
 }
 
@@ -571,13 +571,13 @@ function Followings(props) {
   // console.log(IFollowerData);
 
   return <>
-      <p className="h3 mt-3 mb-2">กำลังติดตาม</p>
-      <div className="artistbox-items">
-          {IFollowerData.length != 0 ? IFollowerData.map(data => (
-              <a key={data.id} href={`/profile/${data.id}`}>
-                  <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews}/>
-              </a>
-          )) : <p>ยังไม่มีข้อมูล</p>}
-      </div>
+    <p className="h3 mt-3 mb-2">กำลังติดตาม</p>
+    <div className="artistbox-items">
+      {IFollowerData.length != 0 ? IFollowerData.map(data => (
+        <a key={data.id} href={`/profile/${data.id}`}>
+          <ArtistBox img={data.urs_profile_img} name={data.urs_name} all_review={data.urs_all_review} total_reviews={data.total_reviews} />
+        </a>
+      )) : <p>ยังไม่มีข้อมูล</p>}
+    </div>
   </>
 }

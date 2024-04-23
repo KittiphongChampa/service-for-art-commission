@@ -30,13 +30,13 @@ const getBase64 = (img, callback) => {
 const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
-        message.error('You can only upload JPG/PNG file!');
+        message.error('อัปโหลดได้แค่ไฟล์ JPG/PNG เท่านั้น');
     }
-    const isLt2M = file.size / 1024 / 1024 < 2;
+    const isLt2M = file.size / 1024 / 1024 < 5;
     if (!isLt2M) {
-        message.error('Image must smaller than 2MB!');
+        message.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
     }
-    return isJpgOrPng && isLt2M;
+    // return isJpgOrPng && isLt2M ;
 };
 
 export default function ManageArtwork() {
@@ -57,8 +57,8 @@ export default function ManageArtwork() {
 
     const topic = () => {
         axios.get(`${host}/getTopic`).then((response) => {
-          const data = response.data;
-          setTopics(data.topics)
+            const data = response.data;
+            setTopics(data.topics)
         });
     }
 
@@ -71,15 +71,15 @@ export default function ManageArtwork() {
     const handleCancelModal = () => setUploadModalOpen(false);
     const handleCmsArtworkModal = () => {
         //
-        if(!cmsArtworkModalOpen){
+        if (!cmsArtworkModalOpen) {
             selectgallory();
         }
         setUploadModalOpen(false)
         setCmsArtworkModalOpen(!cmsArtworkModalOpen)
-        
+
     }
     const [gallery, setGallery] = useState([])
-    const selectgallory = async() => {
+    const selectgallory = async () => {
         const token = localStorage.getItem("token");
         await axios.get(`${host}/gallerry/select-cms`, {
             headers: {
@@ -99,8 +99,8 @@ export default function ManageArtwork() {
 
     const all_option = [
         ...topics.map((data) => ({
-          value: data.tp_id,
-          label: data.tp_name,
+            value: data.tp_id,
+            label: data.tp_name,
         })),
     ]
 
@@ -109,12 +109,17 @@ export default function ManageArtwork() {
     const [imageUrl, setImageUrl] = useState();
     const [fileList, setFileList] = useState([]);
     const handleChange = (info) => {
-        setFileList(info.fileList);
-        getBase64(info.file.originFileObj, (url) => {
-            // setLoading(false);
-            setUploadModalOpen(false)
-            setImageUrl(url);
-        });
+        console.log(info.fileList[info.fileList.length - 1].size / 1024 / 1024)
+        if ((info.fileList[info.fileList.length - 1].type === 'image/jpeg' || info.fileList[info.fileList.length - 1].type === 'image/png') && (info.fileList[info.fileList.length - 1].size / 1024 / 1024 < 5)) {
+            setFileList(info.fileList);
+            getBase64(info.file.originFileObj, (url) => {
+                // setLoading(false);
+
+                setImageUrl(url);
+            });
+        }
+        setUploadModalOpen(false)
+
     };
 
     function selectPic(ex_img_id, ex_img_path) {
@@ -128,9 +133,9 @@ export default function ManageArtwork() {
         //     cancelButtonText: "ยกเลิก"
         // }).then(async (result) => {
         //     if (result.isConfirmed) {
-                setImageId(ex_img_id)
-                setImageUrl(ex_img_path)
-                handleCmsArtworkModal()
+        setImageId(ex_img_id)
+        setImageUrl(ex_img_path)
+        handleCmsArtworkModal()
         //     }
         // });
     }
@@ -199,7 +204,7 @@ export default function ManageArtwork() {
         },
         {
             key: "2",
-            label:"งานวาด"
+            label: "งานวาด"
         }
     ]
 
@@ -211,13 +216,13 @@ export default function ManageArtwork() {
             </Helmet>
             <NavbarUser />
 
-            <div class="body-nopadding" style={{ backgroundColor: "white" }}>
+            <div className="body-nopadding" style={{ backgroundColor: "white" }}>
                 <div className="container-xl">
                     <div className="content-container">
 
                         <div className="content-body preview-cms">
                             <Tabs defaultActiveKey="2" items={menus} />
-                            <h3 className="content-header d-flex justify-content-center mt-4">เพิ่มงานวาด</h3>
+                            <h3 className="content-header d-flex justify-content-center">เพิ่มงานวาด</h3>
                             <Form
                                 form={form}
                                 layout="vertical"
@@ -229,8 +234,24 @@ export default function ManageArtwork() {
                                 }}
                             >
                                 <Form.Item
-                                    label=""
+                                    label="ภาพงานวาด(อัปโหลดไฟล์ภาพได้ไม่เกิน 5 MB)"
                                     name=""
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: null
+                                        },
+                                        ({ }) => ({
+                                            validator(_, value) {
+                                                if (fileList.length == 0) {
+                                                    return Promise.reject(new Error('กรุณาแนบไฟล์ภาพ'));
+                                                } else {
+                                                    return Promise.resolve();
+                                                }
+                                            },
+                                        }),
+
+                                    ]}
                                 >
                                     <div className="artwork-uploader" onClick={() => setUploadModalOpen(true)}>
                                         <Upload
@@ -273,6 +294,7 @@ export default function ManageArtwork() {
                                                 onChange={handleChange}
                                                 multiple={false}
                                                 showUploadList={false}
+                                                beforeUpload={beforeUpload}
                                             >
                                                 <Button shape="round" size="large" icon={<UploadOutlined />}>อัปโหลดรูปภาพจากเครื่อง</Button>
                                             </Upload>
@@ -283,7 +305,7 @@ export default function ManageArtwork() {
 
                                 <Modal open={cmsArtworkModalOpen} title="เลือกรูปภาพจากคอมมิชชัน" footer={null} onCancel={handleCmsArtworkModal} width={"fit-content"}>
                                     <div className="cms-to-artwork-modal">
-                                        {gallery.map(data=>(
+                                        {gallery.map(data => (
                                             <div key={data.ex_img_id} className="pic-wrapper" onClick={() => selectPic(data.ex_img_id, data.ex_img_path)}>
                                                 <img src={data.ex_img_path} />
                                             </div>

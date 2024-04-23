@@ -158,12 +158,12 @@ export default function ForgotPassword() {
                   ) : ( */}
 
                   {/* <form onSubmit={handleSubmitotp}>
-                    <label class="onInput">อีเมล</label>
+                    <label className="onInput">อีเมล</label>
                     <div className="verify-email">
                       <input
                         id="email"
                         name="email"
-                        class="defInput"
+                        className="defInput"
                         onChange={(e) => handleChange(e)}
                       />
                       <button type="submit">ส่งรหัสยืนยัน</button>

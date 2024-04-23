@@ -110,12 +110,11 @@ export default function AdminManageCms() {
                   <td>{item.usr_id}</td>
                   <td>{item.urs_name}</td>
                   <td>{item.formattedCreatedAt}</td>
-                  <td><Link to={`/admin/adminmanage/cms-problem/${item.cms_id}`}>จัดการ</Link></td>
+                  <td><Button shape='round'><Link to={`/admin/adminmanage/cms-problem/${item.cms_id}`}>จัดการ</Link></Button></td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <Button>จัดการ</Button>
         </>
         :
         <ShowSimilarCmsDetail />}

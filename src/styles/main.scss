@@ -15,10 +15,51 @@
     font-weight: 300;
 }
 
+.color-font {
+    color: $darkMineral !important;
+}
+
+.color-font {
+
+    td {
+        color: $darkMineral !important;
+    }
+
+    th {
+        color: $darkMineral !important;
+    }
+
+}
+
+.overview-order-table{
+    .ant-collapse-header {
+        padding: 4.8px 0 !important;
+    }
+}
+
+
+
+.badge-status.ant-badge.ant-badge-not-a-wrapper .ant-scroll-number-custom-component,
+.badge-status.ant-badge.ant-badge-not-a-wrapper .ant-scroll-number {
+    padding: 3px 11px !important;
+    height: fit-content !important;
+    width: fit-content !important;
+    border-radius: 50px !important;
+    font-size: 15px !important;
+}
+
+.ant-pagination {
+    margin: 2rem 0 !important;
+}
+
 .setting-content-box {
     .ant-form-item .ant-form-item-label>label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
         display: none !important;
     }
+}
+
+.ant-select-multiple .ant-select-selector {
+    flex-wrap: nowrap !important;
 }
 
 .ant-input {
@@ -26,22 +67,26 @@
 }
 
 
+.artwork-uploader,
+.slip-uploader {
+    .ant-form {
+        width: 100% !important;
+    }
 
-.artwork-uploader{
     .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
     .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
         width: 100% !important;
         height: 30rem !important;
         object-fit: contain;
 
-        img{
+        img {
             width: 100% !important;
             height: 100% !important;
             object-fit: contain;
         }
     }
-
 }
+
 
 .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container,
 .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container,
@@ -50,7 +95,7 @@
 .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select,
 .ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
     width: 200px;
-    height:200px;
+    height: 200px;
 }
 
 
@@ -138,7 +183,7 @@ div:where(.swal2-container) button:where(.swal2-styled) {
     // line-height: 1
 }
 
-.swal2-html-container{
+.swal2-html-container {
     text-align: left !important;
 }
 
@@ -627,6 +672,7 @@ div.form-order {
             height: fit-content;
             margin-left: 0.5rem;
             vertical-align: middle;
+
             &.open {
                 color: #52c41a;
                 background-color: #f6ffed;
@@ -934,6 +980,10 @@ p.time-sent {
     // flex-basis: 100%;
 }
 
+.top-menu {
+    display: none;
+}
+
 .chatbox-container {
     display: flex;
     flex: 1;
@@ -1067,6 +1117,7 @@ p.time-sent {
             div {
                 /*แก้ปัญหา p ทะลุddiv*/
                 min-width: 0;
+                width: 100%;
 
                 p.order {
                     min-width: 0;
@@ -1885,7 +1936,7 @@ table.overview-order-table {
     // table-layout: fixed;
 
     tr.tr-detail {
-        background-color: #F2F1F7;
+        background-color: #f2f1f782;
         border-bottom: 1px solid #d9d9d9;
 
         td {
@@ -1919,7 +1970,7 @@ table.overview-order-table {
         cursor: pointer;
 
         &:hover {
-            background-color: #F2F1F7;
+            background-color: #f2f1f782;
         }
 
         td {
@@ -2077,6 +2128,8 @@ table.overview-order-table {
 .all-admin-head {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
 
     div:not(.submenu-filter)>* {
         display: flex;
@@ -2089,7 +2142,8 @@ table.overview-order-table {
     //     @include default-ellipse-btn(#495C83, white, transparent)
     // }
 }
-.ant-select-selector .ant-select-selection-overflow{
+
+.ant-select-selector .ant-select-selection-overflow {
     column-gap: 0 !important;
 }
 
@@ -2300,7 +2354,7 @@ table.overview-order-table {
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
     grid-template-rows: min-content;
     gap: 0.6rem;
-    min-height: 50rem;
+    // min-height: 50rem;
 
 
     div.artwork {

@@ -178,8 +178,13 @@
 //artist admin panel
 
 @media (min-width: 0px) and (max-width: 767px) {
+    .top-menu {
+        display: flex !important;
+    }
+
     .aside-panel {
         // flex: 15rem 1 auto;
+        display: none;
         flex-basis: 4rem !important;
 
         .setting-menu {
@@ -198,6 +203,8 @@
 
     .aside-main-card {
         flex: 1 1 auto;
+        border-radius: 0 !important;
+        padding: 1rem !important;
     }
 }
 
@@ -357,5 +364,32 @@
     }
 
 }
+
+@media (min-width: 1901px) {}
+
+
+//my req
+@media (min-width: 0px) and (max-width: 767px) {
+
+    .order-data-row:not(.last) {
+        border-bottom: none !important;
+    }
+    .order-data-row{
+        // padding: 0 0 !important;
+        width: 100% !important;
+        td{
+            padding: 0.3rem 0.5rem !important;
+            p:first-child{
+                font-weight: 400 !important;
+            }
+        }
+    }
+    
+
+}
+
+
+
+@media (min-width: 768px) and (max-width: 1200px) {}
 
 @media (min-width: 1901px) {}
