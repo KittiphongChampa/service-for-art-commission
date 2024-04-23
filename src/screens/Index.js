@@ -562,7 +562,14 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
           (cmsLatests.map(cmsLatest => (
             <SwiperSlide key={cmsLatest.cms_id}>
               <Link to={`/cmsdetail/${cmsLatest.cms_id}`} >
-                <CmsItem src={cmsLatest.ex_img_path} headding={cmsLatest.cms_name} price={cmsLatest.pkg_min_price} desc={cmsLatest.cms_desc} cms_all_review={cmsLatest.cms_all_review} total_reviews={cmsLatest.total_reviews} status={cmsLatest.cms_status} />
+                <CmsItem 
+                  src={cmsLatest.ex_img_path} 
+                  headding={cmsLatest.cms_name} 
+                  price={cmsLatest.pkg_min_price} 
+                  desc={cmsLatest.cms_desc} 
+                  cms_all_review={cmsLatest.cms_all_review} 
+                  total_reviews={cmsLatest.total_reviews} 
+                  status={cmsLatest.cms_status} />
               </Link>
             </SwiperSlide>
           ))) : <p>ยังไม่มีคอมมิชชัน</p>
@@ -658,11 +665,11 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
                             <Link to={`/cmsdetail/${cmsArtstdata.cms_id}`}>
                               <CmsItem
                                 src={cmsArtstdata.ex_img_path}
-                                heading={cmsArtstdata.cms_name}
+                                headding={cmsArtstdata.cms_name}
                                 price={cmsArtstdata.pkg_min_price}
                                 desc={cmsArtstdata.cms_desc}
-                                total_reviews={cmsArtstdata.total_reviews}
                                 cms_all_review={cmsArtstdata.cms_all_review}
+                                total_reviews={cmsArtstdata.total_reviews}
                                 status={cmsArtstdata.cms_status}
                               />
                             </Link>

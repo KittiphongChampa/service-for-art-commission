@@ -3,6 +3,7 @@ import * as Icon from "react-feather";
 import { Rate } from "antd";
 
 export default function CmsItem(props) {
+  console.log(props);
   return (
     <div class="cms-card">
       <div class="cms-card-grid">

@@ -79,7 +79,7 @@ const NavbarUser = (props) => {
 
     //การแจ้งเตือนของ users
     const displayNotification = (data) => {
-        // console.log(data);
+        console.log(data);
         let action;
         let read;
         let linked;
@@ -169,6 +169,11 @@ const NavbarUser = (props) => {
             keyData = data.order_id
             linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
 
+        } else if (data.msg == "ตรวจสอบใบเสร็จแล้ว") {
+            action = data.msg
+            keyData = data.order_id
+            linked = `/chatbox?id=${data.sender_id}&od_id=${data.order_id}`
+
         } else if (data.msg.includes("ถูกลบโดยแอดมิน")) {
             action = data.msg
             if (data.msg.includes("งานวาด")){
@@ -184,6 +189,15 @@ const NavbarUser = (props) => {
                 linked = `/cmsdetail/${data.work_id}`
                 
             } 
+
+        } else if (data.msg.includes("ไม่มีความคล้าย")) {
+            keyData = data.work_id
+            linked = `/cmsdetail/${data.work_id}`
+
+        } else if (data.msg.includes("พบว่ามีความคล้าย")) {
+            keyData = data.work_id
+            linked = `/cmsdetail/${data.work_id}`
+
         }
 
         if (data.noti_read === 1) {

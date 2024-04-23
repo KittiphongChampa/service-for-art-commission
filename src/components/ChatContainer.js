@@ -1145,6 +1145,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             receiver_id: currentChat.id,
             msg: currentStepName.current
           }
+        
           socket.emit('progress_step', progress_step);
           axios.post(`${host}/noti/progress/add`, progress_step);
 

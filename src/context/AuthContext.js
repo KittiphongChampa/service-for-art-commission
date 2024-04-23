@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
                     headers: { Authorization: "Bearer " + token },
                 }).then((response) => {
                     const data = response.data;
-                    console.log(data);
+                    // console.log(data);
                     if (data.status === "ok") {
                         setAdmindata(data.admins[0]);
                         setIsLoggedIn(true);
