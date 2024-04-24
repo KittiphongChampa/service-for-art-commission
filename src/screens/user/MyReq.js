@@ -160,13 +160,13 @@ export default function MyReq() {
         } else if (key == 'wait') {
             req = allData.filter(menu => menu?.step_name?.includes('รับคำขอจ้าง') && menu?.od_cancel_by == null)
         } else if (key == 'cancel') {
-            req = allData.filter(menu => menu?.od_cancel_by !== null)
+            req = allData.filter(menu => menu?.od_cancel_by != null)
         } else if (key == 'finish') {
-            req = allData.filter(menu => menu?.finished_at !== null)
+            req = allData.filter(menu => menu?.finished_at != null)
         }
         else {
             // กรณีแอกเซ็ป
-            req = allData.filter(menu => menu?.finished_at !== null && menu?.od_cancel_by !== null && menu?.step_name.includes('รับคำขอจ้าง'))
+            req = allData.filter(menu => menu?.finished_at != null && menu?.od_cancel_by != null && menu?.step_name.includes('รับคำขอจ้าง'))
         }
         setFilteredData(req)
 
@@ -362,7 +362,7 @@ export default function MyReq() {
 
 
 
-                            {searchQuery && searchValue !== '' ? (
+                            {searchQuery && searchValue != '' ? (
                                 tableData(searchQuery)
                             ) : (
                                 tableData(filteredData)

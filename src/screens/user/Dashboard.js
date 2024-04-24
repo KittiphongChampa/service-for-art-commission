@@ -5,23 +5,27 @@ import LineChart from "../../components/DashboardArtist/LineChart";
 import BarChart from "../../components/DashboardArtist/BarChart";
 import PieChart from "../../components/DashboardArtist/PieChart";
 import Scrollbars from "react-scrollbars-custom";
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "../../context/AuthContext";
 import { host } from "../../utils/api";
-import { Flex, Select } from 'antd';
+import { Flex, Select } from "antd";
 
 export default function Dashboard() {
   const token = localStorage.getItem("token");
   const { userdata, isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const [CountFollower, setCountFollower] = useState()
-  const [SumProfit, setSumProfit] = useState()
-  const [CountOrder, setCountOrder] = useState()
+  const [CountFollower, setCountFollower] = useState();
+  const [SumProfit, setSumProfit] = useState();
+  const [CountOrder, setCountOrder] = useState();
 
   let [status, setStatus] = useState(true);
 
-  const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1)); // วันแรกของปีปัจจุบัน
-  const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), 11, 31)); // วันสุดท้ายของปีปัจจุบัน
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().getFullYear(), 0, 1)
+  ); // วันแรกของปีปัจจุบัน
+  const [endDate, setEndDate] = useState(
+    new Date(new Date().getFullYear(), 11, 31)
+  ); // วันสุดท้ายของปีปัจจุบัน
 
   const [topCMS, setTopCMS] = useState([]);
   const [topCTM, setTopCtm] = useState([]);
@@ -36,75 +40,80 @@ export default function Dashboard() {
     getCountOrder();
     getTopCommission();
     getTopCustomer();
-  }, [])
+  }, []);
 
   const getCountFollower = async () => {
-    await axios.get(`${host}/count/Follower`, {
-      headers: { Authorization: "Bearer " + token }
-    }).then((response) => {
-      const data = response.data;
-      setCountFollower(data.myfollower)
-    })
-  }
+    await axios
+      .get(`${host}/count/Follower`, {
+        headers: { Authorization: "Bearer " + token },
+      })
+      .then((response) => {
+        const data = response.data;
+        setCountFollower(data.myfollower);
+      });
+  };
 
   const getSumProfit = async () => {
-    await axios.get(`${host}/sum/profit`, {
-      headers: { Authorization: "Bearer " + token }
-    }).then((response) => {
-      const data = response.data;
-      setSumProfit(data.sumprofit)
-    })
-  }
+    await axios
+      .get(`${host}/sum/profit`, {
+        headers: { Authorization: "Bearer " + token },
+      })
+      .then((response) => {
+        const data = response.data;
+        setSumProfit(data.sumprofit);
+      });
+  };
 
   const getCountOrder = async () => {
-    await axios.get(`${host}/count/order`, {
-      headers: { Authorization: "Bearer " + token }
-    }).then((response) => {
-      const data = response.data;
-      setCountOrder(data.order_count);
-    })
-  }
+    await axios
+      .get(`${host}/count/order`, {
+        headers: { Authorization: "Bearer " + token },
+      })
+      .then((response) => {
+        const data = response.data;
+        setCountOrder(data.order_count);
+      });
+  };
 
   const [barChartData, setBarChartData] = useState({
     labels: [],
     datasets: [
       {
-        label: 'รายได้',
+        label: "รายได้",
         data: [],
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
-  })
+  });
 
   const [lineChartData, setLineChartData] = useState({
     labels: [],
     datasets: [
       {
-        label: 'จำนวนผู้ติดตาม',
+        label: "จำนวนผู้ติดตาม",
         data: [],
         fill: false,
-        borderColor: 'blue',
-        backgroundColor: 'blue',
+        borderColor: "blue",
+        backgroundColor: "blue",
         tension: 0.1,
-      }
+      },
     ],
   });
 
-  const [filterBy, setFilterBy] = useState('year')
+  const [filterBy, setFilterBy] = useState("year");
 
   useEffect(() => {
-    handleDateChange()
-  }, [filterBy])
-  
-  
+    handleDateChange();
+  }, [filterBy]);
+
   const handleDateChange = () => {
-    setFilterBy(filterBy)
+    setFilterBy(filterBy);
     const currentDate = new Date();
     let newStartDate = new Date();
     let newEndDate = new Date();
 
     switch (filterBy) {
-      case 'year':
+      case "year":
         newStartDate = new Date(currentDate.getFullYear(), 0, 1);
         newEndDate = new Date(currentDate.getFullYear(), 11, 31);
         break;
@@ -123,7 +132,8 @@ export default function Dashboard() {
       case "thisMonth":
         newStartDate = new Date(
           currentDate.getFullYear(),
-          currentDate.getMonth(), 1
+          currentDate.getMonth(),
+          1
         );
         newEndDate = new Date(
           currentDate.getFullYear(),
@@ -163,23 +173,23 @@ export default function Dashboard() {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-    })
+    });
     // console.log(response);
     if (response.status === 200) {
-      setTopCMS(response.data.combinedResult)
+      setTopCMS(response.data.combinedResult);
     }
-  }
+  };
   const getTopCustomer = async () => {
     const response = await axios.get(`${host}/get/top/customer`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-    })
+    });
     if (response.status === 200) {
-      setTopCtm(response.data.results)
+      setTopCtm(response.data.results);
     }
-  }
+  };
 
   // การทำงาน filter ของจำนวนผู้ติดตาม
   const getYearData = async (start, end) => {
@@ -216,15 +226,15 @@ export default function Dashboard() {
       labels: newData.map((item) => item.date),
       datasets: [
         {
-          label: 'จำนวนผู้ติดตาม',
+          label: "จำนวนผู้ติดตาม",
           data: newData.map((item) => item.follower),
           fill: false,
-          borderColor: 'blue',
-          backgroundColor: 'blue',
+          borderColor: "blue",
+          backgroundColor: "blue",
           tension: 0.1,
-        }
+        },
       ],
-    })
+    });
   };
 
   const getOutOfYearData = async (start, end) => {
@@ -249,15 +259,15 @@ export default function Dashboard() {
       labels: newData.map((item) => item.date),
       datasets: [
         {
-          label: 'จำนวนผู้ติดตาม',
+          label: "จำนวนผู้ติดตาม",
           data: newData.map((item) => item.follower),
           fill: false,
-          borderColor: 'blue',
-          backgroundColor: 'blue',
+          borderColor: "blue",
+          backgroundColor: "blue",
           tension: 0.1,
-        }
+        },
       ],
-    })
+    });
   };
 
   function getFilteredData(data, startDate, endDate) {
@@ -265,14 +275,16 @@ export default function Dashboard() {
       const itemDate = new Date(item.date);
       return itemDate >= startDate && itemDate <= endDate;
     });
-  };
+  }
 
   function fillMissingData(data, startDate, endDate) {
-    const allDays = Array.from({ length: (endDate - startDate) / (24 * 60 * 60 * 1000) + 1 }, (_, index) => {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + index);
-      return currentDate.toISOString().split("T")[0];
-    }
+    const allDays = Array.from(
+      { length: (endDate - startDate) / (24 * 60 * 60 * 1000) + 1 },
+      (_, index) => {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + index);
+        return currentDate.toISOString().split("T")[0];
+      }
     );
 
     const newData = allDays.map((day) => {
@@ -281,8 +293,7 @@ export default function Dashboard() {
     });
 
     return newData;
-  };
-
+  }
 
   // การทำงาน filter ของรายได้
   const getYearDataBenefit = async (start, end) => {
@@ -320,12 +331,12 @@ export default function Dashboard() {
       labels: newData.map((item) => item.date),
       datasets: [
         {
-          label: 'รายได้',
+          label: "รายได้",
           data: newData.map((item) => item.profit),
-          backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        }
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        },
       ],
-    })
+    });
   };
 
   const getOutOfYearBenefit = async (start, end) => {
@@ -351,12 +362,12 @@ export default function Dashboard() {
       labels: newData.map((item) => item.monthData),
       datasets: [
         {
-          label: 'รายได้ต่อเดือน',
+          label: "รายได้ต่อเดือน",
           data: newData.map((item) => item.profit),
-          backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        }
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        },
       ],
-    })
+    });
   };
 
   function getFilteredDataProfit(data, startDate, endDate) {
@@ -370,11 +381,13 @@ export default function Dashboard() {
   }
 
   function fillMissingDataProfit(data, startDate, endDate) {
-    const allDays = Array.from({ length: (endDate - startDate) / (24 * 60 * 60 * 1000) + 1 }, (_, index) => {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + index);
-      return currentDate.toISOString().split("T")[0];
-    }
+    const allDays = Array.from(
+      { length: (endDate - startDate) / (24 * 60 * 60 * 1000) + 1 },
+      (_, index) => {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + index);
+        return currentDate.toISOString().split("T")[0];
+      }
     );
 
     const newData = allDays.map((day) => {
@@ -385,55 +398,65 @@ export default function Dashboard() {
     return newData;
   }
 
-
   const getCountTopic = async () => {
     await axios.get(`${host}/getCountTopic`).then((response) => {
       const data = response.data;
-      if (data.status === 'ok') {
-        setCountTopic(data.results)
+      if (data.status === "ok") {
+        setCountTopic(data.results);
       } else {
-        console.log('ไม่มี');
+        console.log("ไม่มี");
       }
-
-    })
-  }
+    });
+  };
 
   const [activePage, setActivePage] = useState(1);
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(9);
   const itemsPerPage = 10;
 
-  const [windowSize, setWindowSize] = useState(window.innerWidth <= 767 ? 'small' : 'big')
+  const [windowSize, setWindowSize] = useState(
+    window.innerWidth <= 767 ? "small" : "big"
+  );
 
   window.onresize = reportWindowSize;
   function reportWindowSize() {
     // console.log(window.innerHeight, window.innerWidth)
     if (window.innerWidth <= 767) {
-      setWindowSize('small')
+      setWindowSize("small");
     } else {
-      setWindowSize('big')
-
+      setWindowSize("big");
     }
-    console.log(windowSize)
+    console.log(windowSize);
   }
 
-
   const top5TableOrderedData = (data) => {
-    if (windowSize != 'small') {
+    if (windowSize != "small") {
       return data?.map((item, index) => (
-        <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-                  <td>{index + 1}</td>
-                  <td>
-            <img src={item.urs_profile_img} style={{ width: 20, borderRadius: 50 }} /> {item.urs_name}
-                  </td>
+        <tr
+          className="order-data-row"
+          key={index + 1 + startIndex}
+          id={index + 1 + startIndex}
+        >
+          <td>{index + 1}</td>
+          <td>
+            <img
+              src={item.urs_profile_img}
+              style={{ width: 20,height:20, borderRadius: 50 }}
+            />{" "}
+            {item.urs_name}
+          </td>
           <td>{item.order_count}</td>
           <td>{item.profit}</td>
-                </tr>
+        </tr>
       ));
     } else {
       return data?.map((item, index) => (
         <>
-          <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+          <tr
+            className="order-data-row"
+            key={index + 1 + startIndex}
+            id={index + 1 + startIndex}
+          >
             <td>
               <Flex justify="space-between">
                 <p>ลำดับ</p>
@@ -445,7 +468,12 @@ export default function Dashboard() {
             <td>
               <Flex justify="space-between">
                 <p>ข้อมูลลูกค้า</p>
-                <img src={item.urs_profile_img} style={{ width: 20, borderRadius: 50 }} /> {item.urs_name}
+                <div><img
+                  src={item.urs_profile_img}
+                  style={{ width: 20, height:20,borderRadius: 50 }}
+                />{" "}
+                {item.urs_name}</div>
+                
               </Flex>
             </td>
           </tr>
@@ -470,15 +498,23 @@ export default function Dashboard() {
     }
   };
 
-
   const top5TableGoodSoldData = (data) => {
-    if (windowSize != 'small') {
+    if (windowSize != "small") {
       return data?.map((item, index) => (
-        <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+        <tr
+          className="order-data-row"
+          key={index + 1 + startIndex}
+          id={index + 1 + startIndex}
+        >
           <td>{index + 1}</td>
-          <td>
-            <img src={item.urs_profile_img} style={{ width: 20, borderRadius: 50 }} /> {item.urs_name}
-          </td>
+          {/* <td>
+            <img
+              src={item.cms_name}
+              style={{ width: 20, borderRadius: 50 }}
+            />{" "}
+            {item.urs_name}
+          </td> */}
+          <td>{item.cms_name}</td>
           <td>{item.customers.length}</td>
           <td>{item.profit}</td>
         </tr>
@@ -486,7 +522,11 @@ export default function Dashboard() {
     } else {
       return data?.map((item, index) => (
         <>
-          <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
+          <tr
+            className="order-data-row"
+            key={index + 1 + startIndex}
+            id={index + 1 + startIndex}
+          >
             <td>
               <Flex justify="space-between">
                 <p>ลำดับ</p>
@@ -497,8 +537,10 @@ export default function Dashboard() {
           <tr className="order-data-row">
             <td>
               <Flex justify="space-between">
-                <p>ข้อมูลลูกค้า</p>
-                <img src={item.urs_profile_img} style={{ width: 20, borderRadius: 50 }} /> {item.urs_name}
+                <p>ชื่อคอมมิชชัน</p>
+                <p>{item.cms_name}</p>
+
+                
               </Flex>
             </td>
           </tr>
@@ -523,8 +565,6 @@ export default function Dashboard() {
     }
   };
 
-
-
   return (
     <>
       {/* <div className="artist-mn-container"> */}
@@ -533,7 +573,7 @@ export default function Dashboard() {
       </div>
       {/* <div className="artist-mn-card"> */}
       {/* <Scrollbars> */}
-      <Flex gap='small' wrap="wrap">
+      <Flex gap="small" wrap="wrap">
         <div className="dashboard-item">
           <h3 className="h4 color-font ">{SumProfit}</h3>
           <p>รายได้</p>
@@ -567,7 +607,7 @@ export default function Dashboard() {
       </div> */}
 
       <Flex align="center" className="mt-4">
-        <p style={{ whiteSpace: 'nowrap'}}>กรองจาก : </p>
+        <p style={{ whiteSpace: "nowrap" }}>กรองจาก : </p>
         <Select
           // value={{ value: sortby, label: sortby }}
           style={{ width: 120 }}
@@ -575,17 +615,16 @@ export default function Dashboard() {
           value={filterBy}
           onChange={setFilterBy}
           options={[
-            { value: 'year', label: 'ปีนี้' },
-            { value: 'today', label: 'วันนี้' },
-            { value: 'last7days', label: '7 วันที่แล้ว' },
-            { value: 'last30days', label: '30 วันที่แล้ว' },
-            { value: 'thisMonth', label: 'เดือนนี้' },
+            { value: "year", label: "ปีนี้" },
+            { value: "today", label: "วันนี้" },
+            { value: "last7days", label: "7 วันที่แล้ว" },
+            { value: "last30days", label: "30 วันที่แล้ว" },
+            { value: "thisMonth", label: "เดือนนี้" },
           ]}
         />
       </Flex>
 
-      
-      <div style={{marginTop: "15px" }}>
+      <div style={{ marginTop: "15px" }}>
         <h4 className="h4 color-font ">รายได้</h4>
         <div
           style={{
@@ -608,14 +647,13 @@ export default function Dashboard() {
                 <PieChart countTopic={countTopic}/>
               </div> */}
 
-      <div style={{marginTop: "15px" }}>
+      <div style={{ marginTop: "15px" }}>
         <h4 className="h4 color-font ">จำนวนผู้ติดตาม</h4>
         <div
           style={{
             width: "100%",
           }}
         >
-          
           <LineChart lineChartData={lineChartData} />
         </div>
       </div>
@@ -625,8 +663,8 @@ export default function Dashboard() {
         {windowSize != 'small' &&
           <tr>
             <th>ลำดับ</th>
-            <th>ข้อมูลลูกค้า</th>
-            <th>จำนวนออเดอร์ทั้งหมด</th>
+            <th>ชื่อคอมมิชชัน</th>
+            <th>ลูกค้าทั้งหมด(คน)</th>
             <th>จำนวนเงินที่ได้ทั้งหมด</th>
           </tr>}
 
@@ -639,37 +677,36 @@ export default function Dashboard() {
         )}
 
       </table>
-      <div style={{ display: "flex", marginTop: "15px" }}>
-
-        {/* <table className="table is-striped is-fullwidth color-font">
+      {/* <div style={{ display: "flex", marginTop: "15px" }}>
+        <table className="table is-striped is-fullwidth color-font">
           <thead>
-            {windowSize != 'samll' &&
+            {windowSize != "samll" && (
               <tr>
                 <th>ลำดับ</th>
                 <th>ชื่อคอมมิชชัน</th>
                 <th>ลูกค้าทั้งหมด(คน)</th>
                 <th>จำนวนเงินที่ได้ทั้งหมด</th>
-              </tr>}
+              </tr>
+            )}
           </thead>
           <tbody>
             {topCMS.length == 0 ? (
-              <tr style={{textAlign:'center'}}>
+              <tr style={{ textAlign: "center" }}>
                 <td colSpan={4}>ยังไม่มีข้อมูล</td>
               </tr>
-            )
-              :
-              (topCMS.map((item, index) => (
+            ) : (
+              topCMS.map((item, index) => (
                 <tr key={item.cms_id}>
                   <td>{index + 1}</td>
                   <td>{item.cms_name}</td>
                   <td>{item.customers.length}</td>
                   <td>{item.profit}</td>
                 </tr>
-              )))
-            }
+              ))
+            )}
           </tbody>
-        </table> */}
-      </div>
+        </table>
+      </div> */}
 
       <h4 className="h4 color-font  mt-4">5 อันดับลูกค้าที่มีออเดอร์สูงสุด</h4>
       <div style={{ display: "flex", marginTop: "15px" }}>
@@ -677,8 +714,8 @@ export default function Dashboard() {
           {windowSize != 'small' &&
             <tr>
               <th>ลำดับ</th>
-              <th>ชื่อคอมมิชชัน</th>
-              <th>ลูกค้าทั้งหมด(คน)</th>
+              <th>ข้อมูลลูกค้า</th>
+              <th>จำนวนออเดอร์ทั้งหมด</th>
               <th>จำนวนเงินที่ได้ทั้งหมด</th>
             </tr>}
 
@@ -690,6 +727,7 @@ export default function Dashboard() {
             </tr>
           )}
         </table>
+
         {/* <table className="table is-striped is-fullwidth color-font">
           <thead>
             <tr>
@@ -700,22 +738,26 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {topCTM.length == 0 ? (<tr style={{ textAlign: 'center' }}>
-              <td colSpan={4} >ยังไม่มีข้อมูล</td>
-            </tr>
-            )
-              :
-              (topCTM.map((item, index) => (
+            {topCTM.length == 0 ? (
+              <tr style={{ textAlign: "center" }}>
+                <td colSpan={4}>ยังไม่มีข้อมูล</td>
+              </tr>
+            ) : (
+              topCTM.map((item, index) => (
                 <tr key={item.id}>
                   <td>{index + 1}</td>
                   <td>
-                    <img src={item.urs_profile_img} style={{ width: 20, borderRadius: 50 }} /> {item.urs_name}
+                    <img
+                      src={item.urs_profile_img}
+                      style={{ width: 20, borderRadius: 50 }}
+                    />{" "}
+                    {item.urs_name}
                   </td>
                   <td>{item.order_count}</td>
                   <td>{item.profit}</td>
                 </tr>
-              )))
-            }
+              ))
+            )}
           </tbody>
         </table> */}
       </div>
