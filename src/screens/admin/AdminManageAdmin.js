@@ -1,388 +1,358 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import "../../css/indexx.css";
-import "../../css/allinput.css";
-import "../../css/allbutton.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { Helmet } from "react-helmet";
-import { NavbarUser, NavbarAdmin, NavbarHomepage } from "../../components/Navbar";
+import DefaultInput from "../../components/DefaultInput";
+import {
+  NavbarUser,
+  NavbarAdmin,
+  NavbarHomepage,
+} from "../../components/Navbar";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
-import * as Icon from 'react-feather';
-import "../../css/indexx.css";
-import '../../styles/main.css';
-import "../../css/allbutton.css";
-import "../../css/profileimg.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import * as ggIcon from '@mui/icons-material';
-import { Cascader, Input, Badge, Select, Flex, Tabs, Pagination } from 'antd';
-import { useAuth } from '../../context/AuthContext';
-
+import * as alertData from "../../alertdata/alertData";
 // import Button from "react-bootstrap/Button";
-import { Button } from 'antd';
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
-import * as alertData from "../../alertdata/alertData";
-import { host } from "../../utils/api";
-import _ from 'lodash';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ProfileImg from "../../components/ProfileImg.js";
+import Lottie from "lottie-react";
+// import loading from "../../loading.json";
+import * as Icon from "react-feather";
+import { Typography, Button, Input } from "antd";
+import { AdminBox, UserBox } from "../../components/UserBox";
+import { useAuth } from "../../context/AuthContext";
+import { host } from "../../utils/api.js";
 
-const title = "รายการจ้างของฉัน";
-export default function MyReq() {
-    const token = localStorage.getItem("token");
+const { Title } = Typography;
+const title = "จัดการแอดมิน";
+const bgImg = "";
+const body = { backgroundColor: "#F1F5F9" };
 
-
-    const [countAll, setCountAll] = useState()
-    const [countWait, setCountWait] = useState()
-    const [countAccepted, setCountAccepted] = useState()
-    const [countCancel, setCountCancel] = useState()
-    const [countFinish, setCountFinish] = useState()
-
-
-    const { userdata, socket } = useAuth();
-    const menus = [
-        {
-            key: 'all',
-            label:
-                <>
-                    <span>ทั้งหมด </span>
-                    <Badge count={countAll} showZero color="#faad14" />
-                </>,
-            // children: <Foryou statusUserLogin={statusUserLogin} cmsLatests={cmsLatests} cmsArtists={cmsArtists} IFollowerData={IFollowerData} gallerylatest={gallerylatest} galleryIfollow={galleryIfollow} />,
-        },
-        {
-            key: 'wait',
-            label:
-
-                <>
-                    <span>รอการตอบรับ </span>
-                    <Badge count={countWait} showZero color="#faad14" />
-                </>
-            ,
-            // children: <Commissions IFollowingIDs={IFollowingIDs} />,
-        },
-        {
-            key: 'accepted',
-            label:
-                <>
-                    <span>ยอมรับแล้ว </span>
-                    <Badge count={countAccepted} showZero color="#faad14" />
-                </>,
-            // children: <Gallery IFollowingIDs={IFollowingIDs} />,
-        },
-        {
-            key: 'finish',
-            label:
-                <>
-                    <span>เสร็จสิ้น </span>
-                    <Badge count={countFinish} showZero color="#faad14" />
-                </>
-            // children: <Artists IFollowingIDs={IFollowingIDs} />,
-        },
-        {
-            key: 'cancel',
-            label:
-                <>
-                    <span>ยกเลิกแล้ว </span>
-                    <Badge count={countCancel} showZero color="#faad14" />
-                </>,
-            // children: <Artists IFollowingIDs={IFollowingIDs} />,
-        },
-
-    ];
-
-    const [activePage, setActivePage] = useState(1);
-    const [startIndex, setStartIndex] = useState(0);
-    const [endIndex, setEndIndex] = useState(9);
-    const itemsPerPage = 10;
-
-    useEffect(() => {
-        if (filteredData) {
-            //หน้าเพจ - 1 = index 0 * จำนวนแสดงต่อหน้า 0-9 10-19 20-29
-            const newStartIndex = (activePage - 1) * itemsPerPage;
-            //เอาจำนวนที่เริ่ม + จำนวนที่แสดง (0+10 = 10) จะเป็น index 0-10 
-
-            const newEndIndex = newStartIndex + (itemsPerPage);
-            //index เริ่มและ index สุดท้าย
-            setFilteredData(filteredData.slice(newStartIndex, newEndIndex))
-            setStartIndex(newStartIndex);
-            setEndIndex(newEndIndex);
-            // setFilterCmsReq(allData);
-            console.log(activePage, newStartIndex, newEndIndex)
-        }
-    }, [activePage]);
-
-    const [allData, setAllData] = useState()
-    const [filteredData, setFilteredData] = useState()
-    const [sortby, setsortby] = useState('เก่าสุด')
-
-
-    useEffect(() => {
-        const getData = async () => {
-            const allData = await axios.get(
-                `${host}/getreq`,
-                {
-                    headers: { Authorization: "Bearer " + token },
-                }
-            )
-            // console.log(allData.data)
-            console.log()
-            setAllData(allData.data)
-            setFilteredData(allData.data)
-            console.log(allData.data)
-
-            const array0 = allData.data
-            setCountAll(array0.length)
-            const array1 = allData.data.filter(data => data?.step_name?.includes('รับคำขอจ้าง') && data?.od_cancel_by == null)
-            setCountWait(array1.length)
-            const array3 = allData.data.filter(data => data?.od_cancel_by != null)
-            setCountCancel(array3.length)
-            const array4 = allData.data.filter(data => data?.finished_at != null)
-            setCountFinish(array4.length)
-            const array5 = allData.data.filter(data => data?.finished_at != null && data?.od_cancel_by != null)
-            setCountAccepted(array5.length)
-
-            // console.log(array3.length)
-        }
-        getData()
+const toastOptions = {
+  position: "bottom-right",
+  autoClose: 1000,
+  pauseOnHover: true,
+  draggable: true,
+  theme: "dark",
+};
 
 
 
-    }, [])
+export default function AdminManageAdmin(props) {
+    const jwt_token = localStorage.getItem("token");
+    const type = localStorage.getItem("type");
+    const navigate = useNavigate();
+    const [id, setID] = useState("");
+    const [admins, setAdmins] = useState([]);
+    const [email, setEmail] = useState("");
+    const [otp, setOtp] = useState("");
+    const [password, setPassword] = useState("");
+    const [profileImg, setProfileImage] = useState("");
+    const [name, setName] = useState("");
+    const [filteredUser, setFilteredUser] = useState([]);
+    const [isLoading, setLoading] = useState(false);
 
-
-    // const countAll = useRef()
-    // const countWait = useRef()
-    // const countCancel = useRef()
-    // const countFinish = useRef()
-    function changeMenu(key) {
-        // key == "all" && const aa = allData.filter(menu => menu.step_name == "")
-        let req;
-        if (key == 'all') {
-            req = allData
-        } else if (key == 'wait') {
-            req = allData.filter(menu => menu?.step_name?.includes('รับคำขอจ้าง') && menu?.od_cancel_by == null)
-        } else if (key == 'cancel') {
-            req = allData.filter(menu => menu?.od_cancel_by != null)
-        } else if (key == 'finish') {
-            req = allData.filter(menu => menu?.finished_at != null)
-        }
-        else {
-            // กรณีแอกเซ็ป
-            req = allData.filter(menu => menu?.finished_at != null && menu?.od_cancel_by != null && menu?.step_name.includes('รับคำขอจ้าง'))
-        }
-        setFilteredData(req)
-
-        if (searchValue) {
-            search2(req)
-        }
-    }
-
-    useEffect(() => {
-        sortAllData(filteredData)
-    }, [sortby])
-
-    //เรียงข้อมูล
-    function sortAllData(allData) {
-        var sortData;
-        if (allData) {
-            if (sortby == "ล่าสุด") {
-                sortData = _.orderBy(allData, ['ordered_at'], ['desc']);
-            } else if (sortby == "เก่าสุด") {
-                sortData = _.orderBy(allData, ['ordered_at'], ['asc']);
-            } else if (sortby == "ราคา ↑") {
-                sortData = _.orderBy(allData, ['od_price'], ['asc']);
-            } else if (sortby == "ราคา ↓") {
-                sortData = _.orderBy(allData, ['od_price'], ['desc']);
-            }
-            setFilteredData(sortData)
-        }
-
-    }
-
-    const [searchQuery, setSearchQuery] = useState()
-    const [searchValue, setSearchValue] = useState()
-
-    //ค้นหา
-    const handleSearch = (event) => {
-        const query = event.target.value.toLowerCase();
-        setSearchValue(query)
-        const filtered = filteredData.filter(
-            (item) =>
-                String(item.od_id).toLowerCase().includes(query) ||
-                String(item.cms_name).toLowerCase().includes(query) ||
-                String(item.artist_name).toLowerCase().includes(query)
-        );
-        setSearchQuery(filtered);
+    const [file, setFile] = useState("");
+    const [previewUrl, setPreviewUrl] = useState("");
+    const addProfileImg = () => {
+    let input = document.createElement("input");
+    input.type = "file";
+    input.onchange = (e) => {
+      const image = e.target.files[0];
+      setFile(image);
+      setPreviewUrl(URL.createObjectURL(image));
     };
+    input.accept = "image/png ,image/gif ,image/jpeg";
+    input.click();
+  };
 
-    function search2(req) {
-        const filtered = req.filter(
-            (item) =>
-                String(item.od_id).toLowerCase().includes(searchValue) ||
-                String(item.cms_name).toLowerCase().includes(searchValue) ||
-                String(item.artist_name).toLowerCase().includes(searchValue)
-        );
-        setSearchQuery(filtered);
+  const { admindata } = useAuth();
 
+  useEffect(() => {
+    if (jwt_token && type === "admin") {
+      getAdminData();
+    } else {
+      navigate("/login");
     }
+  }, []);
 
-    const [windowSize, setWindowSize] = useState(window.innerWidth <= 767 ? 'small' : 'big')
+  useEffect(() => {
+    // update filtered user when user state changes
+    setFilteredUser(admins);
+  }, [admins]);
 
-    window.onresize = reportWindowSize;
-    function reportWindowSize() {
-        // console.log(window.innerHeight, window.innerWidth)
-        if (window.innerWidth <= 767) {
-            setWindowSize('small')
-        } else {
-            setWindowSize('big')
-
+  const getAdminData = async () => {
+    await axios
+      .get(`${host}/alladmin`, {
+        headers: {
+          Authorization: "Bearer " + jwt_token,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        if (data.status === "ok") {
+          setAdmins(data.admins);
         }
-        console.log(windowSize)
-    }
+      });
+  };
 
-
-    const tableData = (data) => {
-        if (windowSize != 'small') {
-            return data?.map((req, index) => (
-                <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-                    <td>{req.od_id}</td>
-                    <td>{req.cms_name} : {req.pkg_name}</td>
-                    <td>{req.od_price}</td>
-                    <td>{req.artist_name}</td>
-                    <td>
-                        {req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
-                        {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
-                        {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}
-                    </td>
-                </tr>
-            ));
-        } else {
-            return data?.map((req, index) => (
-                <>
-                    <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-                        <td>
-                            <Flex justify="space-between">
-                                <p>ไอดีออเดอร์</p>
-                                <p>{req.od_id}</p>
-                            </Flex>
-                        </td>
-                    </tr>
-                    <tr className="order-data-row">
-                        <td>
-                            <Flex justify="space-between">
-                                <p>คอมมิชชัน : แพ็กเกจ</p>
-                                <p>{req.cms_name} : {req.pkg_name}</p>
-                            </Flex>
-                        </td>
-                    </tr>
-                    <tr className="order-data-row">
-                        <td>
-                            <Flex justify="space-between">
-                                <p>ราคา</p>
-                                <p>{req.od_price}</p>
-                            </Flex>
-                        </td>
-                    </tr>
-                    <tr className="order-data-row">
-                        <td>
-                            <Flex justify="space-between">
-                                <p>ชื่อนักวาด</p>
-                                <p>{req.artist_name}</p>
-                            </Flex>
-                        </td>
-                    </tr>
-                    <tr className="order-data-row last">
-                        <td>
-                            <Flex justify="space-between">
-                                <p>ความคืบหน้า</p>
-                                <p>{req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + req.step_name} showZero color="#7E9AFA" />}
-                                    {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
-                                    {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}</p>
-                            </Flex>
-                        </td>
-                    </tr>
-                </>
-            ));
-        }
-    };
-
-    return (
-        <div className="body-con">
-            <Helmet>
-                <title>{title}</title>
-            </Helmet>
-
-            {/* <Navbar /> */}
-            <NavbarUser />
-
-            {/* <div className="setting-container"> */}
-            <div className="body-lesspadding" >
-                <div className="container-xl">
-                    <div className="content-card">
-                        <h1 className="h3">รายการจ้างของฉัน</h1>
-                        <div>
-                            <Tabs defaultActiveKey="1" items={menus} onChange={changeMenu} />
-                        </div>
-                        <Flex justify="space-between" align="center" wrap="wrap">
-                            <div className="filter" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-
-                                <Flex align="center">
-                                    เรียงตาม :
-                                    <Select
-                                        // value={{ value: sortBy, label: sortBy }}
-                                        style={{ width: 120 }}
-                                        // onChange={handleSortByChange}
-                                        value={sortby}
-                                        onChange={setsortby}
-                                        options={[
-                                            { value: 'เก่าสุด', label: 'เก่าสุด' },
-                                            { value: 'ล่าสุด', label: 'ล่าสุด' },
-                                            { value: 'ราคา ↑', label: 'ราคา ↑' },
-                                            { value: 'ราคา ↓', label: 'ราคา ↓' },
-                                            // { value: 'คะแนนรีวิว ↑', label: 'คะแนนรีวิว ↑' },
-                                            // { value: 'คะแนนรีวิว ↓', label: 'คะแนนรีวิว ↓' },
-                                        ]}
-                                    />
-                                </Flex>
-                            </div>
-                            <div>
-                                <Input type="search" placeholder=" ค้นหา..." value={searchValue} onChange={handleSearch} />
-                            </div>
-
-                        </Flex>
-
-                        <table className="overview-order-table">
-                            {windowSize != 'small' &&
-                                <tr className="table-head">
-                                    <th>ไอดีออเดอร์</th>
-                                    <th>คอมมิชชัน:แพ็กเกจ</th>
-                                    <th>ราคาคมช.</th>
-                                    <th>นักวาด</th>
-                                    <th>ความคืบหน้า</th>
-                                </tr>}
-
-
-
-
-                            {searchQuery && searchValue != '' ? (
-                                tableData(searchQuery)
-                            ) : (
-                                tableData(filteredData)
-                            )}
-                        </table>
-
-                        <Pagination hideOnSinglePage
-                            total={filteredData == undefined ? 0 : filteredData.length}
-                            showQuickJumper
-                            showTotal={(total) => `จำนวน ${total} รายการ`}
-                            defaultPageSize={itemsPerPage}
-                            current={activePage}
-                            responsive
-                            onChange={setActivePage}
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+  const handleSearch = (event) => {
+    const query = event.target.value.toLowerCase();
+    const filtered = admins.filter(
+      (item) =>
+        item.admin_name.toLowerCase().includes(query) ||
+        item.admin_email.toLowerCase().includes(query)
     );
+    setFilteredUser(filtered);
+  };
+
+  const [popup, setpopup_verifyEmail] = useState(false);
+  const Close = () => setpopup_verifyEmail(false);
+  const handleClick = () => setpopup_verifyEmail(true);
+
+  const [popup_otp, setpopup_verifyOTP] = useState(false);
+  const CloseOTP = () => setpopup_verifyOTP(false);
+
+  const [popup_setData, setpopup_setDataadmin] = useState(false);
+  const CloseSetData = () => setpopup_setDataadmin(false);
+
+  const manageAdmin = (event) => {};
+
+  const handleValidation = () => {
+    if (email === "") {
+      toast.error("email is required", toastOptions);
+      return false;
+    }
+    return true;
+  };
+  const handleValidationOTP = () => {
+    if (otp === "") {
+      toast.error("otp is required", toastOptions);
+      return false;
+    }
+    return true;
+  };
+  const handleValidationData = () => {
+    if (email === "") {
+      toast.error("email is required", toastOptions);
+      return false;
+    } else if (password === "") {
+      toast.error("password is required", toastOptions);
+      return false;
+    } else if (file === "") {
+      toast.error("image is required", toastOptions);
+      return false;
+    }
+    return true;
+  };
+  const AddEmailAdmin = async () => {
+    setpopup_verifyEmail(false);
+    if (handleValidation()) {
+      setLoading(true);
+      await axios
+        .post(`${host}/alladmin/email/verify`, {
+          headers: {
+            Authorization: "Bearer " + jwt_token,
+          },
+          email: email,
+        })
+        .then((response) => {
+          const data = response.data;
+          setLoading(false);
+          if (data.status === "ok") {
+            // Swal.fire({ ...alertData.verifyEmainSuccess }).then(() => {});
+            setID(data.insertedAdminID);
+            setpopup_verifyOTP(true);
+          } else if (data.status === "used") {
+            Swal.fire({ ...alertData.verifyEmainFailed }).then(() => {
+              window.location.reload(false);
+            });
+          } else {
+            Swal.fire({ ...alertData.otpisnotcorrect }).then(() => {
+              window.location.reload(false);
+            });
+          }
+        });
+    }
+  };
+  const verifyOTP = async () => {
+    setpopup_verifyOTP(false);
+    if (handleValidationOTP()) {
+      await axios
+        .post(`${host}/alladmin/otp/verify/`, {
+          headers: {
+            Authorization: "Bearer " + jwt_token,
+          },
+          otp: otp,
+          id: id,
+        })
+        .then((response) => {
+          const data = response.data;
+          if (data.status === "ok") {
+            setpopup_setDataadmin(true);
+          } else if (data.status === "error") {
+            Swal.fire({ ...alertData.otpisnotcorrect }).then(() => {
+              window.location.reload(false);
+            });
+          } else {
+            Swal.fire({ ...alertData.IsError }).then(() => {
+              window.location.reload(false);
+            });
+          }
+        });
+    }
+  };
+
+  const handleSendData = async () => {
+    setpopup_setDataadmin(false);
+    if (handleValidationData()) {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("file", file);
+      await axios
+        .patch(`${host}/alladmin/add/${id}`, formData, {
+          headers: {
+            Authorization: "Bearer " + jwt_token,
+          },
+        })
+        .then((response) => {
+          const data = response.data;
+          if (data.status === "ok") {
+            Swal.fire({ ...alertData.addadminSuccess }).then(() => {
+              window.location.reload(false);
+            });
+          } else {
+            Swal.fire({ ...alertData.IsError }).then(() => {
+              window.location.reload(false);
+            });
+          }
+        });
+    }
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>{title}</title>
+      </Helmet>
+      <h1 className="h3">ผู้ดูแลระบบ</h1>
+
+      <div className="all-user-head">
+        <h2 className="h3">รายชื่อแอดมิน ({admins.length})</h2>
+        <div>
+        {admindata.admin_type === 0 ? (
+          <Button
+            onClick={handleClick}
+            type="primary"
+            shape="round"
+            icon={<Icon.Plus />}
+            size="large"
+          >
+            เพิ่มแอดมิน
+          </Button>
+        ) : (<></>)}
+          <Input
+            type="search"
+            onChange={handleSearch}
+            placeholder=" ค้นหา..."
+          />
+        </div>
+      </div>
+      <div className="user-item-area">
+        {filteredUser.map((item, index) => (
+          <div key={index} onClick={manageAdmin}>
+            <AdminBox
+              src={item.admin_profile}
+              username={item.admin_name}
+              userid={item.admin_id}
+              email={item.admin_email}
+              admindata={admindata}
+            />
+          </div>
+        ))}
+      </div>
+      <Modal show={popup} onHide={Close}>
+        <Modal.Body>
+          <Form>
+            <Form.Label>กรุณาใส่อีเมลที่ต้องการเพิ่ม</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="example@gmail.com..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <button variant="secondary" onClick={Close}>
+            ปิด
+          </button>
+          <button variant="primary" onClick={AddEmailAdmin}>
+            ยืนยัน
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={popup_otp} onHide={CloseOTP}>
+        <Modal.Body>
+          <Form>
+            <Form.Label>กรุณาใส่รหัสยืนยันบนอีเมลของท่าน</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="123456"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <button variant="secondary" onClick={CloseOTP}>
+            ปิด
+          </button>
+          <button variant="primary" onClick={verifyOTP}>
+            ยืนยัน
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={popup_setData} onHide={CloseSetData}>
+        <Modal.Body>
+          <Form>
+            <Form.Label>กรุณากรอกข้อมูล</Form.Label>
+            <ProfileImg src={previewUrl} onPress={addProfileImg} />
+            <Form.Control type="email" value={email} disabled />
+            <Form.Control
+              type="password"
+              placeholder="กรอกรหัสผ่าน.."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Form.Control
+              type="text"
+              placeholder="กรอกชื่อ.."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <button variant="secondary" onClick={CloseSetData}>
+            ปิด
+          </button>
+          <button variant="primary" onClick={handleSendData}>
+            ยืนยัน
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <ToastContainer />
+    </>
+  );
 }

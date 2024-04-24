@@ -158,8 +158,7 @@ export default function Report(props) {
               Swal.fire({
                 icon: "success",
                 title: "เก็บแล้ว",
-                timer: 1500,
-                showConfirmButton: false,
+                confirmButtonText: "ตกลง",
               }).then(() => {
                 window.location.href = "/admin/adminmanage/report";
               });
@@ -167,8 +166,7 @@ export default function Report(props) {
               Swal.fire({
                 icon: "error",
                 title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
-                timer: 1500,
-                showConfirmButton: false,
+                confirmButtonText: "ตกลง",
               }).then(() => {
                 window.location.reload(false);
               });
@@ -224,8 +222,7 @@ export default function Report(props) {
               Swal.fire({
                 icon: "success",
                 title: "ลบแล้ว",
-                timer: 1500,
-                showConfirmButton: false,
+                confirmButtonText: "ตกลง",
               }).then(() => {
                 window.location.href = "/admin/adminmanage/report";
               });
@@ -233,8 +230,7 @@ export default function Report(props) {
               Swal.fire({
                 icon: "error",
                 title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
-                timer: 1500,
-                showConfirmButton: false,
+                confirmButtonText: "ตกลง",
               }).then(() => {
                 window.location.reload(false);
               });
@@ -434,131 +430,6 @@ export default function Report(props) {
     setSearchQuery(filtered);
   }
 
-  const [windowSize, setWindowSize] = useState(window.innerWidth <= 767 ? 'small' : 'big')
-
-  window.onresize = reportWindowSize;
-  function reportWindowSize() {
-    // console.log(window.innerHeight, window.innerWidth)
-    if (window.innerWidth <= 767) {
-      setWindowSize('small')
-    } else {
-      setWindowSize('big')
-
-    }
-    console.log(windowSize)
-  }
-
-  const tableData = (data) => {
-    if (windowSize != 'small') {
-      return data?.map((req, index) => (
-        <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-          <td>{index + 1}</td>
-          <td>{req.reporter_name} : {req.pkg_name}</td>
-          <td>{req.reported_name}</td>
-          <td>{req.sendrp_header}</td>
-          <td><Badge
-            count={data.text}
-            color={
-              data?.text?.includes("work")
-                ? "#faad14"
-                : data?.text?.includes("mission")
-                  ? "#52c41a"
-                  : "#FF8716"
-            }
-          /></td>
-          <td>{formatDate(data.created_at)}</td>
-          <td>
-            <Button shape="round">
-              <Link
-                to={`/admin/adminmanage/report/${data.sendrp_id}`}
-              >
-                จัดการ
-              </Link>
-            </Button>
-          </td>
-
-        </tr>
-      ));
-    } else {
-      return data?.map((req, index) => (
-        <>
-          <tr className="order-data-row" key={index + 1 + startIndex} id={index + 1 + startIndex}>
-            <td>
-              <Flex justify="space-between">
-                <p>ลำดับ</p>
-                <p>{index + 1}</p>
-              </Flex>
-            </td>
-          </tr>
-          <tr className="order-data-row">
-            <td>
-              <Flex justify="space-between">
-                <p>ผู้รายงาน</p>
-                <p>{req.reporter_name}</p>
-              </Flex>
-            </td>
-          </tr>
-          <tr className="order-data-row">
-            <td>
-              <Flex justify="space-between">
-                <p>ผู้ถูกรายงาน</p>
-                <p>{req.reported_name}</p>
-              </Flex>
-            </td>
-          </tr>
-          <tr className="order-data-row">
-            <td>
-              <Flex justify="space-between">
-                <p>หัวข้อ</p>
-                <p>{req.sendrp_header}</p>
-              </Flex>
-            </td>
-          </tr>
-          <tr className="order-data-row">
-            <td>
-              <Flex justify="space-between">
-                <p>ประเภท</p>
-                <Badge
-                  count={req.artist_name}
-                  color={
-                    data.text.includes("work")
-                      ? "#faad14"
-                      : data.text.includes("mission")
-                        ? "#52c41a"
-                        : "#FF8716"
-                  }
-                />
-              </Flex>
-            </td>
-          </tr>
-          <tr className="order-data-row">
-            <td>
-              <Flex justify="space-between">
-                <p>เวลา</p>
-                <p>{formatDate(data.created_at)}</p>
-              </Flex>
-            </td>
-          </tr>
-          <tr className="order-data-row last">
-            <td>
-              <Flex justify="space-between">
-                <p>Action</p>
-                <Button shape="round">
-                  <Link
-                    to={`/admin/adminmanage/report/${data.sendrp_id}`}
-                  >
-                    จัดการ
-                  </Link>
-                </Button>
-              </Flex>
-            </td>
-          </tr>
-        </>
-      ));
-    }
-  };
-
-
   function formatDate(currentDate) {
     let formatDate = new Date(currentDate);
     if (!Number.isNaN(formatDate.getTime())) {
@@ -632,7 +503,7 @@ export default function Report(props) {
             </div>
           </div>
 
-          {/* <table className="table is-striped is-fullwidth">
+          <table className="table is-striped is-fullwidth">
             <thead>
               <tr>
                 <th>ลำดับ</th>
@@ -660,8 +531,8 @@ export default function Report(props) {
                             data.text.includes("work")
                               ? "#faad14"
                               : data.text.includes("mission")
-                                ? "#52c41a"
-                                : "#FF8716"
+                              ? "#52c41a"
+                              : "#FF8716"
                           }
                         />
                       </td>
@@ -693,8 +564,8 @@ export default function Report(props) {
                             data.text.includes("work")
                               ? "#faad14"
                               : data.text.includes("mission")
-                                ? "#52c41a"
-                                : "#FF8716"
+                              ? "#52c41a"
+                              : "#FF8716"
                           }
                         />
                       </td>
@@ -713,27 +584,7 @@ export default function Report(props) {
                 </>
               )}
             </tbody>
-          </table> */}
-
-          <table className="overview-order-table">
-            {windowSize != 'small' &&
-              <tr className="table-head">
-                <th>ลำดับ</th>
-                <th>ผู้รายงาน</th>
-                <th>ผู้ถูกรายงาน</th>
-                <th>หัวข้อ</th>
-                <th>ประเภท</th>
-                <th>เวลา</th>
-                <th>Action</th>
-              </tr>}
-
-            {searchQuery && searchValue != '' ? (
-              tableData(searchQuery)
-            ) : (
-                tableData(filteredUser)
-            )}
           </table>
-
         </>
       ) : (
         <>
