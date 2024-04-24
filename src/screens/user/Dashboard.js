@@ -708,7 +708,7 @@ export default function Dashboard() {
         </table>
       </div> */}
 
-      <h4 className="h4 color-font  mt-4">5 อันดับลูกค้าที่มีออเดอร์สูงสุด</h4>
+      <h4 className="h4 color-font  mt-4">3 อันดับลูกค้าที่มีออเดอร์สูงสุด</h4>
       <div style={{ display: "flex", marginTop: "15px" }}>
         <table className="overview-order-table">
           {windowSize != 'small' &&
