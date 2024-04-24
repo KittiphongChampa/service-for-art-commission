@@ -473,13 +473,13 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                         {orderDetail.artist_id !== myId ?
                             message.checked == 0 ?
                                 <>
-                                    <Button size="large" type="link" shape="round">
+                                    {/* <Button size="large" type="link" shape="round">
                                         <Flex align='center' gap='small'>
                                             ดาวน์โหลดรูปภาพไฟนัล<Icon.Download />
 
                                         </Flex>
 
-                                    </Button>
+                                    </Button> */}
                                     <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
                                 </>
                                 : null

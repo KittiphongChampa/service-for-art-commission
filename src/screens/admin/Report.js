@@ -459,9 +459,9 @@ export default function Report(props) {
           <td><Badge
             count={data.text}
             color={
-              data.text.includes("work")
+              data?.text?.includes("work")
                 ? "#faad14"
-                : data.text.includes("mission")
+                : data?.text?.includes("mission")
                   ? "#52c41a"
                   : "#FF8716"
             }
