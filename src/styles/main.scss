@@ -2348,15 +2348,12 @@ table.overview-order-table {
 
 
 .content-items {
-
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
     grid-template-rows: min-content;
     gap: 0.6rem;
     // min-height: 50rem;
-
-
     div.artwork {
         overflow: hidden;
         border-radius: 0.5rem;
@@ -2830,12 +2827,16 @@ div.text-wraper {
 
     .sim-pic-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(1fr, 1fr));
         grid-template-rows: min-content;
         gap: 0.5rem;
         overflow-y: auto;
         overflow-x: hidden;
         height: auto;
+
+        .similar-headding2{
+            display: none;
+        }
 
         // background-color: pink;
         .pic-box {

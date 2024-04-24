@@ -447,7 +447,7 @@ const NavbarHomepage = (props) => {
             >
                 <div className="ham-nav">
                     <a href="/login"><Icon.LogIn className='nav-icon mx-2' />เข้าสู่ระบบ</a>
-                    <a href="/selectrole"><Icon.LogIn className='nav-icon mx-2' />สมัครสมาชิก</a>
+                    <a href="/selectrole"><Icon.User className='nav-icon mx-2' />สมัครสมาชิก</a>
                     <a href="/"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
                     <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
                 </div>
@@ -457,11 +457,19 @@ const NavbarHomepage = (props) => {
 }
 
 const NavbarGuest = (props) => {
+    const [open, setOpen] = useState(false);
+    const showDrawer = () => {
+        setOpen(true);
+    };
+    const onClose = () => {
+        setOpen(false);
+    };
     return (
         <div className="nav-box" >
             <nav className="nav-container" >
                 <div className="inline-nav" >
-                    <a href="/"><Icon.Home className='nav-icon' /></a>
+                    <a href="#" className="ham-menu" onClick={showDrawer}><Icon.Menu className='nav-icon' /></a>
+                    <a href="/" ><Icon.Home className='nav-icon' /></a>
                     <a href="/search"><Icon.Search className='nav-icon' /></a>
                 </div>
                 <div className="inline-nav">
@@ -488,6 +496,21 @@ const NavbarGuest = (props) => {
 
                 </div>
             </nav>
+            <Drawer
+                title=""
+                placement="left"
+                closable={true}
+                onClose={onClose}
+                open={open}
+            // className="ham-nav"
+            >
+                <div className="ham-nav">
+                    <a href="/login"><Icon.LogIn className='nav-icon mx-2' />เข้าสู่ระบบ</a>
+                    <a href="/selectrole"><Icon.User className='nav-icon mx-2' />สมัครสมาชิก</a>
+                    <a href="/"><Icon.Home className='nav-icon mx-2' />หน้าหลัก</a>
+                    <a href="/search"><Icon.Search className='nav-icon mx-2' />สำรวจ</a>
+                </div>
+            </Drawer>
         </div>
     )
 }

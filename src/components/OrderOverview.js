@@ -339,7 +339,7 @@ export default function OrderOverview() {
                         <td>{req.od_price}</td>
                         <td>{req.customer_name}</td>
                         <td>
-                            {req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + (req.step_name.includes('ภาพ') ? 'อนุมัติ'+ req.step_name : req.step_name)} showZero color="#7E9AFA" />}
+                            {req.od_cancel_by == null && req.finished_at == null && <Badge className='badge-status' count={'รอ' + (req.step_name.includes('ภาพ') ? 'อนุมัติ' + req.step_name : req.step_name)} showZero color="#7E9AFA" />}
                             {req.finished_at != null && <Badge className='badge-status' count='เสร็จสิ้นแล้ว' showZero color={req.od_cancel_by != null ? "#faad14" : "#52c41a"} />}
                             {req.od_cancel_by != null && <Badge className='badge-status' count='ยกเลิกแล้ว' showZero color="gray" />}
                         </td>
@@ -790,7 +790,7 @@ export default function OrderOverview() {
 
                 } */}
 
-            {/* <Pagination
+            {/* <Pagination hideOnSinglePage
                 layout={layout}
                 size='md'
                 prev={true}
@@ -806,7 +806,7 @@ export default function OrderOverview() {
                 onChangePage={setActivePage}
             /> */}
 
-            <Pagination
+            <Pagination hideOnSinglePage
                 className="mt-4"
                 total={filterCmsReq == undefined ? 0 : filterCmsReq.length}
                 showQuickJumper
@@ -823,5 +823,4 @@ export default function OrderOverview() {
 
     )
 }
-
 

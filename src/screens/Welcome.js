@@ -16,10 +16,10 @@ const title = 'หน้าหลัก';
 const body = { backgroundColor: "white" }
 
 export default function Welcome() {
-  const { isLoggedIn } = useAuth();
-  const type = localStorage.getItem("type");
+    const { isLoggedIn } = useAuth();
+    const type = localStorage.getItem("type");
 
-  return (
+    return (
         <div className="body-con">
             <Helmet>
                 <title>{title}</title>
@@ -34,18 +34,18 @@ export default function Welcome() {
                 >
                     {/* <img className="presenter" src="character.png" /> */}
                     <div className="box-container" style={{ backgroundImage: "url('./images/welcome.png')" }}>
-                        <Flex className="container-xl" vertical style={{ height:'100%'}} wrap="wrap">
+                        <Flex className="container-xl" vertical style={{ height: '100%' }} wrap="wrap">
 
-                            <div style={{ flex:1 }}></div>
+                            <div className='style-container' style={{ flex: 1 }}></div>
 
                             <Flex vertical justify="center" align="center" style={{ flex: '1' }} wrap="wrap">
-                                <p className="display-3" style={{ color: 'white',letterSpacing:'2px',fontWeight:'300 !important' }}>Service for Art<br></br>Commissioning</p>
-                                <p style={{ color: 'white', letterSpacing: '2px',opacity:'0.8',padding:'1rem 0',textAlign:'center' }}>เว็บไซต์สำหรับจ้างงานศิลปะ(Commission) สถานที่ที่รวบรวมผลงานศิลปะและนักวาด
+                                <p className="display-3" style={{ color: 'white', letterSpacing: '2px', fontWeight: '300 !important' }}>Service for Art<br></br>Commissioning</p>
+                                <p style={{ color: 'white', letterSpacing: '2px', opacity: '0.8', padding: '1rem 0', textAlign: 'center' }}>เว็บไซต์สำหรับจ้างงานศิลปะ(Commission) สถานที่ที่รวบรวมผลงานศิลปะและนักวาดหลากหลายสไตล์
                                     ที่พร้อมจะทำให้ความคิดสร้างสรรค์ของคุณเป็นจริง</p>
                             </Flex>
 
-                            <Flex align="center" gap='middle' justify="center" style={{ flex: '1' }} wrap="wrap">
-                                <p style={{color:'white',fontWeight:'300 !important'}}>สไตล์ : </p>
+                            <Flex align="center" gap='middle' justify="center" style={{ flex: '1' }} wrap="wrap" className="style-container">
+                                <p style={{ color: 'white', fontWeight: '300 !important' }}>สไตล์ : </p>
                                 <div className='style-box'>
                                     <div>
                                         <img src='./images/semi.png'></img>
@@ -64,14 +64,10 @@ export default function Welcome() {
                                     </div>
                                     <p className='h6'>Pixel Art</p>
                                 </div>
-                                <div className='style-box'>
-                                    {/* <div>
-                                        <img src='./images/pixel.png'></img>
-                                    </div> */}
-                                    <Flex justify="center" style={{width: '100%'}}>
-                                        <p className='h6'>อื่นๆอีก 17 สไตล์</p>
-                                    </Flex>
-                                    
+                                <div className='allstyle'>
+
+                                    <p className='h6'>อื่นๆอีก 17 สไตล์</p>
+
                                 </div>
                             </Flex>
 
@@ -84,12 +80,12 @@ export default function Welcome() {
                             <div className="icon">
                                 <img src="./images/cms-meanning.svg"></img>
                             </div>
-                            
+
                             <h2 className="h1">art commission คืออะไร</h2>
                             <p>art commission คือ การจ้างนักวาดให้สร้างผลงานศิลปะตามคำร้องของผู้จ้าง ไม่ใช่การซื้อผลงานที่นักวาดสร้างขึ้นก่อนแล้ว โดยเรื่องราคาจะขึ้นอยู่กับรายละเอียดของงานและจุดประสงค์การใช้ โดยประเภทของสิทธิ์ต่างๆมีดังนี้</p>
                             <p>Personal use : ใช้ส่วนตัว ไม่สามารถใช้เชิงพาณิชย์ได้,License : สามารถนำไปทำบางอย่างได้ เช่น ใช้ในเชิงพาณิชย์ ทั้งนี้ทั้งนั้นขึ้นอยู่กับข้อตกลงว่าสามารถทำอะไรได้บ้าง,Exclusive right : สามารถนำผลงานไปทำอะไรก็ได้ อาทิ การนำไปดัดแปลง ขายต่อ เป็นต้น ลิขสิทธิ์อยู่ที่ผู้ซื้อ แต่นักวาดยังมีเครดิตในผลงานอยู่</p>
                             <div className='cms-img'>
-                                <img src='./images/รูปหน้าhome.png' alt='รูป art commission คืออะไร' style={{objectFit:'contain',width:"100%",height:"100%"}}/>
+                                <img src='./images/รูปหน้าhome.png' alt='รูป art commission คืออะไร' style={{ objectFit: 'contain', width: "100%", height: "100%" }} />
                             </div>
                         </div>
                     </div>

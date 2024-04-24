@@ -104,7 +104,10 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
               pay = payData.allprice / 2
               setQrCode(generatePayload(payData.urs_promptpay_number, { pay }));
             } else {
+              //ถ้าจ่ายครั้งแรกแล้ว แต่ยังไม่จ่ายครั้งสุดท้าย = โหลดสลิปเดิม
               //ถ้าจ่ายครั้งแรกแล้ว ให้เอาราคาทั้งหมดไปรวมกันเลย
+
+              
               payPrice.current = payData?.allprice - payData.od_first_pay
               pay = payData.allprice - payData.od_first_pay
               setQrCode(generatePayload(payData.urs_promptpay_number, { pay }));
@@ -540,7 +543,16 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
         await updateOrder({
           step_id: currentStepId.current,
         })
-        Swal.fire("ยอมรับคำขอจ้างนี้แล้ว", "", "success");
+
+        Swal.fire({
+          icon: "success",
+          title: `ยอมรับคำขอจ้างนี้แล้ว`,
+          timer: 1500,
+          showConfirmButton: false,
+        })
+        // Swal.fire(
+        //   "ยอมรับคำขอจ้างนี้แล้ว", "", "success"
+        // );
         //msgid ไม่มีแล้ว
 
       }
@@ -593,7 +605,12 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           }
         ).then((response) => {
           if (response.data.status == 'success') {
-            Swal.fire("ยกเลิกคำขอจ้างนี้แล้ว", "", "success")
+            Swal.fire({
+              icon: "success",
+              title: `ยกเลิกคำขอจ้างนี้แล้ว`,
+              timer: 1500,
+              showConfirmButton: false,
+            })
           }
         })
       }
@@ -650,7 +667,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           }
         ).then((response) => {
           if (response.data.status == 'success') {
-            Swal.fire("ยกเลิกคำขอจ้างนี้แล้ว", "", "success")
+            
+            Swal.fire({
+              icon: "success",
+              title: `ยกเลิกคำขอจ้างนี้แล้ว`,
+              timer: 1500,
+              showConfirmButton: false,
+            })
           }
         })
       }
@@ -751,6 +774,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
         }
       }
 
+      //บันทึกจากตรงนี้
       else if (nextStep.includes("แนบสลิป2")) {
         try {
           await axios.post(`${host}/messages/addmsg`, {
@@ -771,10 +795,16 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             od_id: chat_order_id,
             nowCurId: currentStepId.current
           })
-          Swal.fire("อนุมัติภาพแล้ว", "", "success");
+          Swal.fire({
+            icon: "success",
+            title: `อนุมัติภาพแล้ว`,
+            timer: 1500,
+            showConfirmButton: false,
+          })
+          // Swal.fire("อนุมัติภาพแล้ว", "", "success");
         } catch (error) {
         }
-      }
+      } 
 
     });
   }
@@ -818,7 +848,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
           socket.emit('edit_Progress', edit_Progress);
           axios.post(`${host}/noti/progress/edit`, edit_Progress);
 
-          Swal.fire("แจ้งแก้ไขภาพแล้ว", "", "success");
+          // Swal.fire("แจ้งแก้ไขภาพแล้ว", "", "success");
+          Swal.fire({
+            icon: "success",
+            title: `แจ้งแก้ไขภาพแล้ว`,
+            timer: 1500,
+            showConfirmButton: false,
+          })
           await axios.post(
             `${host}/messages/updatestep`,
             {
@@ -847,7 +883,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             current.filter((msg) => msg.msgId != msgid)
           )
           changeCheckTo1Ui(msgid)
-          Swal.fire("ลบภาพแล้ว", "", "success");
+          // Swal.fire("ลบภาพแล้ว", "", "success");
+          Swal.fire({
+            icon: "success",
+            title: `ลบภาพแล้ว`,
+            timer: 1500,
+            showConfirmButton: false,
+          })
           const result = await axios.post(
             `${host}/messages/updatestep`,
             {
@@ -920,9 +962,21 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             //--ตั้งราคาสำเร็จและอัปเดตทุกอย่างแล้ว---
             await sendQrCode()
 
-            Swal.fire("ตั้งราคาแล้ว", "", "success");
+            // Swal.fire("ตั้งราคาแล้ว", "", "success");
+            Swal.fire({
+              icon: "success",
+              title: `ตั้งราคาแล้ว`,
+              timer: 1500,
+              showConfirmButton: false,
+            })
           } catch (error) {
-            Swal.fire("ไม่สามารถตั้งราคาได้ กรุณาลองใหม่อีกครั้ง", "", "error");
+            // Swal.fire("ไม่สามารถตั้งราคาได้ กรุณาลองใหม่อีกครั้ง", "", "error");
+            Swal.fire({
+              icon: "error",
+              title: `ไม่สามารถตั้งราคาได้ กรุณาลองใหม่อีกครั้ง`,
+              timer: 1500,
+              showConfirmButton: false,
+            })
           }
         }
       });
@@ -1039,7 +1093,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                   nowCurId: currentStepId.current
                 })
                 ModalToggle()
-                Swal.fire("อัปโหลดสลิปแล้ว", "", "success")
+                // Swal.fire("อัปโหลดสลิปแล้ว", "", "success")
+                Swal.fire({
+                  icon: "success",
+                  title: `อัปโหลดสลิปแล้ว`,
+                  timer: 1500,
+                  showConfirmButton: false,
+                })
               } else {
                 console.log('อัปโหลดภาพไม่สำเร็จ');
               }
@@ -1205,7 +1265,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
               }
             )
           }
-          Swal.fire("ยอมรับสลิปแล้ว", "", "success");
+          // Swal.fire("ยอมรับสลิปแล้ว", "", "success");
+          Swal.fire({
+            icon: "success",
+            title: `ยอมรับสลิปแล้ว`,
+            timer: 1500,
+            showConfirmButton: false,
+          })
         }
       });
   }
@@ -1258,7 +1324,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             nowCurId: currentStepId.current
           })
           await sendQrCode()
-          Swal.fire("ยกเลิกสลิปแล้ว", "", "success");
+          // Swal.fire("ยกเลิกสลิปแล้ว", "", "success");
+          Swal.fire({
+            icon: "success",
+            title: `ยกเลิกสลิปแล้ว`,
+            timer: 1500,
+            showConfirmButton: false,
+          })
         }
       });
   }
@@ -1474,7 +1546,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                     created_at: currentDate
                   },
                 ]);
-                Swal.fire("ส่งภาพแล้ว", "", "success");
+                // Swal.fire("ส่งภาพแล้ว", "", "success");
+                Swal.fire({
+                  icon: "success",
+                  title: `ส่งภาพแล้ว`,
+                  timer: 1500,
+                  showConfirmButton: false,
+                })
 
                 // ส่งแจ้งเตือน
                 const progress_step = {
@@ -1587,7 +1665,13 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
             return { ...item, old_tou: touValue, old_tou_name: newTouName }
           }),
           setAllTou(newold),
-          Swal.fire("เปลี่ยนแปลงออเดอร์แล้ว", "", "success")
+          // Swal.fire("เปลี่ยนแปลงออเดอร์แล้ว", "", "success")
+          Swal.fire({
+            icon: "success",
+            title: `เปลี่ยนแปลงออเดอร์แล้ว`,
+            timer: 1500,
+            showConfirmButton: false,
+          })
         )
 
 
@@ -1902,10 +1986,10 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
 
         <div className="chat">
           {messages.map((message, index) => {
-            let thisDate = new Date(message.last_message_time)
+            let thisDate = new Date(message.created_at)
             if (index == 0) {
               //ตั้งวันที่ตั้งต้นของ row แรก
-              nowDate = message.last_message_time
+              nowDate = message.created_at
             }
 
             if (isSameDay(thisDate, new Date(nowDate)) && firstRowofDay) {
@@ -1918,7 +2002,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
               firstRowofDay = false
             } else {
               //กลายเป็นวันใหม่แล้วและเป็นแถวแรก
-              nowDate = message.last_message_time
+              nowDate = message.created_at
               showDate = true
               firstRowofDay = false
             }
@@ -1949,6 +2033,7 @@ export default function ChatContainer({ currentChat, updateMessages  }) {
                     <Flex ref={scrollRef} justify="center" key={message.msgId}>
                       <OrderSystemMsg
                         orderDetail={orderDetail}
+                        messages={messages}
                         message={message}
                         acceptRequest={acceptRequest} cancelRequest={cancelRequest}
                         approveProgress={approveProgress} editProgress={editProgress} delProgress={delProgress}

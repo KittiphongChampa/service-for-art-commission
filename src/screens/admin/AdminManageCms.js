@@ -94,11 +94,11 @@ export default function AdminManageCms() {
           <table className="table is-striped is-fullwidth">
             <thead>
               <tr>
-                <th>cmsID</th>
-                <th>Commission Name</th>
-                <th>userID</th>
-                <th>userName</th>
-                <th>DateTime</th>
+                <th>คอมมิชชันไอดี</th>
+                <th>ชื่อคอมมิชชัน</th>
+                <th>ไอดีผู้ใช้งาน</th>
+                <th>ชื่อผู้ใช้</th>
+                <th>เวลา</th>
                 <th>Action</th>
               </tr>
             </thead>

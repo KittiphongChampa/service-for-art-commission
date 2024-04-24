@@ -125,19 +125,21 @@ export default function MyReq() {
                 }
             )
             // console.log(allData.data)
+            console.log()
             setAllData(allData.data)
             setFilteredData(allData.data)
+            console.log(allData.data)
 
             const array0 = allData.data
-            setCountAll(array0.length == 0 ? '0' : array0.length)
+            setCountAll(array0.length)
             const array1 = allData.data.filter(data => data?.step_name?.includes('รับคำขอจ้าง') && data?.od_cancel_by == null)
-            setCountWait(array1.length == 0 ? '0' : array1.length)
+            setCountWait(array1.length)
             const array3 = allData.data.filter(data => data?.od_cancel_by != null)
-            setCountCancel(array3.length == 0 ? '0' : array3.length)
+            setCountCancel(array3.length)
             const array4 = allData.data.filter(data => data?.finished_at != null)
-            setCountFinish(array4.length == 0 ? '0' : array4.length)
+            setCountFinish(array4.length)
             const array5 = allData.data.filter(data => data?.finished_at != null && data?.od_cancel_by != null)
-            setCountAccepted(array5.length == 0 ? '0' : array5.length)
+            setCountAccepted(array5.length)
 
             // console.log(array3.length)
         }
@@ -369,7 +371,7 @@ export default function MyReq() {
                             )}
                         </table>
 
-                        <Pagination
+                        <Pagination hideOnSinglePage
                             total={filteredData == undefined ? 0 : filteredData.length}
                             showQuickJumper
                             showTotal={(total) => `จำนวน ${total} รายการ`}

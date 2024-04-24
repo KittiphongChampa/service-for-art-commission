@@ -106,7 +106,7 @@ export default function ManageArtwork() {
 
 
     const [imageId, setImageId] = useState();
-    const [imageUrl, setImageUrl] = useState();
+    const [imageUrl, setImageUrl] = useState(null);
     const [fileList, setFileList] = useState([]);
     const handleChange = (info) => {
         console.log(info.fileList[info.fileList.length - 1].size / 1024 / 1024)
@@ -243,7 +243,7 @@ export default function ManageArtwork() {
                                         },
                                         ({ }) => ({
                                             validator(_, value) {
-                                                if (fileList.length == 0) {
+                                                if (fileList.length == 0 && imageUrl == null) {
                                                     return Promise.reject(new Error('กรุณาแนบไฟล์ภาพ'));
                                                 } else {
                                                     return Promise.resolve();
