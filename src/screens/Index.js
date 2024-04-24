@@ -492,7 +492,7 @@ function Commissions({ IFollowingIDs }) {
           </Flex>
         )}
 
-        <Pagination
+        <Pagination hideOnSinglePage
           total={commission == undefined ? 0 : commission?.length}
           showQuickJumper
           showTotal={(total) => `จำนวน ${total} รายการ`}
@@ -557,20 +557,20 @@ function Explore({ type, isLoggedIn, cmsLatests, cmsArtists, IFollowerData, gall
       >
         {
           cmsLatests.length != 0 ?
-          (cmsLatests.map(cmsLatest => (
-            <SwiperSlide key={cmsLatest.cms_id}>
-              <Link to={`/cmsdetail/${cmsLatest.cms_id}`} >
-                <CmsItem 
-                  src={cmsLatest.ex_img_path} 
-                  headding={cmsLatest.cms_name} 
-                  price={cmsLatest.pkg_min_price} 
-                  desc={cmsLatest.cms_desc} 
-                  cms_all_review={cmsLatest.cms_all_review} 
-                  total_reviews={cmsLatest.total_reviews} 
-                  status={cmsLatest.cms_status} />
-              </Link>
-            </SwiperSlide>
-          ))) : <p>ยังไม่มีคอมมิชชัน</p>
+            (cmsLatests.map(cmsLatest => (
+              <SwiperSlide key={cmsLatest.cms_id}>
+                <Link to={`/cmsdetail/${cmsLatest.cms_id}`} >
+                  <CmsItem
+                    src={cmsLatest.ex_img_path}
+                    headding={cmsLatest.cms_name}
+                    price={cmsLatest.pkg_min_price}
+                    desc={cmsLatest.cms_desc}
+                    cms_all_review={cmsLatest.cms_all_review}
+                    total_reviews={cmsLatest.total_reviews}
+                    status={cmsLatest.cms_status} />
+                </Link>
+              </SwiperSlide>
+            ))) : <p>ยังไม่มีคอมมิชชัน</p>
         }
       </Swiper >
 
@@ -878,9 +878,9 @@ function Gallery({ IFollowingIDs }) {
             <div className="artwork">
               <Link key={data.artw_id} to={`/artworkdetail/${data.artw_id}`}>
                 <img src={data.ex_img_path} />
-                </Link>
-              </div>
-            
+              </Link>
+            </div>
+
           )))}
         </div>
       ) : (
@@ -1176,7 +1176,7 @@ function SearchCommission({ cms_SearchResult, search }) {
           </Flex>
         )}
 
-        {/* <Pagination
+        {/* <Pagination hideOnSinglePage
           total={commission == undefined ? 0 : commission?.length}
           showQuickJumper
           showTotal={(total) => `จำนวน ${total} รายการ`}
@@ -1208,8 +1208,8 @@ function SearchArtwork({ art_SearchResult, search }) {
               <div className="artwork">
                 <Link key={data.artw_id} to={`/artworkdetail/${data.artw_id}`}>
                   <img src={data.ex_img_path} />
-                  </Link>
-                </div>
+                </Link>
+              </div>
             )))}
           </div>
         ) : (
@@ -1222,7 +1222,7 @@ function SearchArtwork({ art_SearchResult, search }) {
           </Flex>
         )}
 
-        {/* <Pagination
+        {/* <Pagination hideOnSinglePage
           total={commission == undefined ? 0 : commission?.length}
           showQuickJumper
           showTotal={(total) => `จำนวน ${total} รายการ`}
@@ -1266,7 +1266,7 @@ function SearchArtist({ user_SearchResult, search }) {
           </Flex>
         )}
 
-        {/* <Pagination
+        {/* <Pagination hideOnSinglePage
           total={commission == undefined ? 0 : commission?.length}
           showQuickJumper
           showTotal={(total) => `จำนวน ${total} รายการ`}

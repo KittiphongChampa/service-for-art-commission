@@ -115,7 +115,7 @@ export default function AdminManageCmsProblem() {
           sender_img: admindata.admin_profile,
           receiver_id: problemCmsData.id,
           work_id: problemCmsData.cms_id,
-          msg: `คอมมิชชกันของคุณใช้งานได้แล้ว เนื่องจากแอดมินตรวจสอบแล้วพบว่าไม่มีความคล้าย`,
+          msg: `คอมมิชชันของคุณใช้งานได้แล้ว เนื่องจากแอดมินตรวจสอบแล้วพบว่าไม่มีความคล้าย`,
         };
         socket.emit("ManageCmsSimilar", keepSimilar);
         axios.post(`${host}/admin/keep/work/noti`, keepSimilar);
@@ -321,7 +321,7 @@ export default function AdminManageCmsProblem() {
               {/* Use problemPics?.map() to map each item to a <Tabs.TabPane> */}
               {problemPics?.map((item, index) => (
                 <Tabs.TabPane key={index} tab={"รูป id: " + item.ex_img_id}>
-                  <Flex style={{ gap: "0.5rem", marginBottom: "1rem" }}>
+                  <Flex style={{ gap: "0.5rem", marginBottom: "1rem" }} className='similar-headding1'>
                     <p className="h4" style={{ flex: "1" }}>
                       รูปภาพที่เป็นปัญหา
                     </p>
@@ -330,6 +330,9 @@ export default function AdminManageCmsProblem() {
                     </p>
                   </Flex>
                   <div className="sim-container">
+                    <p className="h4 similar-headding2">
+                      รูปภาพที่เป็นปัญหา
+                    </p>
                     <Card className="problem-pic-container">
                       <div className="cms-artist-box">
                         <Link to={`/profile/${problemCmsData.id}`}>
@@ -351,7 +354,6 @@ export default function AdminManageCmsProblem() {
                           โพสต์เมื่อ {formatDate(problemCmsData.created_at)}
                         </p>
                       </div>
-
                       <div className="pic">
                         <Image
                           src={problemPics[selectedKey]?.ex_img_path}
@@ -375,7 +377,7 @@ export default function AdminManageCmsProblem() {
                           size="large"
                           onClick={() => keep(cmsID.id)}
                         >
-                          อนุมัติ
+                          อนุมัติคอมมิชชัน
                         </Button>
                         <Button
                           shape="round"
@@ -383,11 +385,14 @@ export default function AdminManageCmsProblem() {
                           danger
                           onClick={openDelModal}
                         >
-                          ไม่อนุมัติ
+                          ไม่อนุมัติคอมมิชชัน
                         </Button>
                       </Flex>
                     </Card>
                     <div className="sim-pic-container">
+                      <p className="h4 similar-headding2">
+                        รูปภาพที่เหมือน
+                      </p>
                       {problemPics[selectedKey]?.image_similar.map((item,index)=>{
                         return <Card className="pic-box" key={index}>
                         <div className="cms-artist-box">

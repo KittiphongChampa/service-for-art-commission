@@ -146,7 +146,8 @@ export default function Verify() {
                             title: 'ส่ง otp ล้มเหลว',
                             icon: 'error',
                             iconColor: 'red',
-                            confirmButtonText: 'ตกลง'
+                            timer: 1500,
+                            showConfirmButton: false,
                         })
                     }
                 })

@@ -20,7 +20,7 @@ import ProfileImg from "../../components/ProfileImg.js";
 import Lottie from "lottie-react";
 // import loading from "../../loading.json";
 import * as Icon from "react-feather";
-import { Typography, Button, Input } from "antd";
+import { Typography, Button, Input, Flex } from "antd";
 import { AdminBox, UserBox } from "../../components/UserBox";
 import { useAuth } from "../../context/AuthContext";
 import { host } from "../../utils/api.js";
@@ -243,7 +243,7 @@ export default function AdminManageAdmin(props) {
 
       <div className="all-user-head">
         <h2 className="h3">รายชื่อแอดมิน ({admins.length})</h2>
-        <div>
+        <Flex gap="small">
         {admindata.admin_type === 0 ? (
           <Button
             onClick={handleClick}
@@ -260,7 +260,7 @@ export default function AdminManageAdmin(props) {
             onChange={handleSearch}
             placeholder=" ค้นหา..."
           />
-        </div>
+        </Flex>
       </div>
       <div className="user-item-area">
         {filteredUser.map((item, index) => (

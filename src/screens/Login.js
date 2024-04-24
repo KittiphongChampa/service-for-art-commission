@@ -92,7 +92,10 @@ export default function Login() {
                         required: true,
                         message: "กรุณากรอกอีเมล",
                       },
-                      { type: "email" },
+                      {
+                        type: "email",
+                        message: "กรุณากรอกอีเมล"
+                      },
                     ]}
                   >
                     <Input />

@@ -223,15 +223,10 @@ export default function Profile() {
 
   const menus = [
     {
-      key: "5",
+      key: "1",
       label: "กำลังติดตาม",
       children: <Followings IFollowerData={IFollowerData} />,
     },
-    // {
-    //   key: "1",
-    //   label: "ผู้ติดตาม",
-    //   children: <Followers myFollowerData={myFollowerData} />,
-    // },
   ];
 
   function changeMenu() { }

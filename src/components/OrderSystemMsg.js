@@ -20,7 +20,7 @@ const getBase64 = (img, callback) => {
     reader.readAsDataURL(img);
 };
 
-export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
+export default function OrderSystemMsg({ messages, curStepId, sendReview, cancelRequest, orderDetail, phoneNumber, amount, accName, qrCode, handleBrief, message, acceptRequest, approveProgress, setPrice, submitSlip, approveSlip, rejectSlip, editProgress, delProgress, myId, scrollRef }) {
     // console.log(orderDetail);
     // const flexSysDialog = { width: "50%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
     // const flexSysDialogWip = { width: "80%", alignSelf: "center", margin: "1rem 0", borderRadius: "1rem", padding: "1rem", boxShadow: "rgb(133 126 139 / 0%) 0px 2px 6px 0px, rgb(188 187 193 / 10%) 0px 1px 11px 0px, rgb(195 196 207 / 5%) 0px 7px 28px 8px", backgroundColor: " white" }
@@ -86,24 +86,24 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
     }
 
     const submitReview = async (values) => {
-                await axios.post(
-                    `${host}/sendreview`,
-                    {
-                        od_id: orderDetail.od_id,
-                        rw_comment: values.comment,
-                        rw_score: reviewValue,
-                        cms_id: orderDetail.cms_id,
-                        artist_id: orderDetail.artist_id,
-                        all: orderDetail
-                    }
-                ).then((response) => {
-                    const data = response.data
-                    if (data.status == "ok") {
-                        ReviewModalHandle()
-                        Swal.fire("รีวิวสำเร็จแล้ว", "", "success");
-                    }
-                })
-                sendReview(ReviewModalHandle)
+        await axios.post(
+            `${host}/sendreview`,
+            {
+                od_id: orderDetail.od_id,
+                rw_comment: values.comment,
+                rw_score: reviewValue,
+                cms_id: orderDetail.cms_id,
+                artist_id: orderDetail.artist_id,
+                all: orderDetail
+            }
+        ).then((response) => {
+            const data = response.data
+            if (data.status == "ok") {
+                ReviewModalHandle()
+                Swal.fire("รีวิวสำเร็จแล้ว", "", "success");
+            }
+        })
+        sendReview(ReviewModalHandle)
 
     };
 
@@ -141,7 +141,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
         if (!isLt2M) {
             msgAntd.error('ขนาดของรูปภาพต้องไม่เกิน 5 MB');
         }
-        return isJpgOrPng && isLt2M ;
+        return isJpgOrPng && isLt2M;
     };
 
     const handleChange = (info) => {
@@ -154,7 +154,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
             });
             // ModalToggle()
         }
-        
+
 
     };
 
@@ -168,6 +168,27 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
 
     // -------------------------------------------------------------------
 
+
+    function findFinalPic() {
+        const newArray = messages.reverse();
+        let finalSrc;
+        // newArray.map((msg) => {
+        //     if (msg?.step_name?.includes('ไฟนัล')) {
+        //         finalSrc = msg.img
+        //         return false; //หยุดการทำงาน
+        //     }
+        //     console.log(msg)
+        // })
+
+        for (let i = 0; i < newArray.length; i++) {
+            if (newArray[i].step_name?.includes('ไฟนัล')) {
+                finalSrc = newArray[i].img
+                break;
+            }
+            console.log(newArray[i])
+        }
+        return finalSrc;
+    }
 
 
 
@@ -401,7 +422,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                                     : <p>ดำเนินการแล้ว</p>
                                 : message.checked == 0 ? <>
                                     <Flex wrap='wrap' justify='flex-start' gap="middle" vertical style={{ width: "100%" }}>
-                                        <p><InfoCircleOutlined /> รอลูกค้าตรวจสอบว่าต้องการอนุมัติหรือแก้ไขภาพ ({orderDetail.od_number_of_edit}/{orderDetail.pkg_edits})</p>
+                                        {/* <p><InfoCircleOutlined /> รอลูกค้าตรวจสอบว่าต้องการอนุมัติหรือแก้ไขภาพ ({orderDetail.od_number_of_edit}/{orderDetail.pkg_edits})</p> */}
                                         <Flex wrap='wrap' justify='center'>
                                             <Button size="large" shape="round" onClick={() => delProgress(message.step_id, message.step_name, message.msgId)} style={{ width: "fit-content" }} danger icon={<DeleteOutlined />}></Button>
                                         </Flex>
@@ -427,17 +448,25 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
             {message?.step_name == "รีวิว" &&
                 <>
                     <Flex wrap='wrap' key={message.index} gap="small" justify="center" align="center" vertical className="sys-dialog">
+
                         <p className='time-sent'>{new Date(message.created_at).toLocaleString("th-TH", {
                             hour: "2-digit",
                             minute: "2-digit",
                         })} น.</p>
-                    {orderDetail.artist_id == myId ? <p>งานคอมมิชชันเสร็จสิ้นแล้ว รอลูกค้ารีวิว</p> :
-                        <p>งานคอมมิชชันเสร็จสิ้นแล้ว ดาวน์โหลดภาพไฟนัลได้ที่นี่</p>}
+                        {orderDetail.artist_id == myId ? <p>งานคอมมิชชันเสร็จสิ้นแล้ว รอลูกค้ารีวิว</p> :
+                            <>
+                                <p>งานคอมมิชชันเสร็จสิ้นแล้ว</p>
+                                <p><a href={findFinalPic()} download style={{}}><Button type="link">
+                                    ดาวน์โหลดภาพไฟนัลได้ที่นี่
+                                </Button></a></p>
+                            </>
+
+                        }
                         {/* <p><u>ลิ้งโหลดงาน</u></p> */}
 
                         {orderDetail.artist_id !== myId ?
                             message.checked == 0 ?
-                            <>
+                                <>
                                     <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
                                 </>
                                 : <p>รีวิวแล้ว</p>
@@ -476,9 +505,7 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                                     <Button size="large" type="link" shape="round">
                                         <Flex align='center' gap='small'>
                                             ดาวน์โหลดรูปภาพไฟนัล<Icon.Download />
-
                                         </Flex>
-
                                     </Button>
                                     <Button size="large" type="primary" shape="round" onClick={ReviewModalHandle} >รีวิว</Button>
                                 </>
@@ -510,15 +537,15 @@ export default function OrderSystemMsg({ curStepId, sendReview, cancelRequest, o
                             beforeUpload={beforeUpload}
                             onChange={handleChange}
                             fileList={fileList}
-                            >
+                        >
                             {imageUrl ? (
                                 <img
-                                src={imageUrl}
-                                alt="avatar"
-                                style={{
-                                    width: '100%',
-                                    objectFit: "cover"
-                                }}
+                                    src={imageUrl}
+                                    alt="avatar"
+                                    style={{
+                                        width: '100%',
+                                        objectFit: "cover"
+                                    }}
                                 />
                             ) : (
                                 uploadButton

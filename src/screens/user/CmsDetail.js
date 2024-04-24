@@ -197,11 +197,12 @@ export default function CmsDetail() {
           if (cmsDetail.cms_status == 'open') {
             newStatus = 'ปิด'
           }
-          Swal.fire({
-            icon: "success",
-            title: `${newStatus}คอมมิชชันแล้ว`,
-            confirmButtonText: 'ตกลง',
-          })
+          // Swal.fire({
+          //   icon: "success",
+          //   title: `${newStatus}คอมมิชชันแล้ว`,
+          //   timer: 1500,
+          //   showConfirmButton: false,
+          // })
           window.location.reload()
 
         }
@@ -298,7 +299,8 @@ export default function CmsDetail() {
                     Swal.fire({
                       icon: "success",
                       title: "ส่งคำขอจ้างสำเร็จ",
-                      confirmButtonText: 'ตกลง',
+                      timer: 1500,
+                      showConfirmButton: false,
                     }).then(() => {
                       window.location.href = `/chatbox?id=${artistDetail.artistId}&od_id=${od_id}`;
                     });
@@ -308,6 +310,8 @@ export default function CmsDetail() {
                 Swal.fire({
                   icon: "error",
                   title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
+                  timer: 1500,
+                  showConfirmButton: false,
                 });
               }
             })
@@ -315,11 +319,15 @@ export default function CmsDetail() {
           Swal.fire({
             icon: "error",
             title: "คอมมิชชันรับออเดอร์เต็มแล้ว",
+            timer: 1500,
+            showConfirmButton: false,
           });
         } else {
           Swal.fire({
             icon: "error",
             title: "เกิดข้อผิดพลาด กรุณาลองใหม่",
+            timer: 1500,
+            showConfirmButton: false,
           });
         }
       });
@@ -368,11 +376,21 @@ export default function CmsDetail() {
         axios.patch(`${host}/commission/delete/${cmsID.id}`).then((response) => {
           const data = response.data;
           if (data.status === 'ok') {
-            Swal.fire("ลบคอมมิชชันนี้แล้ว", "", "success").then(() => {
+            Swal.fire({
+              icon: "success",
+              title: `ลบคอมมิชชันนี้แล้ว`,
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
               window.location.href = "/";
             });
           } else {
-            Swal.fire("เกิดข้อผิดพลาดกรุณาลองใหม่", "", "error").then(() => {
+            Swal.fire({
+              icon: "error",
+              title: `เกิดข้อผิดพลาดกรุณาลองใหม่`,
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
               window.location.reload(false);
             });
           }
@@ -419,7 +437,9 @@ export default function CmsDetail() {
           if (response.status === 200) {
             Swal.fire({
               title: "รายงานสำเร็จ",
-              icon: "success"
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
             }).then(() => {
               window.location.reload(false);
             });
@@ -430,7 +450,9 @@ export default function CmsDetail() {
       } else {
         Swal.fire({
           title: "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่",
-          icon: "error"
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
         }).then(() => {
           window.location.reload(false);
         });
@@ -490,14 +512,18 @@ export default function CmsDetail() {
       if (data.status === "ok") {
         Swal.fire({
           title: "บันทึกสำเร็จ",
-          icon: "success"
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
         }).then(() => {
           window.location.reload(false);
         });
       } else {
         Swal.fire({
           title: "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่",
-          icon: "error"
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
         }).then(() => {
           window.location.reload(false);
         });

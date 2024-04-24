@@ -119,14 +119,14 @@ function AdminBox(props) {
                 axios .patch(`${host}/alladmin/delete/${id}`).then((response) => {
                     const data = response.data;
                     if (data.status === "ok") {
-                        Swal.fire('ลบแล้ววว!', '', 'success').then(() => {
+                        Swal.fire('ลบแอดมินสำเร็จ!', '', 'success').then(() => {
                             window.location.reload(false);
                         });
                         // Swal.fire({ ...alertData.deladminSuccess }).then(() => {
                         //     window.location.reload(false);
                         // });
                     } else {
-                        Swal.fire('ลบไม่ได้!', '', 'error')
+                        Swal.fire('ไม่สามารถลบแอดมินได้ กรุณาลองใหม่อีกครั้ง', '', 'error')
                     }
                     
                 })

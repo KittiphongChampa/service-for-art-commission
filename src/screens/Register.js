@@ -235,7 +235,7 @@ export default function SignUp() {
       
       `,
       allowOutsideClick:false,
-      confirmButtonText: "ไปตั้งค่าโปรไฟล์",
+      confirmButtonText: "ไปที่การตั้งค่า",
       showDenyButton: true,
       denyButtonText: `สำรวจเว็บไซต์ก่อน`,
       //iconColor: '#7E9AFA',
